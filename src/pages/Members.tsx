@@ -601,4 +601,169 @@ function CreateTeamDialog({
   );
 }
 
+function MemberRowActions({
+  member,
+  teams,
+  onUpdate,
+  onRemove,
+}: {
+  member: Member;
+  teams: Team[];
+  onUpdate: (
+    id: string,
+    updates: { role: MemberRole; teamId?: string; department: string; makeLead: boolean },
+  ) => void;
+  onRemove: (id: string) => void;
+}) {
+  const [editOpen, setEditOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
+  const [role, setRole] = useState<MemberRole>(member.role);
+  const [teamId, setTeamId] = useState<string>(member.teamId ?? "none");
+  const [department, setDepartment] = useState(member.department);
+  const [makeLead, setMakeLead] = useState(false);
+
+  const openEdit = () => {
+    setRole(member.role);
+    setTeamId(member.teamId ?? "none");
+    setDepartment(member.department);
+    setMakeLead(teams.find((t) => t.id === member.teamId)?.leadId === member.id);
+    setEditOpen(true);
+  };
+
+  const submit = () => {
+    onUpdate(member.id, {
+      role,
+      teamId: teamId === "none" ? undefined : teamId,
+      department,
+      makeLead: teamId !== "none" && makeLead,
+    });
+    setEditOpen(false);
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label={`Actions for ${member.name}`}>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem onClick={openEdit}>
+            <Pencil className="mr-2 h-4 w-4" /> Edit member
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setRemoveOpen(true)}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Remove member
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit {member.name}</DialogTitle>
+            <DialogDescription>
+              Update this member's role, team, and department.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Role</Label>
+              <Select value={role} onValueChange={(v) => setRole(v as MemberRole)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="accountant">Accountant</SelectItem>
+                  <SelectItem value="external_auditor">External Auditor</SelectItem>
+                  <SelectItem value="team_member">Team Member</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Team</Label>
+              <Select value={teamId} onValueChange={setTeamId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select team" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No team</SelectItem>
+                  {teams.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {teamId !== "none" && (
+              <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-3">
+                <input
+                  type="checkbox"
+                  checked={makeLead}
+                  onChange={(e) => setMakeLead(e.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                />
+                <div>
+                  <p className="text-sm font-medium">Make team lead</p>
+                  <p className="text-xs text-muted-foreground">
+                    Replaces the current lead of this team.
+                  </p>
+                </div>
+              </label>
+            )}
+            <div className="space-y-1.5">
+              <Label>Department</Label>
+              <Input
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                placeholder="Sales"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Permissions for each role are configured in{" "}
+              <span className="font-medium text-foreground">Settings → Roles & Permissions</span>.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submit} className="gap-2">
+              <Save className="h-4 w-4" /> Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {member.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              They'll lose access to the workspace and any active cards will be frozen. This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onRemove(member.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Remove member
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
 export default Members;
+
