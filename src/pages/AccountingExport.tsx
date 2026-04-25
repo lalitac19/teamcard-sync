@@ -102,8 +102,11 @@ const AccountingExport = () => {
 
 /* ---------- Tab 1: Card transactions ---------- */
 function CardTxnsTab() {
+  const postedTxns = transactions.filter((t) => t.status === "posted");
+  const pendingCount = transactions.filter((t) => t.status === "pending").length;
+
   const [rows, setRows] = useState(
-    transactions.map((t) => ({ ...t, selected: false, debitAccount: undefined as string | undefined, vatRate: undefined as string | undefined })),
+    postedTxns.map((t) => ({ ...t, selected: false, debitAccount: undefined as string | undefined, vatRate: undefined as string | undefined })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
   const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
@@ -113,6 +116,11 @@ function CardTxnsTab() {
 
   return (
     <>
+      {pendingCount > 0 && (
+        <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm">
+          <span className="font-medium">{pendingCount} card transaction{pendingCount > 1 ? "s" : ""}</span> pending settlement — they'll appear here once posted.
+        </div>
+      )}
       <AccountingHeader
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} transactions to QuickBooks`)}
