@@ -11,6 +11,7 @@ import Wallet from "./pages/Wallet.tsx";
 import AccountingExport from "./pages/AccountingExport.tsx";
 import Reimbursements from "./pages/Reimbursements.tsx";
 import Invoices from "./pages/Invoices.tsx";
+import Approvals from "./pages/Approvals.tsx";
 import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/reimbursements" element={<Reimbursements />} />
           <Route path="/invoices" element={<Invoices />} />
+          <Route path="/approvals" element={<Approvals />} />
           <Route path="/accounting" element={<AccountingExport />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
