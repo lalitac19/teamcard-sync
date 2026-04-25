@@ -8,6 +8,8 @@ import {
   FileSpreadsheet,
   Settings,
   Zap,
+  HandCoins,
+  FileText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,6 +31,11 @@ const mainItems = [
   { title: "Members", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
   { title: "Wallet", url: "/wallet", icon: Wallet },
+];
+
+const approvalItems = [
+  { title: "Out-of-Pocket", url: "/reimbursements", icon: HandCoins },
+  { title: "Invoices", url: "/invoices", icon: FileText },
 ];
 
 const accountingItems = [
@@ -77,6 +84,24 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end={item.url === "/"} className={linkCls(isActive(item.url))}>
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-4">
+          {!collapsed && <SidebarGroupLabel className="text-sidebar-foreground/60">Approvals</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {approvalItems.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} className={linkCls(isActive(item.url))}>
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
