@@ -3,16 +3,105 @@
 export type CardType = "virtual" | "physical" | "single-use";
 export type CardStatus = "active" | "frozen" | "expired";
 
+export type MemberRole = "admin" | "accountant" | "external_auditor" | "team_member";
+
 export interface Member {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "manager" | "employee";
+  role: MemberRole;
   department: string;
   avatar: string;
   kycStatus: "verified" | "pending" | "not_started";
   joinedAt: string;
+  teamId?: string;
 }
+
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  leadId: string;
+  memberIds: string[];
+  createdAt: string;
+}
+
+export interface RolePermissions {
+  role: MemberRole | "team_lead";
+  label: string;
+  description: string;
+  permissions: Record<string, boolean>;
+}
+
+export const permissionCatalog: { key: string; label: string; group: string }[] = [
+  { key: "view_dashboard", label: "View dashboard", group: "General" },
+  { key: "manage_members", label: "Invite & remove members", group: "Members" },
+  { key: "assign_roles", label: "Assign roles to members", group: "Members" },
+  { key: "manage_teams", label: "Create & edit teams", group: "Members" },
+  { key: "issue_cards", label: "Issue new cards", group: "Cards" },
+  { key: "freeze_cards", label: "Freeze / unfreeze cards", group: "Cards" },
+  { key: "set_card_limits", label: "Set card spend limits", group: "Cards" },
+  { key: "approve_transactions", label: "Approve card transactions", group: "Approvals" },
+  { key: "approve_oop", label: "Approve out-of-pocket expenses", group: "Approvals" },
+  { key: "approve_invoices", label: "Approve vendor invoices", group: "Approvals" },
+  { key: "approve_card_requests", label: "Approve card issuance requests", group: "Approvals" },
+  { key: "approve_limit_requests", label: "Approve limit increase requests", group: "Approvals" },
+  { key: "view_wallet", label: "View wallet & balances", group: "Wallet" },
+  { key: "topup_wallet", label: "Top up wallet", group: "Wallet" },
+  { key: "view_accounting", label: "View accounting export", group: "Accounting" },
+  { key: "map_export", label: "Map & export to accounting software", group: "Accounting" },
+  { key: "view_audit_logs", label: "View audit logs (read-only)", group: "Audit" },
+];
+
+export const defaultRolePermissions: RolePermissions[] = [
+  {
+    role: "admin",
+    label: "Admin",
+    description: "Full access to every part of the workspace.",
+    permissions: Object.fromEntries(permissionCatalog.map((p) => [p.key, true])),
+  },
+  {
+    role: "accountant",
+    label: "Accountant",
+    description: "Manages bookkeeping, mapping, and exports.",
+    permissions: Object.fromEntries(
+      permissionCatalog.map((p) => [
+        p.key,
+        ["view_dashboard", "view_wallet", "view_accounting", "map_export", "view_audit_logs"].includes(p.key),
+      ]),
+    ),
+  },
+  {
+    role: "external_auditor",
+    label: "External Auditor",
+    description: "Read-only access to financial data for audits.",
+    permissions: Object.fromEntries(
+      permissionCatalog.map((p) => [
+        p.key,
+        ["view_dashboard", "view_wallet", "view_accounting", "view_audit_logs"].includes(p.key),
+      ]),
+    ),
+  },
+  {
+    role: "team_member",
+    label: "Team Member",
+    description: "Standard cardholder, can submit expenses & invoices.",
+    permissions: Object.fromEntries(
+      permissionCatalog.map((p) => [p.key, ["view_dashboard"].includes(p.key)]),
+    ),
+  },
+  {
+    role: "team_lead",
+    label: "Team Lead",
+    description: "Team-scoped approvals and visibility.",
+    permissions: Object.fromEntries(
+      permissionCatalog.map((p) => [
+        p.key,
+        ["view_dashboard", "approve_oop", "approve_invoices", "set_card_limits"].includes(p.key),
+      ]),
+    ),
+  },
+];
 
 export interface Card {
   id: string;
@@ -139,13 +228,20 @@ export const vatRates = [
 ];
 
 export const members: Member[] = [
-  { id: "m1", name: "Sarah Chen", email: "sarah@northwind.co", role: "admin", department: "Finance", avatar: "SC", kycStatus: "verified", joinedAt: "2024-01-12" },
-  { id: "m2", name: "Marcus Patel", email: "marcus@northwind.co", role: "manager", department: "Sales", avatar: "MP", kycStatus: "verified", joinedAt: "2024-02-03" },
-  { id: "m3", name: "Elena Rodriguez", email: "elena@northwind.co", role: "employee", department: "Marketing", avatar: "ER", kycStatus: "verified", joinedAt: "2024-02-18" },
-  { id: "m4", name: "James O'Connor", email: "james@northwind.co", role: "employee", department: "Engineering", avatar: "JO", kycStatus: "verified", joinedAt: "2024-03-04" },
-  { id: "m5", name: "Aiko Tanaka", email: "aiko@northwind.co", role: "manager", department: "Operations", avatar: "AT", kycStatus: "verified", joinedAt: "2024-03-22" },
-  { id: "m6", name: "David Kim", email: "david@northwind.co", role: "employee", department: "Engineering", avatar: "DK", kycStatus: "pending", joinedAt: "2024-09-15" },
-  { id: "m7", name: "Priya Shah", email: "priya@northwind.co", role: "employee", department: "Sales", avatar: "PS", kycStatus: "not_started", joinedAt: "2024-10-02" },
+  { id: "m1", name: "Sarah Chen", email: "sarah@northwind.co", role: "admin", department: "Finance", avatar: "SC", kycStatus: "verified", joinedAt: "2024-01-12", teamId: "tm1" },
+  { id: "m2", name: "Marcus Patel", email: "marcus@northwind.co", role: "team_member", department: "Sales", avatar: "MP", kycStatus: "verified", joinedAt: "2024-02-03", teamId: "tm2" },
+  { id: "m3", name: "Elena Rodriguez", email: "elena@northwind.co", role: "team_member", department: "Marketing", avatar: "ER", kycStatus: "verified", joinedAt: "2024-02-18", teamId: "tm3" },
+  { id: "m4", name: "James O'Connor", email: "james@northwind.co", role: "team_member", department: "Engineering", avatar: "JO", kycStatus: "verified", joinedAt: "2024-03-04", teamId: "tm4" },
+  { id: "m5", name: "Aiko Tanaka", email: "aiko@northwind.co", role: "team_member", department: "Operations", avatar: "AT", kycStatus: "verified", joinedAt: "2024-03-22" },
+  { id: "m6", name: "David Kim", email: "david@northwind.co", role: "team_member", department: "Engineering", avatar: "DK", kycStatus: "pending", joinedAt: "2024-09-15", teamId: "tm4" },
+  { id: "m7", name: "Priya Shah", email: "priya@northwind.co", role: "accountant", department: "Finance", avatar: "PS", kycStatus: "not_started", joinedAt: "2024-10-02", teamId: "tm1" },
+];
+
+export const teams: Team[] = [
+  { id: "tm1", name: "Finance", description: "Bookkeeping & treasury", leadId: "m1", memberIds: ["m1", "m7"], createdAt: "2024-01-15" },
+  { id: "tm2", name: "Sales", description: "Revenue team", leadId: "m2", memberIds: ["m2"], createdAt: "2024-02-05" },
+  { id: "tm3", name: "Marketing", description: "Brand & growth", leadId: "m3", memberIds: ["m3"], createdAt: "2024-02-20" },
+  { id: "tm4", name: "Engineering", description: "Product & infra", leadId: "m4", memberIds: ["m4", "m6"], createdAt: "2024-03-08" },
 ];
 
 export const cards: Card[] = [
