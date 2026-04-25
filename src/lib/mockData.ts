@@ -72,6 +72,40 @@ export interface Invoice {
   exported?: boolean;
 }
 
+export interface TxnApproval {
+  id: string;
+  txnId: string;
+  date: string;
+  memberId: string;
+  cardId: string;
+  merchant: string;
+  amount: number;
+  policyReason: string; // why it requires approval (per card / cardholder policy)
+  status: "pending" | "approved" | "rejected";
+}
+
+export interface CardRequest {
+  id: string;
+  date: string;
+  memberId: string;
+  type: CardType;
+  requestedLimit: number;
+  limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
+  reason: string;
+  status: "pending" | "approved" | "rejected";
+}
+
+export interface LimitIncreaseRequest {
+  id: string;
+  date: string;
+  memberId: string;
+  cardId: string;
+  currentLimit: number;
+  requestedLimit: number;
+  reason: string;
+  status: "pending" | "approved" | "rejected";
+}
+
 export interface WalletTopUp {
   id: string;
   date: string;
@@ -159,6 +193,25 @@ export const walletTopUps: WalletTopUp[] = [
   { id: "w2", date: "2024-09-15", amount: 25000, reference: "WIRE-SEP-002", source: "Operating Bank ****4521", status: "completed" },
   { id: "w3", date: "2024-09-01", amount: 50000, reference: "WIRE-SEP-001", source: "Operating Bank ****4521", status: "completed" },
   { id: "w4", date: "2024-10-22", amount: 30000, reference: "WIRE-OCT-002", source: "Operating Bank ****4521", status: "processing" },
+];
+
+export const txnApprovals: TxnApproval[] = [
+  { id: "ta1", txnId: "t4", date: "2024-10-21", memberId: "m3", cardId: "c4", merchant: "Google Ads", amount: 2400.00, policyReason: "Exceeds $2,000 single-txn policy", status: "pending" },
+  { id: "ta2", txnId: "t7", date: "2024-10-19", memberId: "m4", cardId: "c5", merchant: "AWS", amount: 1820.00, policyReason: "Cardholder requires manager review", status: "pending" },
+  { id: "ta3", txnId: "t1", date: "2024-10-22", memberId: "m1", cardId: "c1", merchant: "United Airlines", amount: 1240.50, policyReason: "Travel category > $1,000", status: "approved" },
+  { id: "ta4", txnId: "t9", date: "2024-10-18", memberId: "m1", cardId: "c1", merchant: "Hilton Hotels", amount: 412.00, policyReason: "Lodging requires tag review", status: "rejected" },
+];
+
+export const cardRequests: CardRequest[] = [
+  { id: "cr1", date: "2024-10-22", memberId: "m6", type: "virtual", requestedLimit: 2000, limitPeriod: "monthly", reason: "Need card for SaaS subscriptions", status: "pending" },
+  { id: "cr2", date: "2024-10-21", memberId: "m4", type: "single-use", requestedLimit: 800, limitPeriod: "per-transaction", reason: "One-off vendor payment", status: "pending" },
+  { id: "cr3", date: "2024-10-15", memberId: "m3", type: "physical", requestedLimit: 5000, limitPeriod: "monthly", reason: "Field marketing travel", status: "approved" },
+];
+
+export const limitRequests: LimitIncreaseRequest[] = [
+  { id: "lr1", date: "2024-10-22", memberId: "m2", cardId: "c2", currentLimit: 15000, requestedLimit: 20000, reason: "End of quarter client entertainment", status: "pending" },
+  { id: "lr2", date: "2024-10-20", memberId: "m3", cardId: "c4", currentLimit: 8000, requestedLimit: 12000, reason: "Holiday ad campaign", status: "pending" },
+  { id: "lr3", date: "2024-10-10", memberId: "m4", cardId: "c5", currentLimit: 3000, requestedLimit: 4000, reason: "Increased AWS usage", status: "approved" },
 ];
 
 export const walletBalance = 47820.50;

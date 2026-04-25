@@ -10,6 +10,7 @@ import {
   Zap,
   HandCoins,
   FileText,
+  ClipboardCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -34,6 +35,7 @@ const mainItems = [
 ];
 
 const approvalItems = [
+  { title: "Approval Requests", url: "/approvals", icon: ClipboardCheck },
   { title: "Out-of-Pocket", url: "/reimbursements", icon: HandCoins },
   { title: "Invoices", url: "/invoices", icon: FileText },
 ];
