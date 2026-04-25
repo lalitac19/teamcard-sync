@@ -50,7 +50,23 @@ import {
   type Team,
   type MemberRole,
 } from "@/lib/mockData";
-import { UserPlus, Mail, Trash2, Users, Plus } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  UserPlus,
+  Mail,
+  Trash2,
+  Users,
+  Plus,
+  MoreHorizontal,
+  Pencil,
+  Save,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const roleLabels: Record<MemberRole, string> = {
@@ -132,6 +148,41 @@ const Members = () => {
       })),
     );
     toast.success("Member removed");
+  };
+
+  const handleUpdateMember = (
+    id: string,
+    updates: { role: MemberRole; teamId?: string; department: string; makeLead: boolean },
+  ) => {
+    const previousTeamId = members.find((m) => m.id === id)?.teamId;
+    setMembers((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? { ...m, role: updates.role, teamId: updates.teamId, department: updates.department }
+          : m,
+      ),
+    );
+    setTeams((prev) =>
+      prev.map((t) => {
+        let memberIds = t.memberIds;
+        let leadId = t.leadId;
+        // Remove from previous team if changed
+        if (previousTeamId === t.id && updates.teamId !== t.id) {
+          memberIds = memberIds.filter((mid) => mid !== id);
+          if (leadId === id) leadId = memberIds[0] ?? "";
+        }
+        // Add to new team
+        if (updates.teamId === t.id && !memberIds.includes(id)) {
+          memberIds = [...memberIds, id];
+        }
+        // Promote to lead
+        if (updates.teamId === t.id && updates.makeLead) {
+          leadId = id;
+        }
+        return { ...t, memberIds, leadId };
+      }),
+    );
+    toast.success("Member updated");
   };
 
   const handleCreateTeam = (t: Omit<Team, "id" | "createdAt">) => {
@@ -218,36 +269,12 @@ const Members = () => {
                           {m.joinedAt}
                         </TableCell>
                         <TableCell>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-muted-foreground hover:text-destructive"
-                                aria-label={`Remove ${m.name}`}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Remove {m.name}?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  They'll lose access to the workspace and any active cards
-                                  will be frozen. This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleRemove(m.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Remove member
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <MemberRowActions
+                            member={m}
+                            teams={teams}
+                            onUpdate={handleUpdateMember}
+                            onRemove={handleRemove}
+                          />
                         </TableCell>
                       </TableRow>
                     );
