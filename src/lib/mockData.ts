@@ -45,7 +45,7 @@ export const permissionCatalog: { key: string; label: string; group: string }[] 
   { key: "approve_oop", label: "Approve out-of-pocket expenses", group: "Approvals" },
   { key: "approve_invoices", label: "Approve vendor invoices", group: "Approvals" },
   { key: "approve_card_requests", label: "Approve card issuance requests", group: "Approvals" },
-  { key: "approve_limit_requests", label: "Approve limit increase requests", group: "Approvals" },
+  { key: "approve_topup_requests", label: "Approve card top-up requests", group: "Approvals" },
   { key: "view_wallet", label: "View wallet & balances", group: "Wallet" },
   { key: "topup_wallet", label: "Top up wallet", group: "Wallet" },
   { key: "view_accounting", label: "View accounting export", group: "Accounting" },
@@ -199,15 +199,17 @@ export interface CardRequest {
   status: "pending" | "approved" | "rejected";
 }
 
-export interface LimitIncreaseRequest {
+export interface TopUpRequest {
   id: string;
   date: string;
   memberId: string;
   cardId: string;
-  currentLimit: number;
-  requestedLimit: number;
+  currentBalance: number;
+  requestedAmount: number;
   reason: string;
   status: "pending" | "approved" | "rejected";
+  /** Set when approved: indicates whether the wallet had enough funds to complete the transfer. */
+  fundingStatus?: "funded" | "insufficient_funds";
 }
 
 export interface WalletTopUp {
@@ -319,10 +321,10 @@ export const cardRequests: CardRequest[] = [
   { id: "cr3", date: "2024-10-15", memberId: "m3", type: "physical", requestedLimit: 5000, limitPeriod: "monthly", reason: "Field marketing travel", status: "approved" },
 ];
 
-export const limitRequests: LimitIncreaseRequest[] = [
-  { id: "lr1", date: "2024-10-22", memberId: "m2", cardId: "c2", currentLimit: 15000, requestedLimit: 20000, reason: "End of quarter client entertainment", status: "pending" },
-  { id: "lr2", date: "2024-10-20", memberId: "m3", cardId: "c4", currentLimit: 8000, requestedLimit: 12000, reason: "Holiday ad campaign", status: "pending" },
-  { id: "lr3", date: "2024-10-10", memberId: "m4", cardId: "c5", currentLimit: 3000, requestedLimit: 4000, reason: "Increased AWS usage", status: "approved" },
+export const topUpRequests: TopUpRequest[] = [
+  { id: "tr1", date: "2024-10-22", memberId: "m2", cardId: "c2", currentBalance: 1800, requestedAmount: 2500, reason: "End of quarter client entertainment", status: "pending" },
+  { id: "tr2", date: "2024-10-20", memberId: "m3", cardId: "c4", currentBalance: 2550, requestedAmount: 4000, reason: "Holiday ad campaign", status: "pending" },
+  { id: "tr3", date: "2024-10-10", memberId: "m4", cardId: "c5", currentBalance: 1020, requestedAmount: 800, reason: "Top up for AWS usage", status: "approved", fundingStatus: "funded" },
 ];
 
 export const walletTransfers: WalletTransfer[] = [

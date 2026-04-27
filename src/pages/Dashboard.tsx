@@ -29,7 +29,7 @@ import {
   walletTopUps,
   txnApprovals,
   cardRequests,
-  limitRequests,
+  topUpRequests,
   walletTransfers,
   walletBalance,
   walletReserved,
@@ -58,7 +58,7 @@ const Dashboard = () => {
   const pendingApprovalsTotal =
     txnApprovals.filter((t) => t.status === "pending").length +
     cardRequests.filter((c) => c.status === "pending").length +
-    limitRequests.filter((l) => l.status === "pending").length +
+    topUpRequests.filter((l) => l.status === "pending").length +
     walletTransfers.filter((w) => w.status === "pending").length +
     pendingReimb.length +
     pendingInvoices.length;
