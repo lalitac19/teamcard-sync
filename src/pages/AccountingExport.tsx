@@ -209,12 +209,9 @@ function SplitEditor({
 }
 
 /* ---------- Helpers for row state ---------- */
-type RowBase = { id: string; selected: boolean; expanded: boolean; lines: SplitLine[] };
+type RowBase = { id: string; selected: boolean; account?: string; vatRate?: string };
 
-const initLines = (amount: number, debitAccount?: string, vatRate?: string): SplitLine[] =>
-  [newLine(amount, debitAccount, vatRate)];
-
-const rowReady = (r: RowBase, total: number) => splitsReady(r.lines) && splitsBalanced(r.lines, total);
+const rowReady = (r: RowBase) => !!r.account && !!r.vatRate;
 
 /* ---------- Page ---------- */
 const AccountingExport = () => {
