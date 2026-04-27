@@ -162,7 +162,7 @@ const CardStatement = () => {
       });
 
     return list.sort((a, b) => a.date.localeCompare(b.date));
-  }, [card, from, to]);
+  }, [card, from, to, merchantQ, country]);
 
   const fundsIn = rows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
   const fundsOut = rows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
@@ -190,12 +190,27 @@ const CardStatement = () => {
       {/* Filters */}
       <Card className="shadow-soft">
         <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-end md:gap-4">
+          {cardholderOptions.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Cardholder</label>
+              <Select value={cardholderId} onValueChange={(v) => { setCardholderId(v); }}>
+                <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All cardholders</SelectItem>
+                  {cardholderOptions.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-muted-foreground">Card</label>
             <Select value={cardId} onValueChange={setCardId}>
-              <SelectTrigger className="w-full md:w-[280px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full md:w-[260px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {cards.map((c) => {
+                {cardOptions.map((c) => {
                   const m = memberById(c.memberId);
                   return (
                     <SelectItem key={c.id} value={c.id}>
