@@ -111,9 +111,24 @@ export interface Card {
   last4: string;
   spendLimit: number;
   spent: number;
+  balance: number; // funds prepaid onto this card from the main wallet
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
   merchantCategories?: string[];
   createdAt: string;
+}
+
+export type TransferDirection = "wallet_to_card" | "card_to_wallet" | "card_to_card";
+
+export interface WalletTransfer {
+  id: string;
+  date: string;
+  direction: TransferDirection;
+  amount: number;
+  fromCardId?: string; // present for card_to_wallet & card_to_card
+  toCardId?: string;   // present for wallet_to_card & card_to_card
+  requestedBy: string; // memberId
+  reason?: string;
+  status: "pending" | "approved" | "rejected";
 }
 
 export interface Transaction {
