@@ -14,6 +14,7 @@ import Reimbursements from "./pages/Reimbursements.tsx";
 import Invoices from "./pages/Invoices.tsx";
 import Approvals from "./pages/Approvals.tsx";
 import Settings from "./pages/Settings.tsx";
+import Plans from "./pages/Plans.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/approvals" element={<Approvals />} />
           <Route path="/accounting" element={<AccountingExport />} />
           <Route path="/statement" element={<AccountStatement />} />
+          <Route path="/plans" element={<Plans />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
