@@ -151,7 +151,7 @@ const Dashboard = () => {
     { count: txnApprovals.filter((t) => t.status === "pending").length, label: "transactions need approval", to: "/approvals", icon: ShieldCheck },
     { count: cardRequests.filter((c) => c.status === "pending").length, label: "card requests pending", to: "/approvals", icon: CardIcon },
     { count: pendingKyc, label: "members pending KYC", to: "/members", icon: Users },
-    { count: pendingInvoices.length, label: "invoices awaiting approval", to: "/invoices", icon: Receipt },
+    { count: pendingInvoices.length, label: "vendor invoices awaiting approval", to: "/invoices", icon: Receipt },
     { count: cardsNearLimit, label: "cards over 80% utilization", to: "/cards", icon: Flame },
   ].filter((a) => a.count > 0);
 
