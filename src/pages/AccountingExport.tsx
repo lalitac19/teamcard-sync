@@ -351,12 +351,6 @@ function CardTxnsTab() {
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
                       <TableCell className="text-sm">{m?.name}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                      <TableCell className="text-right text-xs text-muted-foreground">
-                        {r.fee ? (
-                          <span title={`Auto-mapped to ${feesAccountInfo?.code} · ${feesAccountInfo?.name}`}>
-                            {formatCurrency(r.fee)}
-                          </span>
-                        ) : "—"}
                       </TableCell>
                       <TableCell>
                         {isSplit
