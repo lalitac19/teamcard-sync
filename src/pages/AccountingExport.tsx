@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import {
   formatCurrency, formatDate, memberById, chartOfAccounts, vatRates,
 } from "@/lib/mockData";
 import {
-  CheckCircle2, ChevronDown, ChevronRight, Download, Plus, RefreshCw, Trash2, Upload,
+  CheckCircle2, ChevronDown, ChevronRight, Download, Plus, RefreshCw, Split, Trash2, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -209,9 +209,40 @@ function SplitEditor({
 }
 
 /* ---------- Helpers for row state ---------- */
-type RowBase = { id: string; selected: boolean; account?: string; vatRate?: string };
+type RowBase = {
+  id: string;
+  selected: boolean;
+  account?: string;
+  vatRate?: string;
+  splitOpen?: boolean;
+  splits?: SplitLine[];
+};
 
-const rowReady = (r: RowBase) => !!r.account && !!r.vatRate;
+const rowReady = (r: RowBase, total?: number) => {
+  if (r.splitOpen && r.splits && r.splits.length > 0) {
+    return (
+      splitsReady(r.splits) &&
+      (total === undefined || splitsBalanced(r.splits, total))
+    );
+  }
+  return !!r.account && !!r.vatRate;
+};
+
+/* ---------- Small split toggle button ---------- */
+const SplitToggle = ({
+  open, onClick,
+}: { open: boolean; onClick: () => void }) => (
+  <Button
+    variant={open ? "secondary" : "ghost"}
+    size="sm"
+    className="h-8 gap-1 px-2 text-xs"
+    onClick={onClick}
+    title={open ? "Collapse split" : "Split this transaction"}
+  >
+    <Split className="h-3.5 w-3.5" />
+    {open ? "Splitting" : "Split"}
+  </Button>
+);
 
 /* ---------- Page ---------- */
 const AccountingExport = () => {
@@ -249,6 +280,8 @@ function CardTxnsTab() {
       selected: false,
       account: t.debitAccount as string | undefined,
       vatRate: undefined as string | undefined,
+      splitOpen: false,
+      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -277,30 +310,64 @@ function CardTxnsTab() {
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Debit account</TableHead>
+              <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
+                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
                 const m = memberById(r.memberId);
-                const ready = rowReady(r);
+                const ready = rowReady(r, r.amount);
+                const isSplit = !!r.splitOpen;
                 return (
-                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                    <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
-                    <TableCell className="text-sm">{m?.name}</TableCell>
-                    <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                    <TableCell><AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} /></TableCell>
-                    <TableCell><VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} /></TableCell>
-                    <TableCell>
-                      {ready
-                        ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                        : <Badge variant="secondary">Needs mapping</Badge>}
-                    </TableCell>
-                  </TableRow>
+                  <Fragment key={r.id}>
+                    <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
+                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                      <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
+                      <TableCell className="text-sm">{m?.name}</TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
+                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
+                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <SplitToggle
+                          open={isSplit}
+                          onClick={() => update(r.id, {
+                            splitOpen: !isSplit,
+                            splits: !isSplit
+                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                              : r.splits,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {ready
+                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                          : <Badge variant="secondary">Needs mapping</Badge>}
+                      </TableCell>
+                    </TableRow>
+                    {isSplit && (
+                      <TableRow key={r.id + "-split"}>
+                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                          <SplitEditor
+                            total={r.amount}
+                            lines={r.splits ?? []}
+                            onChange={(lines) => update(r.id, { splits: lines })}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
             </TableBody>
@@ -320,6 +387,8 @@ function ReimbursementsTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      splitOpen: false,
+      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -352,28 +421,62 @@ function ReimbursementsTab() {
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
+                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
                 const m = memberById(r.memberId);
-                const ready = rowReady(r);
+                const ready = rowReady(r, r.amount);
+                const isSplit = !!r.splitOpen;
                 return (
-                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                    <TableCell className="text-sm">{m?.name}</TableCell>
-                    <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.description}</p></TableCell>
-                    <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                    <TableCell><AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} /></TableCell>
-                    <TableCell><VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} /></TableCell>
-                    <TableCell>
-                      {ready
-                        ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                        : <Badge variant="secondary">Needs mapping</Badge>}
-                    </TableCell>
-                  </TableRow>
+                  <Fragment key={r.id}>
+                    <TableRow data-state={r.selected ? "selected" : undefined}>
+                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                      <TableCell className="text-sm">{m?.name}</TableCell>
+                      <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.description}</p></TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
+                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
+                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <SplitToggle
+                          open={isSplit}
+                          onClick={() => update(r.id, {
+                            splitOpen: !isSplit,
+                            splits: !isSplit
+                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                              : r.splits,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {ready
+                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                          : <Badge variant="secondary">Needs mapping</Badge>}
+                      </TableCell>
+                    </TableRow>
+                    {isSplit && (
+                      <TableRow>
+                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                          <SplitEditor
+                            total={r.amount}
+                            lines={r.splits ?? []}
+                            onChange={(lines) => update(r.id, { splits: lines })}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
             </TableBody>
@@ -393,6 +496,8 @@ function InvoicesTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      splitOpen: false,
+      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -426,28 +531,62 @@ function InvoicesTab() {
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
+                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = rowReady(r);
+                const ready = rowReady(r, r.amount);
+                const isSplit = !!r.splitOpen;
                 return (
-                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
-                    <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
-                    <TableCell className="text-sm font-medium">{r.vendor}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                    <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
-                    <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                    <TableCell><AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} /></TableCell>
-                    <TableCell><VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} /></TableCell>
-                    <TableCell>
-                      {ready
-                        ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                        : <Badge variant="secondary">Needs mapping</Badge>}
-                    </TableCell>
-                  </TableRow>
+                  <Fragment key={r.id}>
+                    <TableRow data-state={r.selected ? "selected" : undefined}>
+                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
+                      <TableCell className="text-sm font-medium">{r.vendor}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                      <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
+                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
+                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <SplitToggle
+                          open={isSplit}
+                          onClick={() => update(r.id, {
+                            splitOpen: !isSplit,
+                            splits: !isSplit
+                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                              : r.splits,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {ready
+                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                          : <Badge variant="secondary">Needs mapping</Badge>}
+                      </TableCell>
+                    </TableRow>
+                    {isSplit && (
+                      <TableRow>
+                        <TableCell colSpan={10} className="bg-muted/20 p-3">
+                          <SplitEditor
+                            total={r.amount}
+                            lines={r.splits ?? []}
+                            onChange={(lines) => update(r.id, { splits: lines })}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
             </TableBody>
@@ -466,6 +605,8 @@ function TopUpsTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      splitOpen: false,
+      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -491,29 +632,63 @@ function TopUpsTab() {
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
+                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = rowReady(r);
+                const ready = rowReady(r, r.amount);
+                const isSplit = !!r.splitOpen;
                 return (
-                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                    <TableCell className="font-mono text-xs">{r.reference}</TableCell>
-                    <TableCell className="text-sm">{r.source}</TableCell>
-                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
-                    <TableCell><AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} /></TableCell>
-                    <TableCell><VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} /></TableCell>
-                    <TableCell>
-                      {r.status === "processing"
-                        ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
-                        : ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
-                    </TableCell>
-                  </TableRow>
+                  <Fragment key={r.id}>
+                    <TableRow data-state={r.selected ? "selected" : undefined}>
+                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                      <TableCell className="font-mono text-xs">{r.reference}</TableCell>
+                      <TableCell className="text-sm">{r.source}</TableCell>
+                      <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
+                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
+                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <SplitToggle
+                          open={isSplit}
+                          onClick={() => update(r.id, {
+                            splitOpen: !isSplit,
+                            splits: !isSplit
+                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                              : r.splits,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {r.status === "processing"
+                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
+                          : ready
+                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                            : <Badge variant="secondary">Needs mapping</Badge>}
+                      </TableCell>
+                    </TableRow>
+                    {isSplit && (
+                      <TableRow>
+                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                          <SplitEditor
+                            total={r.amount}
+                            lines={r.splits ?? []}
+                            onChange={(lines) => update(r.id, { splits: lines })}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
             </TableBody>
