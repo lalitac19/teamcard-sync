@@ -27,6 +27,7 @@ const Dashboard = () => {
   const totalSpent = transactions.reduce((s, t) => s + t.amount, 0);
   const activeCards = cards.filter((c) => c.status === "active").length;
   const verifiedMembers = members.filter((m) => m.kycStatus === "verified").length;
+  const allocatedToCards = cards.reduce((s, c) => s + c.balance, 0);
 
   // Spend by category
   const byCategory = transactions.reduce<Record<string, number>>((acc, t) => {
@@ -58,9 +59,10 @@ const Dashboard = () => {
         <Card className="md:col-span-2 gradient-hero text-white shadow-card border-0">
           <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-widest text-white/60">Wallet balance</p>
+              <p className="text-xs uppercase tracking-widest text-white/60">Main wallet balance</p>
               <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
-              <div className="mt-2 flex gap-4 text-sm text-white/70">
+              <div className="mt-2 flex flex-wrap gap-4 text-sm text-white/70">
+                <span>Allocated to cards: {formatCurrency(allocatedToCards)}</span>
                 <span>Reserved: {formatCurrency(walletReserved)}</span>
                 <span className="text-accent">+ {formatCurrency(30000)} processing</span>
               </div>

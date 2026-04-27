@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CardVisual } from "@/components/CardVisual";
-import { cards, formatCurrency, memberById } from "@/lib/mockData";
-import { Plus, Snowflake, MoreHorizontal } from "lucide-react";
+import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
+import { Plus, Snowflake, MoreHorizontal, ArrowLeftRight } from "lucide-react";
+import { toast } from "sonner";
 
 const statusBadge = (status: string) => {
   if (status === "active") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Active</Badge>;
@@ -85,7 +86,7 @@ const Cards = () => {
                 <div className="mt-4 space-y-1">
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{formatCurrency(card.spent)} spent</span>
-                    <span>{formatCurrency(card.spendLimit)} {card.limitPeriod}</span>
+                    <span>per-txn limit {formatCurrency(card.spendLimit)}</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
                     <div
@@ -93,11 +94,17 @@ const Cards = () => {
                       style={{ width: `${Math.min(pct, 100)}%` }}
                     />
                   </div>
+                  <div className="flex items-center justify-between pt-2 text-xs">
+                    <span className="text-muted-foreground">Card balance</span>
+                    <span className="font-semibold">{formatCurrency(card.balance)}</span>
+                  </div>
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1 gap-1">
-                    <Snowflake className="h-3.5 w-3.5" /> Freeze
+                  <CardFundsDialog card={card} mode="add" />
+                  <CardFundsDialog card={card} mode="withdraw" />
+                  <Button size="sm" variant="ghost" title="Freeze">
+                    <Snowflake className="h-4 w-4" />
                   </Button>
                   <Button size="sm" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
@@ -111,6 +118,55 @@ const Cards = () => {
     </AppLayout>
   );
 };
+
+function CardFundsDialog({ card, mode }: { card: CardModel; mode: "add" | "withdraw" }) {
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [reason, setReason] = useState("");
+  const isAdd = mode === "add";
+
+  const submit = () => {
+    if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount");
+    if (!isAdd && Number(amount) > card.balance) return toast.error("Amount exceeds card balance");
+    toast.success(`Transfer submitted for approval (${isAdd ? "Wallet → Card" : "Card → Wallet"})`);
+    setOpen(false);
+    setAmount(""); setReason("");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant={isAdd ? "outline" : "ghost"} className="flex-1 gap-1">
+          {isAdd ? <Plus className="h-3.5 w-3.5" /> : <ArrowLeftRight className="h-3.5 w-3.5" />}
+          {isAdd ? "Add funds" : "Withdraw"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{isAdd ? "Add funds to card" : "Withdraw funds from card"}</DialogTitle>
+          <DialogDescription>
+            •• {card.last4} · {memberById(card.memberId)?.name} · current balance {formatCurrency(card.balance)}.
+            All transfers require admin approval.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label>Amount (USD)</Label>
+            <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Reason (optional)</Label>
+            <Input placeholder="e.g. Top up for travel" value={reason} onChange={(e) => setReason(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={submit}>Submit for approval</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function IssueCardDialog() {
   return (

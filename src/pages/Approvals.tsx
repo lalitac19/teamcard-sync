@@ -15,10 +15,12 @@ import {
   invoices as seedInvoices,
   cardRequests as seedCardRequests,
   limitRequests as seedLimitRequests,
+  walletTransfers as seedTransfers,
   cardById,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
   type CardRequest, type LimitIncreaseRequest,
+  type WalletTransfer, type TransferDirection,
 } from "@/lib/mockData";
 import { Check, X, Inbox } from "lucide-react";
 import { toast } from "sonner";
@@ -62,6 +64,7 @@ const Approvals = () => {
   const [invs, setInvs] = useState<Invoice[]>(seedInvoices);
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<LimitIncreaseRequest[]>(seedLimitRequests);
+  const [transfers, setTransfers] = useState<WalletTransfer[]>(seedTransfers);
 
   const counts = useMemo(() => ({
     txn: txns.filter((r) => r.status === "pending").length,
@@ -69,7 +72,8 @@ const Approvals = () => {
     inv: invs.filter((r) => r.status === "pending").length,
     card: cReqs.filter((r) => r.status === "pending").length,
     limit: lReqs.filter((r) => r.status === "pending").length,
-  }), [txns, oop, invs, cReqs, lReqs]);
+    transfer: transfers.filter((r) => r.status === "pending").length,
+  }), [txns, oop, invs, cReqs, lReqs, transfers]);
 
   const setField = <T extends { id: string; status: ApprovalStatus }>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -84,6 +88,12 @@ const Approvals = () => {
   const updateInv = setField(setInvs, "Invoice");
   const updateCard = setField(setCReqs, "Card request");
   const updateLimit = setField(setLReqs, "Limit request");
+  const updateTransfer = setField(setTransfers, "Transfer");
+
+  const directionLabel = (d: TransferDirection) =>
+    d === "wallet_to_card" ? "Wallet → Card"
+    : d === "card_to_wallet" ? "Card → Wallet"
+    : "Card → Card";
 
   return (
     <AppLayout
@@ -91,12 +101,13 @@ const Approvals = () => {
       subtitle="Review approval requests from members across transactions, expenses, invoices, and card controls."
     >
       <Tabs defaultValue="txn" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 md:max-w-3xl">
+        <TabsList className="grid w-full grid-cols-6 md:max-w-4xl">
           <TabsTrigger value="txn">Transactions ({counts.txn})</TabsTrigger>
           <TabsTrigger value="oop">Out-of-Pocket ({counts.oop})</TabsTrigger>
           <TabsTrigger value="inv">Invoices ({counts.inv})</TabsTrigger>
           <TabsTrigger value="card">Card requests ({counts.card})</TabsTrigger>
           <TabsTrigger value="limit">Limit increase ({counts.limit})</TabsTrigger>
+          <TabsTrigger value="transfer">Transfers ({counts.transfer})</TabsTrigger>
         </TabsList>
 
         {/* 1. Transaction approvals — tagging only */}
@@ -330,6 +341,61 @@ const Approvals = () => {
                             <ActionCell status={r.status}
                               onApprove={() => updateLimit(r.id, "approved")}
                               onReject={() => updateLimit(r.id, "rejected")} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* 6. Wallet ↔ card transfers */}
+        <TabsContent value="transfer" className="mt-4">
+          <p className="mb-3 text-xs text-muted-foreground">
+            All wallet ↔ card and card ↔ card movements require admin approval before funds settle.
+          </p>
+          {transfers.length === 0 ? <EmptyState /> : (
+            <Card className="shadow-soft">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Direction</TableHead>
+                      <TableHead>From</TableHead>
+                      <TableHead>To</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transfers.map((r) => {
+                      const fromCard = r.fromCardId ? cardById(r.fromCardId) : undefined;
+                      const toCard = r.toCardId ? cardById(r.toCardId) : undefined;
+                      const fromLabel = r.direction === "wallet_to_card"
+                        ? "Main wallet"
+                        : fromCard ? `${memberById(fromCard.memberId)?.name} •• ${fromCard.last4}` : "—";
+                      const toLabel = r.direction === "card_to_wallet"
+                        ? "Main wallet"
+                        : toCard ? `${memberById(toCard.memberId)?.name} •• ${toCard.last4}` : "—";
+                      return (
+                        <TableRow key={r.id}>
+                          <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                          <TableCell className="text-xs">{directionLabel(r.direction)}</TableCell>
+                          <TableCell className="text-sm">{fromLabel}</TableCell>
+                          <TableCell className="text-sm">{toLabel}</TableCell>
+                          <TableCell className="text-xs text-muted-foreground">{r.reason ?? "—"}</TableCell>
+                          <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                          <TableCell>{statusBadge(r.status)}</TableCell>
+                          <TableCell className="text-right">
+                            <ActionCell status={r.status}
+                              onApprove={() => updateTransfer(r.id, "approved")}
+                              onReject={() => updateTransfer(r.id, "rejected")} />
                           </TableCell>
                         </TableRow>
                       );

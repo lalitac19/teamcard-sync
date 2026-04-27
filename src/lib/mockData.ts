@@ -111,9 +111,24 @@ export interface Card {
   last4: string;
   spendLimit: number;
   spent: number;
+  balance: number; // funds prepaid onto this card from the main wallet
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
   merchantCategories?: string[];
   createdAt: string;
+}
+
+export type TransferDirection = "wallet_to_card" | "card_to_wallet" | "card_to_card";
+
+export interface WalletTransfer {
+  id: string;
+  date: string;
+  direction: TransferDirection;
+  amount: number;
+  fromCardId?: string; // present for card_to_wallet & card_to_card
+  toCardId?: string;   // present for wallet_to_card & card_to_card
+  requestedBy: string; // memberId
+  reason?: string;
+  status: "pending" | "approved" | "rejected";
 }
 
 export interface Transaction {
@@ -245,13 +260,13 @@ export const teams: Team[] = [
 ];
 
 export const cards: Card[] = [
-  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, spent: 8420, limitPeriod: "monthly", createdAt: "2024-01-15" },
-  { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, spent: 11200, limitPeriod: "monthly", createdAt: "2024-02-05" },
-  { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, spent: 1280, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
-  { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, spent: 6450, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
-  { id: "c5", memberId: "m4", type: "virtual", status: "active", last4: "7788", spendLimit: 3000, spent: 980, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-03-08" },
-  { id: "c6", memberId: "m5", type: "physical", status: "frozen", last4: "1199", spendLimit: 10000, spent: 0, limitPeriod: "monthly", createdAt: "2024-03-25" },
-  { id: "c7", memberId: "m3", type: "single-use", status: "active", last4: "2255", spendLimit: 1200, spent: 0, limitPeriod: "per-transaction", createdAt: "2024-10-20" },
+  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, spent: 8420, balance: 4200, limitPeriod: "monthly", createdAt: "2024-01-15" },
+  { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, spent: 11200, balance: 1800, limitPeriod: "monthly", createdAt: "2024-02-05" },
+  { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, spent: 1280, balance: 720, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
+  { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, spent: 6450, balance: 2550, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
+  { id: "c5", memberId: "m4", type: "virtual", status: "active", last4: "7788", spendLimit: 3000, spent: 980, balance: 1020, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-03-08" },
+  { id: "c6", memberId: "m5", type: "physical", status: "frozen", last4: "1199", spendLimit: 10000, spent: 0, balance: 0, limitPeriod: "monthly", createdAt: "2024-03-25" },
+  { id: "c7", memberId: "m3", type: "single-use", status: "active", last4: "2255", spendLimit: 1200, spent: 0, balance: 1200, limitPeriod: "per-transaction", createdAt: "2024-10-20" },
 ];
 
 export const transactions: Transaction[] = [
@@ -308,6 +323,13 @@ export const limitRequests: LimitIncreaseRequest[] = [
   { id: "lr1", date: "2024-10-22", memberId: "m2", cardId: "c2", currentLimit: 15000, requestedLimit: 20000, reason: "End of quarter client entertainment", status: "pending" },
   { id: "lr2", date: "2024-10-20", memberId: "m3", cardId: "c4", currentLimit: 8000, requestedLimit: 12000, reason: "Holiday ad campaign", status: "pending" },
   { id: "lr3", date: "2024-10-10", memberId: "m4", cardId: "c5", currentLimit: 3000, requestedLimit: 4000, reason: "Increased AWS usage", status: "approved" },
+];
+
+export const walletTransfers: WalletTransfer[] = [
+  { id: "wt1", date: "2024-10-22", direction: "wallet_to_card", amount: 2000, toCardId: "c1", requestedBy: "m1", reason: "Top up for travel week", status: "pending" },
+  { id: "wt2", date: "2024-10-21", direction: "card_to_card", amount: 500, fromCardId: "c5", toCardId: "c3", requestedBy: "m1", reason: "Reallocate unused SaaS budget", status: "pending" },
+  { id: "wt3", date: "2024-10-20", direction: "card_to_wallet", amount: 1500, fromCardId: "c6", requestedBy: "m1", reason: "Card frozen — return funds", status: "approved" },
+  { id: "wt4", date: "2024-10-18", direction: "wallet_to_card", amount: 3000, toCardId: "c4", requestedBy: "m1", reason: "Q4 ad spend", status: "approved" },
 ];
 
 export const walletBalance = 47820.50;
