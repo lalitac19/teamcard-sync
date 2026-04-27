@@ -165,6 +165,9 @@ const Transactions = () => {
                         <span className="text-xs text-muted-foreground">Missing</span>
                       )}
                     </TableCell>
+                    <TableCell className="text-right text-sm text-muted-foreground">
+                      {t.fee ? `−${formatCurrency(t.fee)}` : "—"}
+                    </TableCell>
                     <TableCell className="text-right text-sm font-semibold">−{formatCurrency(t.amount)}</TableCell>
                   </TableRow>
                 );
