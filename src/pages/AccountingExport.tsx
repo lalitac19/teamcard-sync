@@ -308,30 +308,64 @@ function CardTxnsTab() {
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Debit account</TableHead>
+              <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
+                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
                 const m = memberById(r.memberId);
-                const ready = rowReady(r);
+                const ready = rowReady(r, r.amount);
+                const isSplit = !!r.splitOpen;
                 return (
-                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                    <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
-                    <TableCell className="text-sm">{m?.name}</TableCell>
-                    <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                    <TableCell><AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} /></TableCell>
-                    <TableCell><VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} /></TableCell>
-                    <TableCell>
-                      {ready
-                        ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                        : <Badge variant="secondary">Needs mapping</Badge>}
-                    </TableCell>
-                  </TableRow>
+                  <>
+                    <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
+                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                      <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
+                      <TableCell className="text-sm">{m?.name}</TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
+                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        {isSplit
+                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
+                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <SplitToggle
+                          open={isSplit}
+                          onClick={() => update(r.id, {
+                            splitOpen: !isSplit,
+                            splits: !isSplit
+                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                              : r.splits,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {ready
+                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                          : <Badge variant="secondary">Needs mapping</Badge>}
+                      </TableCell>
+                    </TableRow>
+                    {isSplit && (
+                      <TableRow key={r.id + "-split"}>
+                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                          <SplitEditor
+                            total={r.amount}
+                            lines={r.splits ?? []}
+                            onChange={(lines) => update(r.id, { splits: lines })}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
                 );
               })}
             </TableBody>
