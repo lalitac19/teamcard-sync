@@ -83,7 +83,7 @@ export function TransactionDetailDialog({
   useEffect(() => {
     if (!txn || !open) return;
     setReceipts(txn.receipt ? [{ name: `${txn.id}-original.pdf`, uploadedBy: "cardholder", uploadedAt: txn.date }] : []);
-    setSplits([{ id: crypto.randomUUID(), account: txn.debitAccount ?? "", amount: txn.amount.toFixed(2), memo: "" }]);
+    setSplits([{ id: crypto.randomUUID(), account: txn.debitAccount ?? "", amount: txn.amount.toFixed(2), vatRate: String(txn.vatRate ?? 0), nonBusiness: false, memo: "" }]);
     setVatRate(String(txn.vatRate ?? 0));
     setAdminComment("");
     setCardholderComment("");
@@ -117,7 +117,7 @@ export function TransactionDetailDialog({
     toast({ title: "Receipt uploaded", description: `${newOnes.length} file(s) attached.` });
   };
 
-  const addSplit = () => setSplits((s) => [...s, { id: crypto.randomUUID(), account: "", amount: "0.00", memo: "" }]);
+  const addSplit = () => setSplits((s) => [...s, { id: crypto.randomUUID(), account: "", amount: "0.00", vatRate: "0", nonBusiness: false, memo: "" }]);
   const removeSplit = (id: string) => setSplits((s) => s.filter((r) => r.id !== id));
   const updateSplit = (id: string, patch: Partial<SplitRow>) =>
     setSplits((s) => s.map((r) => (r.id === id ? { ...r, ...patch } : r)));
