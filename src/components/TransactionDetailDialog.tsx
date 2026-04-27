@@ -291,17 +291,8 @@ export function TransactionDetailDialog({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Default VAT rate</Label>
-                <Select value={vatRate} onValueChange={(v) => {
-                  setVatRate(v);
-                  setSplits((s) => s.map((r) => r.nonBusiness ? r : { ...r, vatRate: v }));
-                }}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {vatRates.map((v) => <SelectItem key={v.rate} value={String(v.rate)}>{v.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+              <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground self-end">
+                Amounts entered are <span className="font-medium text-foreground">VAT-inclusive</span>. Net &amp; VAT are derived per line.
               </div>
             </div>
 
