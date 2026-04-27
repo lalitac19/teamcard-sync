@@ -97,7 +97,7 @@ const CardStatement = () => {
     if (!card) return [];
     const list: Row[] = [];
 
-    const merchantQ = merchantQ_str();
+    const merchantQ = merchantQ_input.trim().toLowerCase();
     // Card spend (posted only) — money out of card
     transactions
       .filter((t) => t.cardId === card.id && t.status === "posted" && inRange(t.date, from, to))
