@@ -252,7 +252,27 @@ const CardStatement = () => {
             </Popover>
           </div>
 
-          {card && (
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Merchant</label>
+            <Input
+              value={merchantQ}
+              onChange={(e) => setMerchantQ(e.target.value)}
+              placeholder="Search merchant…"
+              className="h-9 w-[180px]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Country</label>
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>All countries</SelectItem>
+                {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
             <div className="ml-auto text-right">
               <p className="text-xs text-muted-foreground">Cardholder</p>
               <p className="text-sm font-medium">{holder?.name ?? "—"}</p>
