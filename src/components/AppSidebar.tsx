@@ -39,7 +39,7 @@ const mainItems = [
 const approvalItems = [
   { title: "Approval Requests", url: "/approvals", icon: ClipboardCheck },
   { title: "Out-of-Pocket", url: "/reimbursements", icon: HandCoins },
-  { title: "Invoices", url: "/invoices", icon: FileText },
+  { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
 const accountingItems = [

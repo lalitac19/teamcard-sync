@@ -132,7 +132,7 @@ const Approvals = () => {
         <TabsList className="grid w-full grid-cols-6 md:max-w-4xl">
           <TabsTrigger value="txn">Transactions ({counts.txn})</TabsTrigger>
           <TabsTrigger value="oop">Out-of-Pocket ({counts.oop})</TabsTrigger>
-          <TabsTrigger value="inv">Invoices ({counts.inv})</TabsTrigger>
+          <TabsTrigger value="inv">Vendor Invoices ({counts.inv})</TabsTrigger>
           <TabsTrigger value="card">Card requests ({counts.card})</TabsTrigger>
           <TabsTrigger value="topup">Top-up requests ({counts.topup})</TabsTrigger>
           <TabsTrigger value="transfer">Transfers ({counts.transfer})</TabsTrigger>
