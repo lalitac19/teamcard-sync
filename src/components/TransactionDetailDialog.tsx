@@ -308,15 +308,22 @@ export function TransactionDetailDialog({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Debit account</TableHead>
-                    <TableHead className="w-28">Amount</TableHead>
-                    <TableHead className="w-28">VAT</TableHead>
+                    <TableHead className="w-28">Gross (incl. VAT)</TableHead>
+                    <TableHead className="w-24">VAT</TableHead>
+                    <TableHead className="w-24 text-right">Net</TableHead>
+                    <TableHead className="w-24 text-right">VAT amt</TableHead>
                     <TableHead className="w-24">Non-business</TableHead>
                     <TableHead>Memo</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {splits.map((row) => (
+                  {splits.map((row) => {
+                    const gross = parseFloat(row.amount) || 0;
+                    const rate = parseFloat(row.vatRate) || 0;
+                    const net = +(gross / (1 + rate / 100)).toFixed(2);
+                    const vatAmt = +(gross - net).toFixed(2);
+                    return (
                     <TableRow key={row.id}>
                       <TableCell>
                         <Select value={row.account} onValueChange={(v) => updateSplit(row.id, { account: v })}>
@@ -346,6 +353,8 @@ export function TransactionDetailDialog({
                           </SelectContent>
                         </Select>
                       </TableCell>
+                      <TableCell className="text-right text-sm tabular-nums">{formatCurrency(net)}</TableCell>
+                      <TableCell className="text-right text-sm tabular-nums">{formatCurrency(vatAmt)}</TableCell>
                       <TableCell>
                         <label className="flex items-center gap-2 text-xs">
                           <input
@@ -369,18 +378,37 @@ export function TransactionDetailDialog({
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
 
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                  Allocated {formatCurrency(splitTotal)} of {formatCurrency(txn.amount)}
+                  Allocated {formatCurrency(splitTotal)} of {formatCurrency(txn.amount)} (must equal total paid)
                 </span>
                 {splitsBalanced ? (
                   <span className="flex items-center gap-1 text-success"><CheckCircle2 className="h-4 w-4" /> Balanced</span>
                 ) : (
-                  <span className="text-destructive">Difference: {formatCurrency(splitDelta)}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-destructive">Difference: {formatCurrency(splitDelta)}</span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSplits((s) => {
+                          if (!s.length) return s;
+                          const last = s[s.length - 1];
+                          const others = s.slice(0, -1).reduce((a, r) => a + (parseFloat(r.amount) || 0), 0);
+                          const remaining = +(txn.amount - others).toFixed(2);
+                          return s.map((r, i) => i === s.length - 1 ? { ...r, amount: remaining.toFixed(2) } : r);
+                        });
+                      }}
+                    >
+                      Auto-balance
+                    </Button>
+                  </span>
                 )}
               </div>
             </div>
