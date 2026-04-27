@@ -13,8 +13,13 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import {
-  walletTransfers, cardById, memberById, formatCurrency, formatDate,
+  walletTransfers, cardById, memberById, cards as allCards, members,
+  formatCurrency, formatDate,
 } from "@/lib/mockData";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { ALL } from "@/components/TableFilters";
 import {
   CalendarIcon, Download, Printer, ArrowDownLeft, ArrowUpRight,
   TrendingUp, TrendingDown,
@@ -50,12 +55,44 @@ const categoryBadge = (c: Row["category"]) =>
 const WalletInternalStatement = () => {
   const [from, setFrom] = useState<Date | undefined>(new Date("2024-10-01"));
   const [to, setTo] = useState<Date | undefined>(new Date("2024-10-31"));
+  const [cardholderId, setCardholderId] = useState<string>(ALL);
+  const [cardId, setCardId] = useState<string>(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const ids = new Set(allCards.map((c) => c.memberId));
+    return members.filter((m) => ids.has(m.id));
+  }, []);
+
+  const cardOptions = useMemo(() => {
+    return cardholderId === ALL ? allCards : allCards.filter((c) => c.memberId === cardholderId);
+  }, [cardholderId]);
+
+  const activeCardId = useMemo(() => {
+    if (cardId === ALL) return ALL;
+    if (cardholderId === ALL) return cardId;
+    const owns = allCards.find((c) => c.id === cardId)?.memberId === cardholderId;
+    return owns ? cardId : ALL;
+  }, [cardId, cardholderId]);
+
+  // Transfer matches if any of its cards (from/to) belongs to the selected scope.
+  const matchesCardScope = (fromCard?: string, toCard?: string) => {
+    if (activeCardId !== ALL) {
+      return fromCard === activeCardId || toCard === activeCardId;
+    }
+    if (cardholderId !== ALL) {
+      const fromOwned = fromCard ? cardById(fromCard)?.memberId === cardholderId : false;
+      const toOwned = toCard ? cardById(toCard)?.memberId === cardholderId : false;
+      return fromOwned || toOwned;
+    }
+    return true;
+  };
 
   const rows = useMemo<Row[]>(() => {
     const list: Row[] = [];
 
     walletTransfers
       .filter((w) => w.status === "approved" && inRange(w.date, from, to))
+      .filter((w) => matchesCardScope(w.fromCardId, w.toCardId))
       .forEach((w) => {
         if (w.direction === "wallet_to_card") {
           const dst = w.toCardId ? cardById(w.toCardId) : undefined;
