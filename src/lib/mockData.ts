@@ -146,6 +146,8 @@ export interface Transaction {
   vendor?: string;
   country?: string;
   exported?: boolean;
+  /** Fees charged on top of the merchant amount (FX, processing, etc.). */
+  fee?: number;
 }
 
 export interface Reimbursement {
