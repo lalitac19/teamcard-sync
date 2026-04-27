@@ -144,6 +144,7 @@ export interface Transaction {
   vatRate?: number;
   debitAccount?: string;
   vendor?: string;
+  country?: string;
   exported?: boolean;
 }
 
@@ -157,6 +158,7 @@ export interface Reimbursement {
   status: "approved" | "pending" | "rejected";
   receipt: boolean;
   description: string;
+  country?: string;
   debitAccount?: string;
   vatRate?: number;
   exported?: boolean;
@@ -171,6 +173,7 @@ export interface Invoice {
   amount: number;
   uploadedBy: string;
   status: "approved" | "pending" | "rejected";
+  country?: string;
   debitAccount?: string;
   vatRate?: number;
   exported?: boolean;
