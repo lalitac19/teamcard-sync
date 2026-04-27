@@ -9,6 +9,7 @@ import Members from "./pages/Members.tsx";
 import Transactions from "./pages/Transactions.tsx";
 import Wallet from "./pages/Wallet.tsx";
 import AccountingExport from "./pages/AccountingExport.tsx";
+import AccountStatement from "./pages/AccountStatement.tsx";
 import Reimbursements from "./pages/Reimbursements.tsx";
 import Invoices from "./pages/Invoices.tsx";
 import Approvals from "./pages/Approvals.tsx";
