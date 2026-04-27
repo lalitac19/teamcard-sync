@@ -273,6 +273,7 @@ const CardStatement = () => {
             </Select>
           </div>
 
+          {card && (
             <div className="ml-auto text-right">
               <p className="text-xs text-muted-foreground">Cardholder</p>
               <p className="text-sm font-medium">{holder?.name ?? "—"}</p>
