@@ -351,6 +351,61 @@ const Approvals = () => {
             </Card>
           )}
         </TabsContent>
+
+        {/* 6. Wallet ↔ card transfers */}
+        <TabsContent value="transfer" className="mt-4">
+          <p className="mb-3 text-xs text-muted-foreground">
+            All wallet ↔ card and card ↔ card movements require admin approval before funds settle.
+          </p>
+          {transfers.length === 0 ? <EmptyState /> : (
+            <Card className="shadow-soft">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Direction</TableHead>
+                      <TableHead>From</TableHead>
+                      <TableHead>To</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transfers.map((r) => {
+                      const fromCard = r.fromCardId ? cardById(r.fromCardId) : undefined;
+                      const toCard = r.toCardId ? cardById(r.toCardId) : undefined;
+                      const fromLabel = r.direction === "wallet_to_card"
+                        ? "Main wallet"
+                        : fromCard ? `${memberById(fromCard.memberId)?.name} •• ${fromCard.last4}` : "—";
+                      const toLabel = r.direction === "card_to_wallet"
+                        ? "Main wallet"
+                        : toCard ? `${memberById(toCard.memberId)?.name} •• ${toCard.last4}` : "—";
+                      return (
+                        <TableRow key={r.id}>
+                          <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                          <TableCell className="text-xs">{directionLabel(r.direction)}</TableCell>
+                          <TableCell className="text-sm">{fromLabel}</TableCell>
+                          <TableCell className="text-sm">{toLabel}</TableCell>
+                          <TableCell className="text-xs text-muted-foreground">{r.reason ?? "—"}</TableCell>
+                          <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                          <TableCell>{statusBadge(r.status)}</TableCell>
+                          <TableCell className="text-right">
+                            <ActionCell status={r.status}
+                              onApprove={() => updateTransfer(r.id, "approved")}
+                              onReject={() => updateTransfer(r.id, "rejected")} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
       </Tabs>
     </AppLayout>
   );
