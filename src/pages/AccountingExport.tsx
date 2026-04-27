@@ -296,6 +296,10 @@ function CardTxnsTab() {
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
+  const feesAccount = getDefaultFeesAccount();
+  const feesAccountInfo = chartOfAccounts.find((a) => a.code === feesAccount);
+  const totalFees = rows.reduce((s, r) => s + (r.fee || 0), 0);
+
   return (
     <>
       {pendingCount > 0 && (
@@ -307,6 +311,17 @@ function CardTxnsTab() {
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} transactions to QuickBooks`)}
       />
+      {totalFees > 0 && feesAccountInfo && (
+        <div className="mb-3 flex items-start gap-2 rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>
+            Card fees ({formatCurrency(totalFees)} total) are auto-mapped to{" "}
+            <span className="font-mono">{feesAccountInfo.code}</span> · {feesAccountInfo.name}.
+            You only map the amount paid to the vendor below. Change the default in
+            Settings → Integrations.
+          </span>
+        </div>
+      )}
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
@@ -316,7 +331,8 @@ function CardTxnsTab() {
                 <TableHead>Date</TableHead>
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Vendor amount</TableHead>
+                <TableHead className="text-right">Fee</TableHead>
               <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
@@ -336,6 +352,13 @@ function CardTxnsTab() {
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
                       <TableCell className="text-sm">{m?.name}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                      <TableCell className="text-right text-xs text-muted-foreground">
+                        {r.fee ? (
+                          <span title={`Auto-mapped to ${feesAccountInfo?.code} · ${feesAccountInfo?.name}`}>
+                            {formatCurrency(r.fee)}
+                          </span>
+                        ) : "—"}
+                      </TableCell>
                       <TableCell>
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
@@ -365,7 +388,7 @@ function CardTxnsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow key={r.id + "-split"}>
-                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                        <TableCell colSpan={10} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
