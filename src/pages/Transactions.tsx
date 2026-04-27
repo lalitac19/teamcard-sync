@@ -12,6 +12,8 @@ import {
 } from "@/lib/mockData";
 import { Download, FileText, Inbox } from "lucide-react";
 import { TableFilters, ALL } from "@/components/TableFilters";
+import { TransactionDetailDialog } from "@/components/TransactionDetailDialog";
+import type { Transaction } from "@/lib/mockData";
 
 const statusBadge = (s: string) => {
   if (s === "posted") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Posted</Badge>;
@@ -37,6 +39,7 @@ const Transactions = () => {
   const [cardId, setCardId] = useState<string>(ALL);
   const [merchant, setMerchant] = useState("");
   const [country, setCountry] = useState<string>(ALL);
+  const [selected, setSelected] = useState<Transaction | null>(null);
 
   // Cardholders = members who own at least one card
   const cardholderOptions = useMemo(() => {
@@ -142,7 +145,7 @@ const Transactions = () => {
                 const m = memberById(t.memberId);
                 const c = t.cardId ? cardById(t.cardId) : undefined;
                 return (
-                  <TableRow key={t.id}>
+                  <TableRow key={t.id} onClick={() => setSelected(t)} className="cursor-pointer hover:bg-muted/50">
                     <TableCell className="text-sm text-muted-foreground">{formatDate(t.date)}</TableCell>
                     <TableCell>
                       <p className="text-sm font-medium">{t.merchant}</p>
@@ -169,6 +172,12 @@ const Transactions = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <TransactionDetailDialog
+        txn={selected}
+        open={!!selected}
+        onOpenChange={(o) => { if (!o) setSelected(null); }}
+      />
     </AppLayout>
   );
 };
