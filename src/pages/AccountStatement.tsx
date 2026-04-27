@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/table";
 import {
   transactions, walletTopUps, statementExtras, memberById, cardById,
+  cards as allCards, members, allCountries,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import { Download, Printer, ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
+import { TableFilters, ALL } from "@/components/TableFilters";
 
 type Row = {
   id: string;
@@ -52,59 +54,99 @@ const typeLabel = (t: string) => {
 
 const AccountStatement = () => {
   const [period, setPeriod] = useState("2024-10");
+  const [cardholderId, setCardholderId] = useState<string>(ALL);
+  const [cardId, setCardId] = useState<string>(ALL);
+  const [merchant, setMerchant] = useState("");
+  const [country, setCountry] = useState<string>(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const ids = new Set(allCards.map((c) => c.memberId));
+    return members
+      .filter((m) => ids.has(m.id))
+      .map((m) => ({ value: m.id, label: m.name }));
+  }, []);
+
+  const cardOptions = useMemo(() => {
+    const scoped = cardholderId === ALL
+      ? allCards
+      : allCards.filter((c) => c.memberId === cardholderId);
+    return scoped.map((c) => {
+      const m = memberById(c.memberId);
+      return { value: c.id, label: `•• ${c.last4} — ${m?.name ?? ""}` };
+    });
+  }, [cardholderId]);
+
+  const activeCardId = useMemo(() => {
+    if (cardId === ALL) return ALL;
+    if (cardholderId === ALL) return cardId;
+    const owns = allCards.find((c) => c.id === cardId)?.memberId === cardholderId;
+    return owns ? cardId : ALL;
+  }, [cardId, cardholderId]);
+
+  const countries = useMemo(() => allCountries(), []);
+
+  // Card-related filters narrow scope to card spend only (and hide top-ups/extras when filtering).
+  const isCardScoped = cardholderId !== ALL || activeCardId !== ALL || merchant.trim() !== "" || country !== ALL;
 
   const rows = useMemo<Row[]>(() => {
     const list: Row[] = [];
+    const merchantQ = merchant.trim().toLowerCase();
 
-    // Money out — corporate card uses (posted only)
+    // Money out — corporate card uses (posted only), filtered by all selectors
     transactions
       .filter((t) => t.status === "posted" && inMonth(t.date, period))
+      .filter((t) => cardholderId === ALL || t.memberId === cardholderId)
+      .filter((t) => activeCardId === ALL || t.cardId === activeCardId)
+      .filter((t) => !merchantQ || t.merchant.toLowerCase().includes(merchantQ))
+      .filter((t) => country === ALL || t.country === country)
       .forEach((t) => {
         const m = memberById(t.memberId);
         const c = t.cardId ? cardById(t.cardId) : undefined;
         list.push({
           id: `tx-${t.id}`,
           date: t.date,
-          description: `${t.merchant} — ${m?.name ?? ""}${c ? ` (•• ${c.last4})` : ""}`,
+          description: `${t.merchant} — ${m?.name ?? ""}${c ? ` (•• ${c.last4})` : ""}${t.country ? ` · ${t.country}` : ""}`,
           reference: t.id.toUpperCase(),
           category: "card_spend",
           amount: -t.amount,
         });
       });
 
-    // Money in — wallet top-ups (completed only)
-    walletTopUps
-      .filter((w) => w.status === "completed" && inMonth(w.date, period))
-      .forEach((w) => {
-        list.push({
-          id: `top-${w.id}`,
-          date: w.date,
-          description: `Bank transfer — ${w.source}`,
-          reference: w.reference,
-          category: "topup",
-          amount: w.amount,
+    if (!isCardScoped) {
+      // Money in — wallet top-ups (completed only)
+      walletTopUps
+        .filter((w) => w.status === "completed" && inMonth(w.date, period))
+        .forEach((w) => {
+          list.push({
+            id: `top-${w.id}`,
+            date: w.date,
+            description: `Bank transfer — ${w.source}`,
+            reference: w.reference,
+            category: "topup",
+            amount: w.amount,
+          });
         });
-      });
 
-    // Refunds, cashback, fees
-    statementExtras
-      .filter((e) => inMonth(e.date, period))
-      .forEach((e) => {
-        list.push({
-          id: `ex-${e.id}`,
-          date: e.date,
-          description: e.description,
-          reference: e.reference ?? "—",
-          category: e.type,
-          amount: e.amount,
+      // Refunds, cashback, fees
+      statementExtras
+        .filter((e) => inMonth(e.date, period))
+        .forEach((e) => {
+          list.push({
+            id: `ex-${e.id}`,
+            date: e.date,
+            description: e.description,
+            reference: e.reference ?? "—",
+            category: e.type,
+            amount: e.amount,
+          });
         });
-      });
+    }
 
     // Internal wallet<->card transfers are intentionally excluded.
     return list.sort((a, b) => a.date.localeCompare(b.date));
-  }, [period]);
+  }, [period, cardholderId, activeCardId, merchant, country, isCardScoped]);
 
-  const opening = OPENING_BALANCES[period] ?? 0;
+  const opening = isCardScoped ? 0 : (OPENING_BALANCES[period] ?? 0);
   const moneyIn = rows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
   const moneyOut = rows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
   const closing = opening + moneyIn - moneyOut;
@@ -143,8 +185,29 @@ const AccountStatement = () => {
         </>
       }
     >
+      {/* Filters */}
+      <TableFilters
+        cardholders={cardholderOptions}
+        cardholderId={cardholderId}
+        onCardholderChange={(v) => { setCardholderId(v); setCardId(ALL); }}
+        cards={cardOptions}
+        cardId={activeCardId}
+        onCardChange={setCardId}
+        merchant={merchant}
+        onMerchantChange={setMerchant}
+        countries={countries}
+        country={country}
+        onCountryChange={setCountry}
+        onReset={() => { setCardholderId(ALL); setCardId(ALL); setMerchant(""); setCountry(ALL); }}
+      />
+      {isCardScoped && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Filtering active — only matching card spend is shown. Wallet top-ups and adjustments (refunds, fees) are hidden while a card-related filter is applied.
+        </p>
+      )}
+
       {/* Summary */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card className="shadow-soft">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">Opening balance</p>

@@ -17,12 +17,15 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import {
   cards, transactions, walletTransfers, memberById, cardById,
+  members, allCountries,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import {
   CalendarIcon, Download, Printer, ArrowDownLeft, ArrowUpRight,
   TrendingUp, TrendingDown,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ALL } from "@/components/TableFilters";
 
 type Row = {
   id: string;
@@ -60,25 +63,51 @@ const categoryBadge = (c: Row["category"]) => {
 };
 
 const CardStatement = () => {
+  const [cardholderId, setCardholderId] = useState<string>(ALL);
   const [cardId, setCardId] = useState<string>(cards[0]?.id ?? "");
   const [from, setFrom] = useState<Date | undefined>(new Date("2024-10-01"));
   const [to, setTo] = useState<Date | undefined>(new Date("2024-10-31"));
+  const [merchantQ, setMerchantQ] = useState("");
+  const [country, setCountry] = useState<string>(ALL);
+
+  // Cardholder list — only members who hold ≥1 card
+  const cardholderOptions = useMemo(() => {
+    const ids = new Set(cards.map((c) => c.memberId));
+    return members.filter((m) => ids.has(m.id));
+  }, []);
+
+  // Cards scoped to selected cardholder
+  const cardOptions = useMemo(() => {
+    return cardholderId === ALL ? cards : cards.filter((c) => c.memberId === cardholderId);
+  }, [cardholderId]);
+
+  // Keep cardId valid for the chosen cardholder
+  useMemo(() => {
+    if (cardholderId !== ALL && !cardOptions.some((c) => c.id === cardId)) {
+      setCardId(cardOptions[0]?.id ?? "");
+    }
+  }, [cardholderId, cardOptions, cardId]);
 
   const card = cards.find((c) => c.id === cardId);
   const holder = card ? memberById(card.memberId) : undefined;
+
+  const countries = useMemo(() => allCountries(), []);
 
   const rows = useMemo<Row[]>(() => {
     if (!card) return [];
     const list: Row[] = [];
 
+    const mq = merchantQ.trim().toLowerCase();
     // Card spend (posted only) — money out of card
     transactions
       .filter((t) => t.cardId === card.id && t.status === "posted" && inRange(t.date, from, to))
+      .filter((t) => !mq || t.merchant.toLowerCase().includes(mq))
+      .filter((t) => country === ALL || t.country === country)
       .forEach((t) => {
         list.push({
           id: `tx-${t.id}`,
           date: t.date,
-          description: `${t.merchant} — ${t.category}`,
+          description: `${t.merchant} — ${t.category}${t.country ? ` · ${t.country}` : ""}`,
           reference: t.id.toUpperCase(),
           category: "card_spend",
           amount: -t.amount,
@@ -133,7 +162,7 @@ const CardStatement = () => {
       });
 
     return list.sort((a, b) => a.date.localeCompare(b.date));
-  }, [card, from, to]);
+  }, [card, from, to, merchantQ, country]);
 
   const fundsIn = rows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
   const fundsOut = rows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
@@ -161,12 +190,27 @@ const CardStatement = () => {
       {/* Filters */}
       <Card className="shadow-soft">
         <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-end md:gap-4">
+          {cardholderOptions.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Cardholder</label>
+              <Select value={cardholderId} onValueChange={(v) => { setCardholderId(v); }}>
+                <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All cardholders</SelectItem>
+                  {cardholderOptions.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-muted-foreground">Card</label>
             <Select value={cardId} onValueChange={setCardId}>
-              <SelectTrigger className="w-full md:w-[280px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full md:w-[260px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {cards.map((c) => {
+                {cardOptions.map((c) => {
                   const m = memberById(c.memberId);
                   return (
                     <SelectItem key={c.id} value={c.id}>
@@ -206,6 +250,27 @@ const CardStatement = () => {
                 <Calendar mode="single" selected={to} onSelect={setTo} initialFocus className={cn("p-3 pointer-events-auto")} />
               </PopoverContent>
             </Popover>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Merchant</label>
+            <Input
+              value={merchantQ}
+              onChange={(e) => setMerchantQ(e.target.value)}
+              placeholder="Search merchant…"
+              className="h-9 w-[180px]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-muted-foreground">Country</label>
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>All countries</SelectItem>
+                {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
 
           {card && (
