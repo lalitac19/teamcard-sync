@@ -332,7 +332,6 @@ function CardTxnsTab() {
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
                 <TableHead className="text-right">Vendor amount</TableHead>
-                <TableHead className="text-right">Fee</TableHead>
               <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
