@@ -275,33 +275,33 @@ export const cards: Card[] = [
 ];
 
 export const transactions: Transaction[] = [
-  { id: "t1", date: "2024-10-22", merchant: "United Airlines", category: "Travel", amount: 1240.50, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "United Airlines Inc." },
-  { id: "t2", date: "2024-10-22", merchant: "Figma Inc.", category: "Software", amount: 144.00, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Figma Inc." },
-  { id: "t3", date: "2024-10-21", merchant: "WeWork", category: "Office", amount: 890.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "WeWork Companies" },
-  { id: "t4", date: "2024-10-21", merchant: "Google Ads", category: "Marketing", amount: 2400.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "Google LLC" },
-  { id: "t5", date: "2024-10-20", merchant: "Uber", category: "Travel", amount: 38.20, cardId: "c2", memberId: "m2", status: "posted", receipt: false, vendor: "Uber Technologies" },
-  { id: "t6", date: "2024-10-20", merchant: "Sweetgreen", category: "Meals", amount: 64.80, cardId: "c2", memberId: "m2", status: "posted", receipt: true, vendor: "Sweetgreen Inc." },
-  { id: "t7", date: "2024-10-19", merchant: "AWS", category: "Software", amount: 1820.00, cardId: "c5", memberId: "m4", status: "posted", receipt: true, vendor: "Amazon Web Services" },
-  { id: "t8", date: "2024-10-19", merchant: "LinkedIn Ads", category: "Marketing", amount: 760.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "LinkedIn Corp." },
-  { id: "t9", date: "2024-10-18", merchant: "Hilton Hotels", category: "Travel", amount: 412.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Hilton Worldwide" },
-  { id: "t10", date: "2024-10-18", merchant: "Notion Labs", category: "Software", amount: 96.00, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Notion Labs Inc." },
-  { id: "t11", date: "2024-10-17", merchant: "Lyft", category: "Travel", amount: 24.50, cardId: "c2", memberId: "m2", status: "pending", receipt: false, vendor: "Lyft Inc." },
-  { id: "t12", date: "2024-10-17", merchant: "Staples", category: "Office", amount: 156.30, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Staples Inc." },
+  { id: "t1", date: "2024-10-22", merchant: "United Airlines", category: "Travel", amount: 1240.50, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "United Airlines Inc.", country: "United States" },
+  { id: "t2", date: "2024-10-22", merchant: "Figma Inc.", category: "Software", amount: 144.00, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Figma Inc.", country: "United States" },
+  { id: "t3", date: "2024-10-21", merchant: "WeWork", category: "Office", amount: 890.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "WeWork Companies", country: "United Kingdom" },
+  { id: "t4", date: "2024-10-21", merchant: "Google Ads", category: "Marketing", amount: 2400.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "Google LLC", country: "Ireland" },
+  { id: "t5", date: "2024-10-20", merchant: "Uber", category: "Travel", amount: 38.20, cardId: "c2", memberId: "m2", status: "posted", receipt: false, vendor: "Uber Technologies", country: "United States" },
+  { id: "t6", date: "2024-10-20", merchant: "Sweetgreen", category: "Meals", amount: 64.80, cardId: "c2", memberId: "m2", status: "posted", receipt: true, vendor: "Sweetgreen Inc.", country: "United States" },
+  { id: "t7", date: "2024-10-19", merchant: "AWS", category: "Software", amount: 1820.00, cardId: "c5", memberId: "m4", status: "posted", receipt: true, vendor: "Amazon Web Services", country: "United States" },
+  { id: "t8", date: "2024-10-19", merchant: "LinkedIn Ads", category: "Marketing", amount: 760.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "LinkedIn Corp.", country: "United States" },
+  { id: "t9", date: "2024-10-18", merchant: "Hilton Hotels", category: "Travel", amount: 412.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Hilton Worldwide", country: "Germany" },
+  { id: "t10", date: "2024-10-18", merchant: "Notion Labs", category: "Software", amount: 96.00, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Notion Labs Inc.", country: "United States" },
+  { id: "t11", date: "2024-10-17", merchant: "Lyft", category: "Travel", amount: 24.50, cardId: "c2", memberId: "m2", status: "pending", receipt: false, vendor: "Lyft Inc.", country: "United States" },
+  { id: "t12", date: "2024-10-17", merchant: "Staples", category: "Office", amount: 156.30, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Staples Inc.", country: "Canada" },
 ];
 
 export const reimbursements: Reimbursement[] = [
-  { id: "r1", date: "2024-10-21", memberId: "m4", merchant: "Local Taxi", category: "Travel", amount: 42.00, status: "approved", receipt: true, description: "Client meeting transport" },
-  { id: "r2", date: "2024-10-20", memberId: "m3", merchant: "Print Shop", category: "Office", amount: 88.50, status: "approved", receipt: true, description: "Conference materials" },
-  { id: "r3", date: "2024-10-19", memberId: "m5", merchant: "Restaurant Daniel", category: "Meals", amount: 215.00, status: "approved", receipt: true, description: "Client dinner" },
-  { id: "r4", date: "2024-10-22", memberId: "m4", merchant: "Coffee Bean", category: "Meals", amount: 18.40, status: "pending", receipt: true, description: "Team coffee" },
-  { id: "r5", date: "2024-10-18", memberId: "m2", merchant: "Parking Garage", category: "Travel", amount: 35.00, status: "approved", receipt: true, description: "Off-site meeting parking" },
+  { id: "r1", date: "2024-10-21", memberId: "m4", merchant: "Local Taxi", category: "Travel", amount: 42.00, status: "approved", receipt: true, description: "Client meeting transport", country: "United States" },
+  { id: "r2", date: "2024-10-20", memberId: "m3", merchant: "Print Shop", category: "Office", amount: 88.50, status: "approved", receipt: true, description: "Conference materials", country: "France" },
+  { id: "r3", date: "2024-10-19", memberId: "m5", merchant: "Restaurant Daniel", category: "Meals", amount: 215.00, status: "approved", receipt: true, description: "Client dinner", country: "United States" },
+  { id: "r4", date: "2024-10-22", memberId: "m4", merchant: "Coffee Bean", category: "Meals", amount: 18.40, status: "pending", receipt: true, description: "Team coffee", country: "United States" },
+  { id: "r5", date: "2024-10-18", memberId: "m2", merchant: "Parking Garage", category: "Travel", amount: 35.00, status: "approved", receipt: true, description: "Off-site meeting parking", country: "United Kingdom" },
 ];
 
 export const invoices: Invoice[] = [
-  { id: "i1", invoiceNumber: "INV-2024-1042", date: "2024-10-15", dueDate: "2024-11-14", vendor: "Acme Legal LLP", amount: 4500.00, uploadedBy: "m1", status: "approved" },
-  { id: "i2", invoiceNumber: "INV-90234", date: "2024-10-12", dueDate: "2024-11-11", vendor: "BrightDesign Studio", amount: 6800.00, uploadedBy: "m3", status: "approved" },
-  { id: "i3", invoiceNumber: "2024-1098", date: "2024-10-18", dueDate: "2024-11-17", vendor: "Cloudflare Enterprise", amount: 2400.00, uploadedBy: "m4", status: "approved" },
-  { id: "i4", invoiceNumber: "INV-7711", date: "2024-10-22", dueDate: "2024-11-21", vendor: "FreshClean Office Co.", amount: 320.00, uploadedBy: "m5", status: "pending" },
+  { id: "i1", invoiceNumber: "INV-2024-1042", date: "2024-10-15", dueDate: "2024-11-14", vendor: "Acme Legal LLP", amount: 4500.00, uploadedBy: "m1", status: "approved", country: "United States" },
+  { id: "i2", invoiceNumber: "INV-90234", date: "2024-10-12", dueDate: "2024-11-11", vendor: "BrightDesign Studio", amount: 6800.00, uploadedBy: "m3", status: "approved", country: "United Kingdom" },
+  { id: "i3", invoiceNumber: "2024-1098", date: "2024-10-18", dueDate: "2024-11-17", vendor: "Cloudflare Enterprise", amount: 2400.00, uploadedBy: "m4", status: "approved", country: "United States" },
+  { id: "i4", invoiceNumber: "INV-7711", date: "2024-10-22", dueDate: "2024-11-21", vendor: "FreshClean Office Co.", amount: 320.00, uploadedBy: "m5", status: "pending", country: "Germany" },
 ];
 
 export const walletTopUps: WalletTopUp[] = [
@@ -363,6 +363,15 @@ export const statementExtras: StatementExtra[] = [
 
 export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
+
+/** Distinct countries appearing across transactions, reimbursements, and invoices. */
+export const allCountries = (): string[] => {
+  const set = new Set<string>();
+  transactions.forEach((t) => t.country && set.add(t.country));
+  reimbursements.forEach((r) => r.country && set.add(r.country));
+  invoices.forEach((i) => i.country && set.add(i.country));
+  return Array.from(set).sort();
+};
 
 export const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
