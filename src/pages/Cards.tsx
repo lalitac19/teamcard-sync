@@ -142,23 +142,10 @@ function IssueCardDialog() {
             </SelectContent>
           </Select>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>Spend limit</Label>
-            <Input type="number" placeholder="5000" />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Period</Label>
-            <Select defaultValue="monthly">
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="per-transaction">Per transaction</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-1.5">
+          <Label>Per-transaction limit</Label>
+          <Input type="number" placeholder="5000" />
+          <p className="text-xs text-muted-foreground">Maximum amount allowed for a single transaction.</p>
         </div>
         <div className="space-y-1.5">
           <Label>Allowed merchant categories</Label>
