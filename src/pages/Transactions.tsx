@@ -12,6 +12,8 @@ import {
 } from "@/lib/mockData";
 import { Download, FileText, Inbox } from "lucide-react";
 import { TableFilters, ALL } from "@/components/TableFilters";
+import { TransactionDetailDialog } from "@/components/TransactionDetailDialog";
+import type { Transaction } from "@/lib/mockData";
 
 const statusBadge = (s: string) => {
   if (s === "posted") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Posted</Badge>;
