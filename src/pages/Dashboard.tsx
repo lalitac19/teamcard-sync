@@ -159,16 +159,6 @@ const Dashboard = () => {
     <AppLayout
       title="Dashboard"
       subtitle="Real-time spend, balances, and activity across Northwind."
-      actions={
-        <>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="h-4 w-4" /> Export
-          </Button>
-          <Button size="sm" className="gap-2">
-            <Plus className="h-4 w-4" /> Issue card
-          </Button>
-        </>
-      }
     >
       {/* Action center strip */}
       {actionItems.length > 0 && (
