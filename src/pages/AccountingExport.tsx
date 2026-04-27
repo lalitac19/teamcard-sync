@@ -496,6 +496,8 @@ function InvoicesTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      splitOpen: false,
+      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
