@@ -281,19 +281,8 @@ export function TransactionDetailDialog({
 
           {/* ACCOUNTING */}
           <TabsContent value="accounting" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="text-xs">Accounting software</Label>
-                <Select value={software} onValueChange={setSoftware}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {accountingSoftwares.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground self-end">
-                Amounts entered are <span className="font-medium text-foreground">VAT-inclusive</span>. Net &amp; VAT are derived per line.
-              </div>
+            <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+              Amounts entered are <span className="font-medium text-foreground">VAT-inclusive</span>. Net &amp; VAT are derived per line.
             </div>
 
             <div className="space-y-2">
@@ -309,7 +298,7 @@ export function TransactionDetailDialog({
                 <TableHeader>
                   <TableRow>
                     <TableHead className="min-w-[180px]">Debit account</TableHead>
-                    <TableHead className="w-32">Gross (incl. VAT)</TableHead>
+                    <TableHead className="w-36">Amount (incl. VAT)</TableHead>
                     <TableHead className="min-w-[220px]">VAT</TableHead>
                     <TableHead className="w-24 text-right">Net</TableHead>
                     <TableHead className="w-24 text-right">VAT amt</TableHead>
