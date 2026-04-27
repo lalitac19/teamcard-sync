@@ -117,7 +117,7 @@ export function TransactionDetailDialog({
     toast({ title: "Receipt uploaded", description: `${newOnes.length} file(s) attached.` });
   };
 
-  const addSplit = () => setSplits((s) => [...s, { id: crypto.randomUUID(), account: "", amount: "0.00", vatRate: "0", nonBusiness: false, memo: "" }]);
+  const addSplit = () => setSplits((s) => [...s, { id: crypto.randomUUID(), account: "", amount: "0.00", vatRate: "ZERO_0", nonBusiness: false, memo: "" }]);
   const removeSplit = (id: string) => setSplits((s) => s.filter((r) => r.id !== id));
   const updateSplit = (id: string, patch: Partial<SplitRow>) =>
     setSplits((s) => s.map((r) => (r.id === id ? { ...r, ...patch } : r)));
