@@ -97,11 +97,11 @@ const CardStatement = () => {
     if (!card) return [];
     const list: Row[] = [];
 
-    const merchantQ = merchantQ_input.trim().toLowerCase();
+    const mq = merchantQ.trim().toLowerCase();
     // Card spend (posted only) — money out of card
     transactions
       .filter((t) => t.cardId === card.id && t.status === "posted" && inRange(t.date, from, to))
-      .filter((t) => !merchantQ || t.merchant.toLowerCase().includes(merchantQ))
+      .filter((t) => !mq || t.merchant.toLowerCase().includes(mq))
       .filter((t) => country === ALL || t.country === country)
       .forEach((t) => {
         list.push({
