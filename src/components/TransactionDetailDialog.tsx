@@ -83,8 +83,8 @@ export function TransactionDetailDialog({
   useEffect(() => {
     if (!txn || !open) return;
     setReceipts(txn.receipt ? [{ name: `${txn.id}-original.pdf`, uploadedBy: "cardholder", uploadedAt: txn.date }] : []);
-    setSplits([{ id: crypto.randomUUID(), account: txn.debitAccount ?? "", amount: txn.amount.toFixed(2), vatRate: String(txn.vatRate ?? 0), nonBusiness: false, memo: "" }]);
-    setVatRate(String(txn.vatRate ?? 0));
+    setSplits([{ id: crypto.randomUUID(), account: txn.debitAccount ?? "", amount: txn.amount.toFixed(2), vatRate: "ZERO_0", nonBusiness: false, memo: "" }]);
+    setVatRate("ZERO_0");
     setAdminComment("");
     setCardholderComment("");
     setComments([]);
