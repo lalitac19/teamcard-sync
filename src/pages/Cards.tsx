@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -21,15 +20,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CardVisual } from "@/components/CardVisual";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, MoreHorizontal, ArrowLeftRight } from "lucide-react";
+import { Plus, Snowflake, MoreHorizontal, ArrowLeftRight, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 const statusBadge = (status: string) => {
   if (status === "active") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Active</Badge>;
   if (status === "frozen") return <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Frozen</Badge>;
   return <Badge variant="secondary">Expired</Badge>;
+};
+
+const typeBadge = (type: string) => {
+  const label = type.replace("-", " ");
+  return <Badge variant="outline" className="capitalize">{label}</Badge>;
 };
 
 const Cards = () => {
@@ -65,56 +77,62 @@ const Cards = () => {
         ))}
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filtered.map((card) => {
-          const member = memberById(card.memberId);
-          const pct = (card.spent / card.spendLimit) * 100;
-          return (
-            <Card key={card.id} className="shadow-soft transition-shadow hover:shadow-card">
-              <CardContent className="p-5">
-                <div className="flex justify-center">
-                  <CardVisual card={card} size="md" />
-                </div>
-                <div className="mt-4 flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-semibold">{member?.name}</p>
-                    <p className="text-xs text-muted-foreground">{member?.department}</p>
-                  </div>
-                  {statusBadge(card.status)}
-                </div>
-
-                <div className="mt-4 space-y-1">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{formatCurrency(card.spent)} spent</span>
-                    <span>per-txn limit {formatCurrency(card.spendLimit)}</span>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-                    <div
-                      className={`h-full rounded-full ${pct > 85 ? "bg-warning" : "bg-primary"}`}
-                      style={{ width: `${Math.min(pct, 100)}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between pt-2 text-xs">
-                    <span className="text-muted-foreground">Card balance</span>
-                    <span className="font-semibold">{formatCurrency(card.balance)}</span>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  <CardFundsDialog card={card} mode="add" />
-                  <CardFundsDialog card={card} mode="withdraw" />
-                  <Button size="sm" variant="ghost" title="Freeze">
-                    <Snowflake className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      <Card className="shadow-soft">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Card</TableHead>
+                <TableHead>Cardholder</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="text-right">Spent</TableHead>
+                <TableHead className="text-right">Per-txn limit</TableHead>
+                <TableHead className="w-[260px] text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((card) => {
+                const member = memberById(card.memberId);
+                return (
+                  <TableRow key={card.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-10 items-center justify-center rounded-md bg-secondary text-muted-foreground">
+                          <CreditCard className="h-4 w-4" />
+                        </div>
+                        <span className="font-mono text-sm">•• {card.last4}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-sm font-medium">{member?.name ?? "—"}</p>
+                      <p className="text-xs text-muted-foreground">{member?.department}</p>
+                    </TableCell>
+                    <TableCell>{typeBadge(card.type)}</TableCell>
+                    <TableCell>{statusBadge(card.status)}</TableCell>
+                    <TableCell className="text-right font-semibold">{formatCurrency(card.balance)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{formatCurrency(card.spent)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{formatCurrency(card.spendLimit)}</TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-1">
+                        <CardFundsDialog card={card} mode="add" />
+                        <CardFundsDialog card={card} mode="withdraw" />
+                        <Button size="sm" variant="ghost" title="Freeze">
+                          <Snowflake className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="ghost">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </AppLayout>
   );
 };
@@ -136,9 +154,9 @@ function CardFundsDialog({ card, mode }: { card: CardModel; mode: "add" | "withd
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant={isAdd ? "outline" : "ghost"} className="flex-1 gap-1">
+        <Button size="sm" variant="ghost" className="gap-1" title={isAdd ? "Add funds" : "Withdraw"}>
           {isAdd ? <Plus className="h-3.5 w-3.5" /> : <ArrowLeftRight className="h-3.5 w-3.5" />}
-          {isAdd ? "Add funds" : "Withdraw"}
+          <span className="hidden lg:inline">{isAdd ? "Add" : "Withdraw"}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
