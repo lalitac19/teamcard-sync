@@ -44,6 +44,8 @@ const approvalItems = [
 
 const accountingItems = [
   { title: "Account Statement", url: "/statement", icon: BookOpen },
+  { title: "Card Statement", url: "/statement/cards", icon: CreditCard },
+  { title: "Wallet Internal", url: "/statement/wallet-internal", icon: Wallet },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
 ];
 
@@ -58,7 +60,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   const isActive = (url: string) =>
-    url === "/" ? location.pathname === "/" : location.pathname.startsWith(url);
+    url === "/" || url === "/statement" ? location.pathname === url : location.pathname.startsWith(url);
 
   const linkCls = (active: boolean) =>
     active
