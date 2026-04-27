@@ -94,7 +94,7 @@ const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v
     </SelectTrigger>
     <SelectContent>
       {vatRates.map((v) => (
-        <SelectItem key={v.rate} value={String(v.rate)}>{v.label}</SelectItem>
+        <SelectItem key={v.code} value={v.code}>{v.label}</SelectItem>
       ))}
     </SelectContent>
   </Select>
@@ -166,7 +166,7 @@ function SplitEditor({
                     checked={l.nonBusiness}
                     onCheckedChange={(v) => update(l.id, {
                       nonBusiness: !!v,
-                      vatRate: v ? "0" : l.vatRate,
+                      vatRate: v ? "ZERO_0" : l.vatRate,
                     })}
                   />
                   <span className="text-muted-foreground">Personal</span>
@@ -251,7 +251,7 @@ function CardTxnsTab() {
       ...t,
       selected: false,
       expanded: false,
-      lines: initLines(t.amount, t.debitAccount, t.vatRate != null ? String(t.vatRate) : undefined),
+      lines: initLines(t.amount, t.debitAccount, undefined),
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;

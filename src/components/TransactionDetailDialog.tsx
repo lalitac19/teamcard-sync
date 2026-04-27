@@ -83,8 +83,8 @@ export function TransactionDetailDialog({
   useEffect(() => {
     if (!txn || !open) return;
     setReceipts(txn.receipt ? [{ name: `${txn.id}-original.pdf`, uploadedBy: "cardholder", uploadedAt: txn.date }] : []);
-    setSplits([{ id: crypto.randomUUID(), account: txn.debitAccount ?? "", amount: txn.amount.toFixed(2), vatRate: String(txn.vatRate ?? 0), nonBusiness: false, memo: "" }]);
-    setVatRate(String(txn.vatRate ?? 0));
+    setSplits([{ id: crypto.randomUUID(), account: txn.debitAccount ?? "", amount: txn.amount.toFixed(2), vatRate: "ZERO_0", nonBusiness: false, memo: "" }]);
+    setVatRate("ZERO_0");
     setAdminComment("");
     setCardholderComment("");
     setComments([]);
@@ -117,7 +117,7 @@ export function TransactionDetailDialog({
     toast({ title: "Receipt uploaded", description: `${newOnes.length} file(s) attached.` });
   };
 
-  const addSplit = () => setSplits((s) => [...s, { id: crypto.randomUUID(), account: "", amount: "0.00", vatRate: "0", nonBusiness: false, memo: "" }]);
+  const addSplit = () => setSplits((s) => [...s, { id: crypto.randomUUID(), account: "", amount: "0.00", vatRate: "ZERO_0", nonBusiness: false, memo: "" }]);
   const removeSplit = (id: string) => setSplits((s) => s.filter((r) => r.id !== id));
   const updateSplit = (id: string, patch: Partial<SplitRow>) =>
     setSplits((s) => s.map((r) => (r.id === id ? { ...r, ...patch } : r)));
@@ -304,23 +304,25 @@ export function TransactionDetailDialog({
                 </Button>
               </div>
 
-              <Table>
+              <div className="overflow-x-auto">
+              <Table className="min-w-[920px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Debit account</TableHead>
-                    <TableHead className="w-28">Gross (incl. VAT)</TableHead>
-                    <TableHead className="w-24">VAT</TableHead>
+                    <TableHead className="min-w-[180px]">Debit account</TableHead>
+                    <TableHead className="w-32">Gross (incl. VAT)</TableHead>
+                    <TableHead className="min-w-[220px]">VAT</TableHead>
                     <TableHead className="w-24 text-right">Net</TableHead>
                     <TableHead className="w-24 text-right">VAT amt</TableHead>
                     <TableHead className="w-24">Non-business</TableHead>
-                    <TableHead>Memo</TableHead>
+                    <TableHead className="min-w-[140px]">Memo</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {splits.map((row) => {
                     const gross = parseFloat(row.amount) || 0;
-                    const rate = parseFloat(row.vatRate) || 0;
+                    const rateInfo = vatRates.find((v) => v.code === row.vatRate);
+                    const rate = rateInfo?.rate ?? 0;
                     const net = +(gross / (1 + rate / 100)).toFixed(2);
                     const vatAmt = +(gross - net).toFixed(2);
                     return (
@@ -337,7 +339,7 @@ export function TransactionDetailDialog({
                       </TableCell>
                       <TableCell>
                         <Input
-                          type="number" step="0.01" value={row.amount}
+                          type="number" step="0.01" inputMode="decimal" value={row.amount}
                           onChange={(e) => updateSplit(row.id, { amount: e.target.value })}
                         />
                       </TableCell>
@@ -349,7 +351,7 @@ export function TransactionDetailDialog({
                         >
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            {vatRates.map((v) => <SelectItem key={v.rate} value={String(v.rate)}>{v.label}</SelectItem>)}
+                            {vatRates.map((v) => <SelectItem key={v.code} value={v.code}>{v.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -363,7 +365,7 @@ export function TransactionDetailDialog({
                             checked={row.nonBusiness}
                             onChange={(e) => updateSplit(row.id, {
                               nonBusiness: e.target.checked,
-                              vatRate: e.target.checked ? "0" : row.vatRate,
+                              vatRate: e.target.checked ? "ZERO_0" : row.vatRate,
                             })}
                           />
                           <span className="text-muted-foreground">Personal</span>
@@ -382,6 +384,7 @@ export function TransactionDetailDialog({
                   })}
                 </TableBody>
               </Table>
+              </div>
 
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
