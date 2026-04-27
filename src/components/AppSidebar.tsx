@@ -60,7 +60,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   const isActive = (url: string) =>
-    url === "/" ? location.pathname === "/" : location.pathname.startsWith(url);
+    url === "/" || url === "/statement" ? location.pathname === url : location.pathname.startsWith(url);
 
   const linkCls = (active: boolean) =>
     active
