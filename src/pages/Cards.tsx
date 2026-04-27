@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CardVisual } from "@/components/CardVisual";
-import { cards, formatCurrency, memberById } from "@/lib/mockData";
-import { Plus, Snowflake, MoreHorizontal } from "lucide-react";
+import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
+import { Plus, Snowflake, MoreHorizontal, ArrowLeftRight } from "lucide-react";
+import { toast } from "sonner";
 
 const statusBadge = (status: string) => {
   if (status === "active") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Active</Badge>;
