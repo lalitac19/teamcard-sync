@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,19 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import {
   defaultRolePermissions,
   permissionCatalog,
+  chartOfAccounts,
   type RolePermissions,
 } from "@/lib/mockData";
 import { toast } from "sonner";
+
+const FEES_ACCOUNT_KEY = "accounting:feesAccount";
 
 const Settings = () => {
   return (
