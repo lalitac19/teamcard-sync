@@ -172,6 +172,12 @@ const Transactions = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <TransactionDetailDialog
+        txn={selected}
+        open={!!selected}
+        onOpenChange={(o) => { if (!o) setSelected(null); }}
+      />
     </AppLayout>
   );
 };
