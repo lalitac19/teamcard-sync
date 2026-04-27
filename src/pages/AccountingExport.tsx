@@ -322,7 +322,7 @@ function CardTxnsTab() {
                 const ready = rowReady(r, r.amount);
                 const isSplit = !!r.splitOpen;
                 return (
-                  <>
+                  <Fragment key={r.id}>
                     <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
                       <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
