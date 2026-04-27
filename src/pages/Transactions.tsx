@@ -145,7 +145,7 @@ const Transactions = () => {
                 const m = memberById(t.memberId);
                 const c = t.cardId ? cardById(t.cardId) : undefined;
                 return (
-                  <TableRow key={t.id}>
+                  <TableRow key={t.id} onClick={() => setSelected(t)} className="cursor-pointer hover:bg-muted/50">
                     <TableCell className="text-sm text-muted-foreground">{formatDate(t.date)}</TableCell>
                     <TableCell>
                       <p className="text-sm font-medium">{t.merchant}</p>
