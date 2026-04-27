@@ -292,8 +292,11 @@ export function TransactionDetailDialog({
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">VAT rate</Label>
-                <Select value={vatRate} onValueChange={setVatRate}>
+                <Label className="text-xs">Default VAT rate</Label>
+                <Select value={vatRate} onValueChange={(v) => {
+                  setVatRate(v);
+                  setSplits((s) => s.map((r) => r.nonBusiness ? r : { ...r, vatRate: v }));
+                }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {vatRates.map((v) => <SelectItem key={v.rate} value={String(v.rate)}>{v.label}</SelectItem>)}
@@ -314,7 +317,9 @@ export function TransactionDetailDialog({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Debit account</TableHead>
-                    <TableHead className="w-32">Amount</TableHead>
+                    <TableHead className="w-28">Amount</TableHead>
+                    <TableHead className="w-28">VAT</TableHead>
+                    <TableHead className="w-24">Non-business</TableHead>
                     <TableHead>Memo</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
@@ -337,6 +342,32 @@ export function TransactionDetailDialog({
                           type="number" step="0.01" value={row.amount}
                           onChange={(e) => updateSplit(row.id, { amount: e.target.value })}
                         />
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={row.vatRate}
+                          onValueChange={(v) => updateSplit(row.id, { vatRate: v })}
+                          disabled={row.nonBusiness}
+                        >
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {vatRates.map((v) => <SelectItem key={v.rate} value={String(v.rate)}>{v.label}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <label className="flex items-center gap-2 text-xs">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4"
+                            checked={row.nonBusiness}
+                            onChange={(e) => updateSplit(row.id, {
+                              nonBusiness: e.target.checked,
+                              vatRate: e.target.checked ? "0" : row.vatRate,
+                            })}
+                          />
+                          <span className="text-muted-foreground">Personal</span>
+                        </label>
                       </TableCell>
                       <TableCell>
                         <Input value={row.memo} onChange={(e) => updateSplit(row.id, { memo: e.target.value })} placeholder="Optional" />
