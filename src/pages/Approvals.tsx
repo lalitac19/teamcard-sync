@@ -14,15 +14,16 @@ import {
   reimbursements as seedReimbursements,
   invoices as seedInvoices,
   cardRequests as seedCardRequests,
-  limitRequests as seedLimitRequests,
+  topUpRequests as seedTopUpRequests,
   walletTransfers as seedTransfers,
   cardById,
+  walletBalance,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
-  type CardRequest, type LimitIncreaseRequest,
+  type CardRequest, type TopUpRequest,
   type WalletTransfer, type TransferDirection,
 } from "@/lib/mockData";
-import { Check, X, Inbox } from "lucide-react";
+import { Check, X, Inbox, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 type ApprovalStatus = "pending" | "approved" | "rejected";
@@ -63,15 +64,18 @@ const Approvals = () => {
   const [oop, setOop] = useState<Reimbursement[]>(seedReimbursements);
   const [invs, setInvs] = useState<Invoice[]>(seedInvoices);
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
-  const [lReqs, setLReqs] = useState<LimitIncreaseRequest[]>(seedLimitRequests);
+  const [lReqs, setLReqs] = useState<TopUpRequest[]>(seedTopUpRequests);
   const [transfers, setTransfers] = useState<WalletTransfer[]>(seedTransfers);
+
+  // Track wallet balance locally so approved top-ups visibly draw it down.
+  const [wallet, setWallet] = useState<number>(walletBalance);
 
   const counts = useMemo(() => ({
     txn: txns.filter((r) => r.status === "pending").length,
     oop: oop.filter((r) => r.status === "pending").length,
     inv: invs.filter((r) => r.status === "pending").length,
     card: cReqs.filter((r) => r.status === "pending").length,
-    limit: lReqs.filter((r) => r.status === "pending").length,
+    topup: lReqs.filter((r) => r.status === "pending").length,
     transfer: transfers.filter((r) => r.status === "pending").length,
   }), [txns, oop, invs, cReqs, lReqs, transfers]);
 
@@ -87,8 +91,32 @@ const Approvals = () => {
   const updateOop = setField(setOop, "Reimbursement");
   const updateInv = setField(setInvs, "Invoice");
   const updateCard = setField(setCReqs, "Card request");
-  const updateLimit = setField(setLReqs, "Limit request");
   const updateTransfer = setField(setTransfers, "Transfer");
+
+  // Top-up approval has special handling: when approved, attempt the wallet→card transfer.
+  const updateTopUp = (id: string, status: ApprovalStatus) => {
+    setLReqs((rs) => rs.map((r) => {
+      if (r.id !== id) return r;
+      if (status !== "approved") {
+        toast.success(`Top-up request ${status}`);
+        return { ...r, status };
+      }
+      // Approved: check wallet availability
+      if (wallet >= r.requestedAmount) {
+        setWallet((w) => w - r.requestedAmount);
+        const member = memberById(r.memberId);
+        const card = cardById(r.cardId);
+        toast.success(
+          `Top-up approved — ${formatCurrency(r.requestedAmount)} transferred from main wallet to ${member?.name ?? "cardholder"} •• ${card?.last4 ?? ""}`,
+        );
+        return { ...r, status: "approved", fundingStatus: "funded" };
+      }
+      toast.error(
+        `Approved, but main wallet has only ${formatCurrency(wallet)} — transfer is on hold pending wallet top-up.`,
+      );
+      return { ...r, status: "approved", fundingStatus: "insufficient_funds" };
+    }));
+  };
 
   const directionLabel = (d: TransferDirection) =>
     d === "wallet_to_card" ? "Wallet → Card"
