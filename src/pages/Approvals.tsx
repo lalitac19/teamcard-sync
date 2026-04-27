@@ -331,11 +331,25 @@ const Approvals = () => {
         </TabsContent>
 
         {/* 3. Invoice approvals */}
-        <TabsContent value="inv" className="mt-4">
-          <p className="mb-3 text-xs text-muted-foreground">
+        <TabsContent value="inv" className="mt-4 space-y-3">
+          <p className="text-xs text-muted-foreground">
             Approved invoices will flow to Accounting Export for mapping.
           </p>
-          {invs.length === 0 ? <EmptyState /> : (
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            cardholders={cardholderOptions}
+            cardholderId={memberFilter}
+            onCardholderChange={(v) => { setMemberFilter(v); setCardFilter(ALL); }}
+            merchant={merchantQ}
+            onMerchantChange={setMerchantQ}
+            merchantLabel="Vendor"
+            merchantPlaceholder="Search vendor…"
+            countries={countries}
+            country={country}
+            onCountryChange={setCountry}
+            onReset={resetFilters}
+          />
+          {invsFiltered.length === 0 ? <EmptyState /> : (
             <Card className="shadow-soft">
               <CardContent className="p-0">
                 <Table>
