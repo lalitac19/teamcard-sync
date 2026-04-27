@@ -166,7 +166,7 @@ function SplitEditor({
                     checked={l.nonBusiness}
                     onCheckedChange={(v) => update(l.id, {
                       nonBusiness: !!v,
-                      vatRate: v ? "0" : l.vatRate,
+                      vatRate: v ? "ZERO_0" : l.vatRate,
                     })}
                   />
                   <span className="text-muted-foreground">Personal</span>
