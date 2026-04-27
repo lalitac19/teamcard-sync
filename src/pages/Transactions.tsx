@@ -39,6 +39,7 @@ const Transactions = () => {
   const [cardId, setCardId] = useState<string>(ALL);
   const [merchant, setMerchant] = useState("");
   const [country, setCountry] = useState<string>(ALL);
+  const [selected, setSelected] = useState<Transaction | null>(null);
 
   // Cardholders = members who own at least one card
   const cardholderOptions = useMemo(() => {
