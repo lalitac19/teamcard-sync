@@ -15,10 +15,12 @@ import {
   invoices as seedInvoices,
   cardRequests as seedCardRequests,
   limitRequests as seedLimitRequests,
+  walletTransfers as seedTransfers,
   cardById,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
   type CardRequest, type LimitIncreaseRequest,
+  type WalletTransfer, type TransferDirection,
 } from "@/lib/mockData";
 import { Check, X, Inbox } from "lucide-react";
 import { toast } from "sonner";
