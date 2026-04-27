@@ -195,6 +195,37 @@ const WalletInternalStatement = () => {
               </PopoverContent>
             </Popover>
           </div>
+
+          {cardholderOptions.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Cardholder</label>
+              <Select value={cardholderId} onValueChange={(v) => { setCardholderId(v); setCardId(ALL); }}>
+                <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All cardholders</SelectItem>
+                  {cardholderOptions.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {cardOptions.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-muted-foreground">Card</label>
+              <Select value={activeCardId} onValueChange={setCardId}>
+                <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All cards</SelectItem>
+                  {cardOptions.map((c) => {
+                    const m = memberById(c.memberId);
+                    return (
+                      <SelectItem key={c.id} value={c.id}>•• {c.last4} — {m?.name ?? ""}</SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </CardContent>
       </Card>
 
