@@ -17,12 +17,15 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import {
   cards, transactions, walletTransfers, memberById, cardById,
+  members, allCountries,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import {
   CalendarIcon, Download, Printer, ArrowDownLeft, ArrowUpRight,
   TrendingUp, TrendingDown,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ALL } from "@/components/TableFilters";
 
 type Row = {
   id: string;
@@ -60,12 +63,35 @@ const categoryBadge = (c: Row["category"]) => {
 };
 
 const CardStatement = () => {
+  const [cardholderId, setCardholderId] = useState<string>(ALL);
   const [cardId, setCardId] = useState<string>(cards[0]?.id ?? "");
   const [from, setFrom] = useState<Date | undefined>(new Date("2024-10-01"));
   const [to, setTo] = useState<Date | undefined>(new Date("2024-10-31"));
+  const [merchantQ, setMerchantQ] = useState("");
+  const [country, setCountry] = useState<string>(ALL);
+
+  // Cardholder list — only members who hold ≥1 card
+  const cardholderOptions = useMemo(() => {
+    const ids = new Set(cards.map((c) => c.memberId));
+    return members.filter((m) => ids.has(m.id));
+  }, []);
+
+  // Cards scoped to selected cardholder
+  const cardOptions = useMemo(() => {
+    return cardholderId === ALL ? cards : cards.filter((c) => c.memberId === cardholderId);
+  }, [cardholderId]);
+
+  // Keep cardId valid for the chosen cardholder
+  useMemo(() => {
+    if (cardholderId !== ALL && !cardOptions.some((c) => c.id === cardId)) {
+      setCardId(cardOptions[0]?.id ?? "");
+    }
+  }, [cardholderId, cardOptions, cardId]);
 
   const card = cards.find((c) => c.id === cardId);
   const holder = card ? memberById(card.memberId) : undefined;
+
+  const countries = useMemo(() => allCountries(), []);
 
   const rows = useMemo<Row[]>(() => {
     if (!card) return [];
