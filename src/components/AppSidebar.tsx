@@ -6,6 +6,7 @@ import {
   Receipt,
   Wallet,
   FileSpreadsheet,
+  BookOpen,
   Settings,
   Zap,
   HandCoins,
