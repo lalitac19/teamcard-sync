@@ -72,30 +72,34 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="integrations" className="mt-0">
-          <Card className="shadow-soft">
-            <CardContent className="p-6">
-              <h3 className="text-base font-semibold">Integrations</h3>
-              <p className="text-sm text-muted-foreground">Connect your accounting software.</p>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3">
-                  <div>
-                    <p className="text-sm font-medium">QuickBooks Online</p>
-                    <p className="flex items-center gap-1 text-xs text-success">
-                      <CheckCircle2 className="h-3 w-3" /> Connected • Northwind Inc.
-                    </p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="shadow-soft">
+              <CardContent className="p-6">
+                <h3 className="text-base font-semibold">Integrations</h3>
+                <p className="text-sm text-muted-foreground">Connect your accounting software.</p>
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3">
+                    <div>
+                      <p className="text-sm font-medium">QuickBooks Online</p>
+                      <p className="flex items-center gap-1 text-xs text-success">
+                        <CheckCircle2 className="h-3 w-3" /> Connected • Northwind Inc.
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">Manage</Button>
                   </div>
-                  <Button variant="outline" size="sm">Manage</Button>
-                </div>
-                <div className="flex items-center justify-between rounded-md border border-border p-3">
-                  <div>
-                    <p className="text-sm font-medium">Xero</p>
-                    <p className="text-xs text-muted-foreground">Not connected</p>
+                  <div className="flex items-center justify-between rounded-md border border-border p-3">
+                    <div>
+                      <p className="text-sm font-medium">Xero</p>
+                      <p className="text-xs text-muted-foreground">Not connected</p>
+                    </div>
+                    <Button variant="outline" size="sm">Connect</Button>
                   </div>
-                  <Button variant="outline" size="sm">Connect</Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            <FeesAccountCard />
+          </div>
         </TabsContent>
       </Tabs>
     </AppLayout>
