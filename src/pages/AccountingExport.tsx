@@ -209,9 +209,40 @@ function SplitEditor({
 }
 
 /* ---------- Helpers for row state ---------- */
-type RowBase = { id: string; selected: boolean; account?: string; vatRate?: string };
+type RowBase = {
+  id: string;
+  selected: boolean;
+  account?: string;
+  vatRate?: string;
+  splitOpen?: boolean;
+  splits?: SplitLine[];
+};
 
-const rowReady = (r: RowBase) => !!r.account && !!r.vatRate;
+const rowReady = (r: RowBase, total?: number) => {
+  if (r.splitOpen && r.splits && r.splits.length > 0) {
+    return (
+      splitsReady(r.splits) &&
+      (total === undefined || splitsBalanced(r.splits, total))
+    );
+  }
+  return !!r.account && !!r.vatRate;
+};
+
+/* ---------- Small split toggle button ---------- */
+const SplitToggle = ({
+  open, onClick,
+}: { open: boolean; onClick: () => void }) => (
+  <Button
+    variant={open ? "secondary" : "ghost"}
+    size="sm"
+    className="h-8 gap-1 px-2 text-xs"
+    onClick={onClick}
+    title={open ? "Collapse split" : "Split this transaction"}
+  >
+    <Split className="h-3.5 w-3.5" />
+    {open ? "Splitting" : "Split"}
+  </Button>
+);
 
 /* ---------- Page ---------- */
 const AccountingExport = () => {
