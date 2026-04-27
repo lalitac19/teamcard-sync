@@ -241,10 +241,10 @@ export const chartOfAccounts = [
 ];
 
 export const vatRates = [
-  { rate: 0, label: "0% — Zero rated" },
-  { rate: 5, label: "5% — Reduced" },
-  { rate: 10, label: "10% — Standard (intl.)" },
-  { rate: 20, label: "20% — Standard" },
+  { code: "STD_5", rate: 5, label: "Standard Rated — 5%", reverseCharge: false },
+  { code: "ZERO_0", rate: 0, label: "Zero Rated — 0%", reverseCharge: false },
+  { code: "STD_5_RC", rate: 5, label: "Standard Rated — 5% (Reverse Charge)", reverseCharge: true },
+  { code: "ZERO_0_RC", rate: 0, label: "Zero Rated — 0% (Reverse Charge)", reverseCharge: true },
 ];
 
 export const members: Member[] = [
