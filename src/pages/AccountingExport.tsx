@@ -251,7 +251,7 @@ function CardTxnsTab() {
       ...t,
       selected: false,
       expanded: false,
-      lines: initLines(t.amount, t.debitAccount, t.vatRate != null ? String(t.vatRate) : undefined),
+      lines: initLines(t.amount, t.debitAccount, undefined),
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
