@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,19 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import {
   defaultRolePermissions,
   permissionCatalog,
+  chartOfAccounts,
   type RolePermissions,
 } from "@/lib/mockData";
 import { toast } from "sonner";
+
+const FEES_ACCOUNT_KEY = "accounting:feesAccount";
 
 const Settings = () => {
   return (
@@ -66,30 +72,34 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="integrations" className="mt-0">
-          <Card className="shadow-soft">
-            <CardContent className="p-6">
-              <h3 className="text-base font-semibold">Integrations</h3>
-              <p className="text-sm text-muted-foreground">Connect your accounting software.</p>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3">
-                  <div>
-                    <p className="text-sm font-medium">QuickBooks Online</p>
-                    <p className="flex items-center gap-1 text-xs text-success">
-                      <CheckCircle2 className="h-3 w-3" /> Connected • Northwind Inc.
-                    </p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="shadow-soft">
+              <CardContent className="p-6">
+                <h3 className="text-base font-semibold">Integrations</h3>
+                <p className="text-sm text-muted-foreground">Connect your accounting software.</p>
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3">
+                    <div>
+                      <p className="text-sm font-medium">QuickBooks Online</p>
+                      <p className="flex items-center gap-1 text-xs text-success">
+                        <CheckCircle2 className="h-3 w-3" /> Connected • Northwind Inc.
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">Manage</Button>
                   </div>
-                  <Button variant="outline" size="sm">Manage</Button>
-                </div>
-                <div className="flex items-center justify-between rounded-md border border-border p-3">
-                  <div>
-                    <p className="text-sm font-medium">Xero</p>
-                    <p className="text-xs text-muted-foreground">Not connected</p>
+                  <div className="flex items-center justify-between rounded-md border border-border p-3">
+                    <div>
+                      <p className="text-sm font-medium">Xero</p>
+                      <p className="text-xs text-muted-foreground">Not connected</p>
+                    </div>
+                    <Button variant="outline" size="sm">Connect</Button>
                   </div>
-                  <Button variant="outline" size="sm">Connect</Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            <FeesAccountCard />
+          </div>
         </TabsContent>
       </Tabs>
     </AppLayout>
@@ -199,5 +209,55 @@ function Toggle({ label, defaultChecked }: { label: string; defaultChecked?: boo
     </div>
   );
 }
+
+function FeesAccountCard() {
+  const [account, setAccount] = useState<string>("5090");
+
+  useEffect(() => {
+    const stored = localStorage.getItem(FEES_ACCOUNT_KEY);
+    if (stored) setAccount(stored);
+  }, []);
+
+  const handleChange = (v: string) => {
+    setAccount(v);
+    localStorage.setItem(FEES_ACCOUNT_KEY, v);
+    const acc = chartOfAccounts.find((a) => a.code === v);
+    toast.success(`Card fees will auto-map to ${acc?.code} · ${acc?.name}`);
+  };
+
+  const expenseAccounts = chartOfAccounts.filter((a) => a.type === "Expense");
+
+  return (
+    <Card className="shadow-soft">
+      <CardContent className="p-6">
+        <h3 className="text-base font-semibold">Card fees mapping</h3>
+        <p className="text-sm text-muted-foreground">
+          Choose the default account for card transaction fees (FX, processing,
+          interchange). Fees are auto-mapped to this account on every export.
+        </p>
+        <div className="mt-4 space-y-1.5">
+          <Label>Default fees account</Label>
+          <Select value={account} onValueChange={handleChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select an expense account" />
+            </SelectTrigger>
+            <SelectContent>
+              {expenseAccounts.map((a) => (
+                <SelectItem key={a.code} value={a.code}>
+                  <span className="font-mono text-muted-foreground">{a.code}</span> · {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Only the amount paid to the vendor needs manual mapping in the
+            Accounting Export.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 
 export default Settings;
