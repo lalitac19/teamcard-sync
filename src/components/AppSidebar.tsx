@@ -6,6 +6,7 @@ import {
   Receipt,
   Wallet,
   FileSpreadsheet,
+  BookOpen,
   Settings,
   Zap,
   HandCoins,
@@ -41,6 +42,7 @@ const approvalItems = [
 ];
 
 const accountingItems = [
+  { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
 ];
 
