@@ -335,6 +335,27 @@ export const walletTransfers: WalletTransfer[] = [
 export const walletBalance = 47820.50;
 export const walletReserved = 12400.00;
 
+// Statement-only entries (refunds, cashback, fees). Internal wallet<->card transfers are excluded by design.
+export type StatementExtraType = "refund" | "cashback" | "fee";
+export interface StatementExtra {
+  id: string;
+  date: string;
+  type: StatementExtraType;
+  description: string;
+  amount: number; // positive = money in, negative = money out
+  reference?: string;
+}
+
+export const statementExtras: StatementExtra[] = [
+  { id: "se1", date: "2024-10-23", type: "refund", description: "United Airlines — itinerary change refund", amount: 320.00, reference: "RFND-UA-8821" },
+  { id: "se2", date: "2024-10-15", type: "cashback", description: "Monthly card spend cashback (1%)", amount: 184.20, reference: "CB-OCT-24" },
+  { id: "se3", date: "2024-10-10", type: "fee", description: "International transaction fee", amount: -12.40, reference: "FEE-FX-1010" },
+  { id: "se4", date: "2024-10-05", type: "fee", description: "Monthly platform fee", amount: -49.00, reference: "FEE-PLT-OCT" },
+  { id: "se5", date: "2024-09-22", type: "refund", description: "Hilton Hotels — duplicate charge refund", amount: 412.00, reference: "RFND-HIL-7711" },
+  { id: "se6", date: "2024-09-15", type: "cashback", description: "Monthly card spend cashback (1%)", amount: 156.80, reference: "CB-SEP-24" },
+  { id: "se7", date: "2024-09-04", type: "fee", description: "Monthly platform fee", amount: -49.00, reference: "FEE-PLT-SEP" },
+];
+
 export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
 
