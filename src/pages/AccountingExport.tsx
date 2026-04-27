@@ -19,9 +19,16 @@ import {
   formatCurrency, formatDate, memberById, chartOfAccounts, vatRates,
 } from "@/lib/mockData";
 import {
-  CheckCircle2, ChevronDown, ChevronRight, Download, Plus, RefreshCw, Split, Trash2, Upload,
+  CheckCircle2, ChevronDown, ChevronRight, Download, Plus, RefreshCw, Split, Trash2, Upload, Info,
 } from "lucide-react";
 import { toast } from "sonner";
+
+/* ---------- Default fees account (settable in Settings → Integrations) ---------- */
+const FEES_ACCOUNT_KEY = "accounting:feesAccount";
+const getDefaultFeesAccount = () => {
+  if (typeof window === "undefined") return "5090";
+  return localStorage.getItem(FEES_ACCOUNT_KEY) || "5090";
+};
 
 /* ---------- Shared types ---------- */
 interface SplitLine {
