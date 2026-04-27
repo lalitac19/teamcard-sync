@@ -247,8 +247,8 @@ function CardTxnsTab() {
     postedTxns.map((t) => ({
       ...t,
       selected: false,
-      expanded: false,
-      lines: initLines(t.amount, t.debitAccount, undefined),
+      account: t.debitAccount as string | undefined,
+      vatRate: undefined as string | undefined,
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -273,47 +273,34 @@ function CardTxnsTab() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10"><Checkbox onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
-                <TableHead className="w-8" />
                 <TableHead>Date</TableHead>
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
-                <TableHead>Vendor</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Debit account</TableHead>
+                <TableHead>VAT</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
                 const m = memberById(r.memberId);
-                const ready = rowReady(r, r.amount);
+                const ready = rowReady(r);
                 return (
-                  <>
-                    <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => update(r.id, { expanded: !r.expanded })}>
-                          {r.expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                        </Button>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                      <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
-                      <TableCell className="text-sm">{m?.name}</TableCell>
-                      <TableCell className="text-sm">{r.vendor}</TableCell>
-                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                      <TableCell>
-                        {ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
-                      </TableCell>
-                    </TableRow>
-                    {r.expanded && (
-                      <TableRow>
-                        <TableCell colSpan={8} className="bg-muted/20 p-3">
-                          <SplitEditor total={r.amount} lines={r.lines} onChange={(lines) => update(r.id, { lines })} />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
+                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
+                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                    <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
+                    <TableCell className="text-sm">{m?.name}</TableCell>
+                    <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                    <TableCell><AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} /></TableCell>
+                    <TableCell><VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} /></TableCell>
+                    <TableCell>
+                      {ready
+                        ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                        : <Badge variant="secondary">Needs mapping</Badge>}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>
