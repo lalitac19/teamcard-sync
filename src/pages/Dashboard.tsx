@@ -27,6 +27,7 @@ const Dashboard = () => {
   const totalSpent = transactions.reduce((s, t) => s + t.amount, 0);
   const activeCards = cards.filter((c) => c.status === "active").length;
   const verifiedMembers = members.filter((m) => m.kycStatus === "verified").length;
+  const allocatedToCards = cards.reduce((s, c) => s + c.balance, 0);
 
   // Spend by category
   const byCategory = transactions.reduce<Record<string, number>>((acc, t) => {
