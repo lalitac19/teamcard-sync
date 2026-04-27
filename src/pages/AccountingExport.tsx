@@ -19,7 +19,7 @@ import {
   formatCurrency, formatDate, memberById, chartOfAccounts, vatRates,
 } from "@/lib/mockData";
 import {
-  CheckCircle2, ChevronDown, ChevronRight, Download, Plus, RefreshCw, Trash2, Upload,
+  CheckCircle2, ChevronDown, ChevronRight, Download, Plus, RefreshCw, Split, Trash2, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 
