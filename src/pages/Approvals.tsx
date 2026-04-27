@@ -270,11 +270,23 @@ const Approvals = () => {
         </TabsContent>
 
         {/* 2. Out-of-Pocket approvals */}
-        <TabsContent value="oop" className="mt-4">
-          <p className="mb-3 text-xs text-muted-foreground">
+        <TabsContent value="oop" className="mt-4 space-y-3">
+          <p className="text-xs text-muted-foreground">
             Approved claims will flow to Accounting Export for mapping.
           </p>
-          {oop.length === 0 ? <EmptyState /> : (
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            cardholders={cardholderOptions}
+            cardholderId={memberFilter}
+            onCardholderChange={(v) => { setMemberFilter(v); setCardFilter(ALL); }}
+            merchant={merchantQ}
+            onMerchantChange={setMerchantQ}
+            countries={countries}
+            country={country}
+            onCountryChange={setCountry}
+            onReset={resetFilters}
+          />
+          {oopFiltered.length === 0 ? <EmptyState /> : (
             <Card className="shadow-soft">
               <CardContent className="p-0">
                 <Table>
@@ -290,7 +302,7 @@ const Approvals = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {oop.map((r) => {
+                    {oopFiltered.map((r) => {
                       const m = memberById(r.memberId);
                       return (
                         <TableRow key={r.id}>
