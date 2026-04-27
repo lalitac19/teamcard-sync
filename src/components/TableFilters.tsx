@@ -123,7 +123,7 @@ export function TableFilters({
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-muted-foreground">Cardholder</label>
             <Select value={cardholderId ?? ALL} onValueChange={onCardholderChange}>
-              <SelectTrigger size="sm" className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL}>All cardholders</SelectItem>
                 {cardholders!.map((o) => (
@@ -138,7 +138,7 @@ export function TableFilters({
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-muted-foreground">Card</label>
             <Select value={cardId ?? ALL} onValueChange={onCardChange}>
-              <SelectTrigger size="sm" className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL}>All cards</SelectItem>
                 {cards!.map((o) => (
@@ -165,7 +165,7 @@ export function TableFilters({
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-muted-foreground">Country</label>
             <Select value={country ?? ALL} onValueChange={onCountryChange}>
-              <SelectTrigger size="sm" className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL}>All countries</SelectItem>
                 {countries!.map((c) => (
