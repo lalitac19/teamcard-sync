@@ -238,6 +238,7 @@ export const chartOfAccounts = [
   { code: "5060", name: "Professional Services", type: "Expense" },
   { code: "5070", name: "Utilities", type: "Expense" },
   { code: "5080", name: "Equipment & Hardware", type: "Expense" },
+  { code: "5090", name: "Bank & Card Fees", type: "Expense" },
   { code: "1010", name: "Cash — Corporate Wallet", type: "Asset" },
   { code: "1020", name: "Bank Account — Operating", type: "Asset" },
 ];
