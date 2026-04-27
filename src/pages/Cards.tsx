@@ -119,6 +119,55 @@ const Cards = () => {
   );
 };
 
+function CardFundsDialog({ card, mode }: { card: CardModel; mode: "add" | "withdraw" }) {
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [reason, setReason] = useState("");
+  const isAdd = mode === "add";
+
+  const submit = () => {
+    if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount");
+    if (!isAdd && Number(amount) > card.balance) return toast.error("Amount exceeds card balance");
+    toast.success(`Transfer submitted for approval (${isAdd ? "Wallet → Card" : "Card → Wallet"})`);
+    setOpen(false);
+    setAmount(""); setReason("");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant={isAdd ? "outline" : "ghost"} className="flex-1 gap-1">
+          {isAdd ? <Plus className="h-3.5 w-3.5" /> : <ArrowLeftRight className="h-3.5 w-3.5" />}
+          {isAdd ? "Add funds" : "Withdraw"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{isAdd ? "Add funds to card" : "Withdraw funds from card"}</DialogTitle>
+          <DialogDescription>
+            •• {card.last4} · {memberById(card.memberId)?.name} · current balance {formatCurrency(card.balance)}.
+            All transfers require admin approval.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label>Amount (USD)</Label>
+            <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Reason (optional)</Label>
+            <Input placeholder="e.g. Top up for travel" value={reason} onChange={(e) => setReason(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={submit}>Submit for approval</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function IssueCardDialog() {
   return (
     <DialogContent className="sm:max-w-md">
