@@ -72,6 +72,74 @@ const Approvals = () => {
   // Track wallet balance locally so approved top-ups visibly draw it down.
   const [wallet, setWallet] = useState<number>(walletBalance);
 
+  // ── Filter state (shared across the three "expense" tabs) ────────────────
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [memberFilter, setMemberFilter] = useState<string>(ALL);
+  const [cardFilter, setCardFilter] = useState<string>(ALL);
+  const [merchantQ, setMerchantQ] = useState("");
+  const [country, setCountry] = useState<string>(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const ids = new Set(allCards.map((c) => c.memberId));
+    return members.filter((m) => ids.has(m.id)).map((m) => ({ value: m.id, label: m.name }));
+  }, []);
+  const cardOptions = useMemo(() => {
+    const scoped = memberFilter === ALL ? allCards : allCards.filter((c) => c.memberId === memberFilter);
+    return scoped.map((c) => ({ value: c.id, label: `•• ${c.last4} — ${memberById(c.memberId)?.name ?? ""}` }));
+  }, [memberFilter]);
+  const activeCardId = useMemo(() => {
+    if (cardFilter === ALL) return ALL;
+    if (memberFilter === ALL) return cardFilter;
+    const owns = allCards.find((c) => c.id === cardFilter)?.memberId === memberFilter;
+    return owns ? cardFilter : ALL;
+  }, [cardFilter, memberFilter]);
+  const countries = useMemo(() => allCountries(), []);
+
+  const inRange = (iso: string) => {
+    const d = new Date(iso);
+    if (from && d < from) return false;
+    if (to) {
+      const end = new Date(to);
+      end.setHours(23, 59, 59, 999);
+      if (d > end) return false;
+    }
+    return true;
+  };
+
+  const resetFilters = () => {
+    setFrom(undefined); setTo(undefined);
+    setMemberFilter(ALL); setCardFilter(ALL);
+    setMerchantQ(""); setCountry(ALL);
+  };
+
+  const merchantQLower = merchantQ.trim().toLowerCase();
+
+  const txnsFiltered = useMemo(() => txns.filter((r) => {
+    if (!inRange(r.date)) return false;
+    if (memberFilter !== ALL && r.memberId !== memberFilter) return false;
+    if (activeCardId !== ALL && r.cardId !== activeCardId) return false;
+    if (merchantQLower && !r.merchant.toLowerCase().includes(merchantQLower)) return false;
+    return true;
+  }), [txns, from, to, memberFilter, activeCardId, merchantQLower]);
+
+  const oopFiltered = useMemo(() => oop.filter((r) => {
+    if (!inRange(r.date)) return false;
+    if (memberFilter !== ALL && r.memberId !== memberFilter) return false;
+    if (merchantQLower && !r.merchant.toLowerCase().includes(merchantQLower)) return false;
+    if (country !== ALL && r.country !== country) return false;
+    return true;
+  }), [oop, from, to, memberFilter, merchantQLower, country]);
+
+  const invsFiltered = useMemo(() => invs.filter((r) => {
+    if (!inRange(r.date)) return false;
+    if (memberFilter !== ALL && r.uploadedBy !== memberFilter) return false;
+    if (merchantQLower && !r.vendor.toLowerCase().includes(merchantQLower)) return false;
+    if (country !== ALL && r.country !== country) return false;
+    return true;
+  }), [invs, from, to, memberFilter, merchantQLower, country]);
+
+
   const counts = useMemo(() => ({
     txn: txns.filter((r) => r.status === "pending").length,
     oop: oop.filter((r) => r.status === "pending").length,
