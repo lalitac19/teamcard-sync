@@ -140,7 +140,7 @@ const WalletInternalStatement = () => {
       });
 
     return list.sort((a, b) => a.date.localeCompare(b.date));
-  }, [from, to]);
+  }, [from, to, cardholderId, activeCardId]);
 
   const fundsIn = rows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
   const fundsOut = rows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
