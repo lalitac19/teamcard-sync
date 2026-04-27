@@ -278,18 +278,18 @@ export const cards: Card[] = [
 ];
 
 export const transactions: Transaction[] = [
-  { id: "t1", date: "2024-10-22", merchant: "United Airlines", category: "Travel", amount: 1240.50, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "United Airlines Inc.", country: "United States" },
-  { id: "t2", date: "2024-10-22", merchant: "Figma Inc.", category: "Software", amount: 144.00, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Figma Inc.", country: "United States" },
+  { id: "t1", date: "2024-10-22", merchant: "United Airlines", category: "Travel", amount: 1240.50, fee: 18.60, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "United Airlines Inc.", country: "United States" },
+  { id: "t2", date: "2024-10-22", merchant: "Figma Inc.", category: "Software", amount: 144.00, fee: 2.16, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Figma Inc.", country: "United States" },
   { id: "t3", date: "2024-10-21", merchant: "WeWork", category: "Office", amount: 890.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "WeWork Companies", country: "United Kingdom" },
-  { id: "t4", date: "2024-10-21", merchant: "Google Ads", category: "Marketing", amount: 2400.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "Google LLC", country: "Ireland" },
+  { id: "t4", date: "2024-10-21", merchant: "Google Ads", category: "Marketing", amount: 2400.00, fee: 36.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "Google LLC", country: "Ireland" },
   { id: "t5", date: "2024-10-20", merchant: "Uber", category: "Travel", amount: 38.20, cardId: "c2", memberId: "m2", status: "posted", receipt: false, vendor: "Uber Technologies", country: "United States" },
   { id: "t6", date: "2024-10-20", merchant: "Sweetgreen", category: "Meals", amount: 64.80, cardId: "c2", memberId: "m2", status: "posted", receipt: true, vendor: "Sweetgreen Inc.", country: "United States" },
-  { id: "t7", date: "2024-10-19", merchant: "AWS", category: "Software", amount: 1820.00, cardId: "c5", memberId: "m4", status: "posted", receipt: true, vendor: "Amazon Web Services", country: "United States" },
-  { id: "t8", date: "2024-10-19", merchant: "LinkedIn Ads", category: "Marketing", amount: 760.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "LinkedIn Corp.", country: "United States" },
-  { id: "t9", date: "2024-10-18", merchant: "Hilton Hotels", category: "Travel", amount: 412.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Hilton Worldwide", country: "Germany" },
-  { id: "t10", date: "2024-10-18", merchant: "Notion Labs", category: "Software", amount: 96.00, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Notion Labs Inc.", country: "United States" },
+  { id: "t7", date: "2024-10-19", merchant: "AWS", category: "Software", amount: 1820.00, fee: 27.30, cardId: "c5", memberId: "m4", status: "posted", receipt: true, vendor: "Amazon Web Services", country: "United States" },
+  { id: "t8", date: "2024-10-19", merchant: "LinkedIn Ads", category: "Marketing", amount: 760.00, fee: 11.40, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "LinkedIn Corp.", country: "United States" },
+  { id: "t9", date: "2024-10-18", merchant: "Hilton Hotels", category: "Travel", amount: 412.00, fee: 6.18, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Hilton Worldwide", country: "Germany" },
+  { id: "t10", date: "2024-10-18", merchant: "Notion Labs", category: "Software", amount: 96.00, fee: 1.44, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Notion Labs Inc.", country: "United States" },
   { id: "t11", date: "2024-10-17", merchant: "Lyft", category: "Travel", amount: 24.50, cardId: "c2", memberId: "m2", status: "pending", receipt: false, vendor: "Lyft Inc.", country: "United States" },
-  { id: "t12", date: "2024-10-17", merchant: "Staples", category: "Office", amount: 156.30, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Staples Inc.", country: "Canada" },
+  { id: "t12", date: "2024-10-17", merchant: "Staples", category: "Office", amount: 156.30, fee: 2.34, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Staples Inc.", country: "Canada" },
 ];
 
 export const reimbursements: Reimbursement[] = [
