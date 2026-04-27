@@ -86,7 +86,7 @@ const Cards = () => {
                 <div className="mt-4 space-y-1">
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{formatCurrency(card.spent)} spent</span>
-                    <span>{formatCurrency(card.spendLimit)} {card.limitPeriod}</span>
+                    <span>per-txn limit {formatCurrency(card.spendLimit)}</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
                     <div
@@ -94,11 +94,17 @@ const Cards = () => {
                       style={{ width: `${Math.min(pct, 100)}%` }}
                     />
                   </div>
+                  <div className="flex items-center justify-between pt-2 text-xs">
+                    <span className="text-muted-foreground">Card balance</span>
+                    <span className="font-semibold">{formatCurrency(card.balance)}</span>
+                  </div>
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1 gap-1">
-                    <Snowflake className="h-3.5 w-3.5" /> Freeze
+                  <CardFundsDialog card={card} mode="add" />
+                  <CardFundsDialog card={card} mode="withdraw" />
+                  <Button size="sm" variant="ghost" title="Freeze">
+                    <Snowflake className="h-4 w-4" />
                   </Button>
                   <Button size="sm" variant="ghost">
                     <MoreHorizontal className="h-4 w-4" />
