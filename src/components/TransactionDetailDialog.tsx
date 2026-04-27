@@ -27,6 +27,8 @@ interface SplitRow {
   id: string;
   account: string;
   amount: string;
+  vatRate: string;
+  nonBusiness: boolean;
   memo: string;
 }
 
