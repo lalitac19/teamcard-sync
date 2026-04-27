@@ -97,14 +97,17 @@ const CardStatement = () => {
     if (!card) return [];
     const list: Row[] = [];
 
+    const merchantQ = merchantQ_str();
     // Card spend (posted only) — money out of card
     transactions
       .filter((t) => t.cardId === card.id && t.status === "posted" && inRange(t.date, from, to))
+      .filter((t) => !merchantQ || t.merchant.toLowerCase().includes(merchantQ))
+      .filter((t) => country === ALL || t.country === country)
       .forEach((t) => {
         list.push({
           id: `tx-${t.id}`,
           date: t.date,
-          description: `${t.merchant} — ${t.category}`,
+          description: `${t.merchant} — ${t.category}${t.country ? ` · ${t.country}` : ""}`,
           reference: t.id.toUpperCase(),
           category: "card_spend",
           amount: -t.amount,
