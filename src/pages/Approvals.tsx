@@ -18,6 +18,7 @@ import {
   walletTransfers as seedTransfers,
   cardById,
   walletBalance,
+  cards as allCards, members, allCountries,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
   type CardRequest, type TopUpRequest,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/mockData";
 import { Check, X, Inbox, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { TableFilters, ALL } from "@/components/TableFilters";
 
 type ApprovalStatus = "pending" | "approved" | "rejected";
 
