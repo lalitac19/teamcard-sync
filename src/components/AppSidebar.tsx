@@ -12,6 +12,7 @@ import {
   HandCoins,
   FileText,
   ClipboardCheck,
+  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +48,7 @@ const accountingItems = [
 ];
 
 const bottomItems = [
+  { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
