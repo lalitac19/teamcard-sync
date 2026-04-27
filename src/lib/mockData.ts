@@ -325,6 +325,13 @@ export const limitRequests: LimitIncreaseRequest[] = [
   { id: "lr3", date: "2024-10-10", memberId: "m4", cardId: "c5", currentLimit: 3000, requestedLimit: 4000, reason: "Increased AWS usage", status: "approved" },
 ];
 
+export const walletTransfers: WalletTransfer[] = [
+  { id: "wt1", date: "2024-10-22", direction: "wallet_to_card", amount: 2000, toCardId: "c1", requestedBy: "m1", reason: "Top up for travel week", status: "pending" },
+  { id: "wt2", date: "2024-10-21", direction: "card_to_card", amount: 500, fromCardId: "c5", toCardId: "c3", requestedBy: "m1", reason: "Reallocate unused SaaS budget", status: "pending" },
+  { id: "wt3", date: "2024-10-20", direction: "card_to_wallet", amount: 1500, fromCardId: "c6", requestedBy: "m1", reason: "Card frozen — return funds", status: "approved" },
+  { id: "wt4", date: "2024-10-18", direction: "wallet_to_card", amount: 3000, toCardId: "c4", requestedBy: "m1", reason: "Q4 ad spend", status: "approved" },
+];
+
 export const walletBalance = 47820.50;
 export const walletReserved = 12400.00;
 
