@@ -210,4 +210,54 @@ function Toggle({ label, defaultChecked }: { label: string; defaultChecked?: boo
   );
 }
 
+function FeesAccountCard() {
+  const [account, setAccount] = useState<string>("5090");
+
+  useEffect(() => {
+    const stored = localStorage.getItem(FEES_ACCOUNT_KEY);
+    if (stored) setAccount(stored);
+  }, []);
+
+  const handleChange = (v: string) => {
+    setAccount(v);
+    localStorage.setItem(FEES_ACCOUNT_KEY, v);
+    const acc = chartOfAccounts.find((a) => a.code === v);
+    toast.success(`Card fees will auto-map to ${acc?.code} · ${acc?.name}`);
+  };
+
+  const expenseAccounts = chartOfAccounts.filter((a) => a.type === "Expense");
+
+  return (
+    <Card className="shadow-soft">
+      <CardContent className="p-6">
+        <h3 className="text-base font-semibold">Card fees mapping</h3>
+        <p className="text-sm text-muted-foreground">
+          Choose the default account for card transaction fees (FX, processing,
+          interchange). Fees are auto-mapped to this account on every export.
+        </p>
+        <div className="mt-4 space-y-1.5">
+          <Label>Default fees account</Label>
+          <Select value={account} onValueChange={handleChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select an expense account" />
+            </SelectTrigger>
+            <SelectContent>
+              {expenseAccounts.map((a) => (
+                <SelectItem key={a.code} value={a.code}>
+                  <span className="font-mono text-muted-foreground">{a.code}</span> · {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Only the amount paid to the vendor needs manual mapping in the
+            Accounting Export.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+
 export default Settings;
