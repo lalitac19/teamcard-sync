@@ -129,13 +129,14 @@ const Transactions = () => {
                 <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Receipt</TableHead>
+                <TableHead className="text-right">Fee</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={10} className="py-12 text-center text-sm text-muted-foreground">
                     <Inbox className="mx-auto mb-2 h-6 w-6" />
                     No transactions match the selected filters.
                   </TableCell>
