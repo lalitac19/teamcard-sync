@@ -64,6 +64,7 @@ const Approvals = () => {
   const [invs, setInvs] = useState<Invoice[]>(seedInvoices);
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<LimitIncreaseRequest[]>(seedLimitRequests);
+  const [transfers, setTransfers] = useState<WalletTransfer[]>(seedTransfers);
 
   const counts = useMemo(() => ({
     txn: txns.filter((r) => r.status === "pending").length,
@@ -71,7 +72,8 @@ const Approvals = () => {
     inv: invs.filter((r) => r.status === "pending").length,
     card: cReqs.filter((r) => r.status === "pending").length,
     limit: lReqs.filter((r) => r.status === "pending").length,
-  }), [txns, oop, invs, cReqs, lReqs]);
+    transfer: transfers.filter((r) => r.status === "pending").length,
+  }), [txns, oop, invs, cReqs, lReqs, transfers]);
 
   const setField = <T extends { id: string; status: ApprovalStatus }>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -86,6 +88,12 @@ const Approvals = () => {
   const updateInv = setField(setInvs, "Invoice");
   const updateCard = setField(setCReqs, "Card request");
   const updateLimit = setField(setLReqs, "Limit request");
+  const updateTransfer = setField(setTransfers, "Transfer");
+
+  const directionLabel = (d: TransferDirection) =>
+    d === "wallet_to_card" ? "Wallet → Card"
+    : d === "card_to_wallet" ? "Card → Wallet"
+    : "Card → Card";
 
   return (
     <AppLayout
