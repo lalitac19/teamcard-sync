@@ -209,11 +209,23 @@ const Approvals = () => {
         </TabsList>
 
         {/* 1. Transaction approvals — tagging only */}
-        <TabsContent value="txn" className="mt-4">
-          <p className="mb-3 text-xs text-muted-foreground">
+        <TabsContent value="txn" className="mt-4 space-y-3">
+          <p className="text-xs text-muted-foreground">
             Tagging only — these decisions do not affect whether the transaction flows to Accounting Export.
           </p>
-          {txns.length === 0 ? <EmptyState /> : (
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            cardholders={cardholderOptions}
+            cardholderId={memberFilter}
+            onCardholderChange={(v) => { setMemberFilter(v); setCardFilter(ALL); }}
+            cards={cardOptions}
+            cardId={activeCardId}
+            onCardChange={setCardFilter}
+            merchant={merchantQ}
+            onMerchantChange={setMerchantQ}
+            onReset={resetFilters}
+          />
+          {txnsFiltered.length === 0 ? <EmptyState /> : (
             <Card className="shadow-soft">
               <CardContent className="p-0">
                 <Table>
@@ -230,7 +242,7 @@ const Approvals = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {txns.map((r) => {
+                    {txnsFiltered.map((r) => {
                       const m = memberById(r.memberId);
                       const c = cardById(r.cardId);
                       return (
