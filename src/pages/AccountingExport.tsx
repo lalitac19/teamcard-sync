@@ -351,7 +351,6 @@ function CardTxnsTab() {
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
                       <TableCell className="text-sm">{m?.name}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                      </TableCell>
                       <TableCell>
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
