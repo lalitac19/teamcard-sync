@@ -94,7 +94,7 @@ const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v
     </SelectTrigger>
     <SelectContent>
       {vatRates.map((v) => (
-        <SelectItem key={v.rate} value={String(v.rate)}>{v.label}</SelectItem>
+        <SelectItem key={v.code} value={v.code}>{v.label}</SelectItem>
       ))}
     </SelectContent>
   </Select>
