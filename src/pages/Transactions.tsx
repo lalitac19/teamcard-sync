@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import {
   transactions, formatCurrency, formatDate, memberById, cardById,
-  cards as allCards, members, allCountries,
+  cards as allCards, members, allCountries, txnApprovals,
 } from "@/lib/mockData";
 import { Download, FileText, Inbox } from "lucide-react";
 import { TableFilters, ALL } from "@/components/TableFilters";
@@ -18,7 +18,13 @@ import type { Transaction } from "@/lib/mockData";
 const statusBadge = (s: string) => {
   if (s === "posted") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Posted</Badge>;
   if (s === "pending") return <Badge className="bg-warning/10 text-warning-foreground hover:bg-warning/10 border-0">Pending</Badge>;
-  return <Badge variant="destructive">Declined</Badge>;
+};
+
+const approvalBadge = (s?: "pending" | "approved" | "rejected") => {
+  if (s === "approved") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Approved</Badge>;
+  if (s === "pending") return <Badge className="bg-warning/10 text-warning-foreground hover:bg-warning/10 border-0">Pending</Badge>;
+  if (s === "rejected") return <Badge variant="destructive">Rejected</Badge>;
+  return <span className="text-xs text-muted-foreground">Auto-approved</span>;
 };
 
 const inRange = (iso: string, from?: Date, to?: Date) => {
@@ -125,9 +131,8 @@ const Transactions = () => {
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
                 <TableHead>Card</TableHead>
-                <TableHead>Country</TableHead>
-                <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Approval</TableHead>
                 <TableHead>Receipt</TableHead>
                 <TableHead className="text-right">Fee</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
@@ -136,7 +141,7 @@ const Transactions = () => {
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="py-12 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
                     <Inbox className="mx-auto mb-2 h-6 w-6" />
                     No transactions match the selected filters.
                   </TableCell>
@@ -145,6 +150,7 @@ const Transactions = () => {
               {filtered.map((t) => {
                 const m = memberById(t.memberId);
                 const c = t.cardId ? cardById(t.cardId) : undefined;
+                const approval = txnApprovals.find((a) => a.txnId === t.id)?.status;
                 return (
                   <TableRow key={t.id} onClick={() => setSelected(t)} className="cursor-pointer hover:bg-muted/50">
                     <TableCell className="text-sm text-muted-foreground">{formatDate(t.date)}</TableCell>
@@ -155,9 +161,8 @@ const Transactions = () => {
                     <TableCell className="text-sm font-mono text-muted-foreground">
                       {c ? `•• ${c.last4}` : "—"}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{t.country ?? "—"}</TableCell>
-                    <TableCell><Badge variant="secondary" className="font-normal">{t.category}</Badge></TableCell>
                     <TableCell>{statusBadge(t.status)}</TableCell>
+                    <TableCell>{approvalBadge(approval)}</TableCell>
                     <TableCell>
                       {t.receipt ? (
                         <FileText className="h-4 w-4 text-success" />
