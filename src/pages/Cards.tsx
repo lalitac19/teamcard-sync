@@ -510,26 +510,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               </Button>
             </section>
 
-            <section className="space-y-3 rounded-lg border border-destructive/40 p-4">
-              <p className="text-sm font-medium text-destructive flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" /> Terminate card
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Permanently cancels the card. Remaining balance ({formatCurrency(card.balance)}) will
-                be returned to the wallet. This action cannot be undone.
-              </p>
-              <div className="space-y-1.5">
-                <Label>Type <span className="font-mono">TERMINATE</span> to confirm</Label>
-                <Input
-                  value={terminateConfirm}
-                  onChange={(e) => setTerminateConfirm(e.target.value)}
-                  placeholder="TERMINATE"
-                />
-              </div>
-              <Button variant="destructive" onClick={handleTerminate} className="gap-2">
-                <Ban className="h-4 w-4" /> Terminate card
-              </Button>
-            </section>
           </TabsContent>
         </Tabs>
       </DialogContent>
