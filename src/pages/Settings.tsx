@@ -14,6 +14,7 @@ import {
   defaultRolePermissions,
   permissionCatalog,
   chartOfAccounts,
+  vatRates,
   type RolePermissions,
 } from "@/lib/mockData";
 import { toast } from "sonner";
