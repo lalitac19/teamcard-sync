@@ -3,6 +3,11 @@ import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -30,8 +35,32 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, MoreHorizontal, ArrowLeftRight, CreditCard } from "lucide-react";
+import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, Sun, AlertTriangle, RefreshCcw, Ban, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+
+const MERCHANT_CATEGORIES = [
+  "Software & SaaS",
+  "Travel & Transportation",
+  "Lodging & Hotels",
+  "Restaurants & Food",
+  "Office Supplies",
+  "Marketing & Advertising",
+  "Professional Services",
+  "Utilities & Telecom",
+  "Entertainment",
+  "ATM & Cash",
+];
+
+const REGIONS = [
+  "North America",
+  "Europe (EEA)",
+  "United Kingdom",
+  "Latin America",
+  "Middle East",
+  "Africa",
+  "Asia Pacific",
+  "Oceania",
+];
 
 const statusBadge = (status: string) => {
   if (status === "active") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Active</Badge>;
