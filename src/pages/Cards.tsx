@@ -211,7 +211,98 @@ function CardFundsDialog({ card, mode }: { card: CardModel; mode: "add" | "withd
   );
 }
 
+const COUNTRIES = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "IE", name: "Ireland" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "ES", name: "Spain" },
+  { code: "IT", name: "Italy" },
+  { code: "NL", name: "Netherlands" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "IN", name: "India" },
+  { code: "SG", name: "Singapore" },
+  { code: "AU", name: "Australia" },
+  { code: "JP", name: "Japan" },
+  { code: "BR", name: "Brazil" },
+];
+
+function MultiSelectChips({
+  label, placeholder, options, selected, onChange, allLabel = "All",
+}: {
+  label: string;
+  placeholder: string;
+  options: { value: string; label: string }[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+  allLabel?: string;
+}) {
+  const toggle = (v: string) =>
+    onChange(selected.includes(v) ? selected.filter((s) => s !== v) : [...selected, v]);
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <Label>{label}</Label>
+        {selected.length > 0 && (
+          <button
+            type="button"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => onChange([])}
+          >
+            Clear
+          </button>
+        )}
+      </div>
+      <div className="rounded-md border border-border p-2">
+        {selected.length === 0 ? (
+          <p className="px-1 py-0.5 text-xs text-muted-foreground">{allLabel} ({placeholder})</p>
+        ) : (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {selected.map((s) => {
+              const opt = options.find((o) => o.value === s);
+              return (
+                <Badge key={s} variant="secondary" className="gap-1">
+                  {opt?.label ?? s}
+                  <button
+                    type="button"
+                    onClick={() => toggle(s)}
+                    className="ml-0.5 text-muted-foreground hover:text-foreground"
+                    aria-label={`Remove ${opt?.label ?? s}`}
+                  >
+                    ×
+                  </button>
+                </Badge>
+              );
+            })}
+          </div>
+        )}
+        <div className="max-h-32 overflow-y-auto rounded border border-border/60 bg-secondary/30">
+          {options.map((o) => (
+            <label
+              key={o.value}
+              className="flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm hover:bg-secondary"
+            >
+              <Checkbox
+                checked={selected.includes(o.value)}
+                onCheckedChange={() => toggle(o.value)}
+              />
+              <span>{o.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function IssueCardDialog() {
+  const [categories, setCategories] = useState<string[]>([]);
+  const [countries, setCountries] = useState<string[]>([]);
+
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
@@ -246,14 +337,26 @@ function IssueCardDialog() {
           <Input type="number" placeholder="5000" />
           <p className="text-xs text-muted-foreground">Maximum amount allowed for a single transaction.</p>
         </div>
-        <div className="space-y-1.5">
-          <Label>Allowed merchant categories</Label>
-          <Input placeholder="e.g. Software, Travel, Office" />
-        </div>
+        <MultiSelectChips
+          label="Allowed merchant categories"
+          placeholder="all categories allowed"
+          allLabel="No restrictions"
+          options={MERCHANT_CATEGORIES.map((c) => ({ value: c, label: c }))}
+          selected={categories}
+          onChange={setCategories}
+        />
+        <MultiSelectChips
+          label="Allowed countries"
+          placeholder="all countries allowed"
+          allLabel="No restrictions"
+          options={COUNTRIES.map((c) => ({ value: c.code, label: `${c.name} (${c.code})` }))}
+          selected={countries}
+          onChange={setCountries}
+        />
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button>Issue card</Button>
+        <Button onClick={() => toast.success("Card issued")}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
