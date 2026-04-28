@@ -135,11 +135,13 @@ const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v
 
 /* ---------- Reusable split editor ---------- */
 function SplitEditor({
-  total, lines, onChange,
+  total, lines, onChange, showCredit = false, defaultCreditAccount,
 }: {
   total: number;
   lines: SplitLine[];
   onChange: (lines: SplitLine[]) => void;
+  showCredit?: boolean;
+  defaultCreditAccount?: string;
 }) {
   const update = (id: string, patch: Partial<SplitLine>) =>
     onChange(lines.map((l) => (l.id === id ? { ...l, ...patch } : l)));
@@ -147,7 +149,7 @@ function SplitEditor({
   const add = () => {
     const allocated = splitTotal(lines);
     const remaining = Math.max(0, +(total - allocated).toFixed(2));
-    onChange([...lines, newLine(remaining)]);
+    onChange([...lines, newLine(remaining, undefined, undefined, defaultCreditAccount)]);
   };
 
   const allocated = splitTotal(lines);
@@ -166,6 +168,7 @@ function SplitEditor({
         <TableHeader>
           <TableRow>
             <TableHead className="h-8 text-xs">Debit account</TableHead>
+            {showCredit && <TableHead className="h-8 text-xs">Credit account</TableHead>}
             <TableHead className="h-8 w-28 text-xs">Amount</TableHead>
             <TableHead className="h-8 w-28 text-xs">VAT</TableHead>
             <TableHead className="h-8 w-24 text-xs">Non-business</TableHead>
@@ -179,6 +182,11 @@ function SplitEditor({
               <TableCell className="py-1.5">
                 <AccountSelect value={l.debitAccount} onChange={(v) => update(l.id, { debitAccount: v })} size="xs" />
               </TableCell>
+              {showCredit && (
+                <TableCell className="py-1.5">
+                  <CreditAccountSelect value={l.creditAccount} onChange={(v) => update(l.id, { creditAccount: v })} />
+                </TableCell>
+              )}
               <TableCell className="py-1.5">
                 <Input
                   type="number" step="0.01" value={l.amount}
