@@ -262,8 +262,8 @@ const AccountingExport = () => {
       <Tabs defaultValue="cards" className="w-full">
         <TabsList className="grid w-full grid-cols-2 md:max-w-2xl md:grid-cols-4">
           <TabsTrigger value="cards">Card transactions</TabsTrigger>
-          <TabsTrigger value="reimbursements">Reimbursements</TabsTrigger>
-          <TabsTrigger value="invoices">Unpaid invoices</TabsTrigger>
+          <TabsTrigger value="reimbursements">Out of pocket</TabsTrigger>
+          <TabsTrigger value="invoices">Vendor Invoices</TabsTrigger>
           <TabsTrigger value="topups">Wallet top-ups</TabsTrigger>
         </TabsList>
 
