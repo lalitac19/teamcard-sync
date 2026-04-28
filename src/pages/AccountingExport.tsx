@@ -111,6 +111,21 @@ const CreditAccountSelect = ({ value, onChange, placeholder = "Map credit accoun
   </Select>
 );
 
+const BankAccountSelect = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => (
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="h-8 w-[220px] border-dashed text-xs">
+      <SelectValue placeholder="Map bank account…" />
+    </SelectTrigger>
+    <SelectContent>
+      {chartOfAccounts.filter((a) => a.type === "Asset").map((a) => (
+        <SelectItem key={a.code} value={a.code}>
+          <span className="font-mono text-muted-foreground">{a.code}</span> · {a.name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
 const VendorInput = ({ value, onChange, placeholder = "Vendor name" }: { value?: string; onChange: (v: string) => void; placeholder?: string }) => (
   <Input
     value={value ?? ""}
