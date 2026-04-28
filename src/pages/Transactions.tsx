@@ -150,6 +150,7 @@ const Transactions = () => {
               {filtered.map((t) => {
                 const m = memberById(t.memberId);
                 const c = t.cardId ? cardById(t.cardId) : undefined;
+                const approval = txnApprovals.find((a) => a.txnId === t.id)?.status;
                 return (
                   <TableRow key={t.id} onClick={() => setSelected(t)} className="cursor-pointer hover:bg-muted/50">
                     <TableCell className="text-sm text-muted-foreground">{formatDate(t.date)}</TableCell>
@@ -160,9 +161,8 @@ const Transactions = () => {
                     <TableCell className="text-sm font-mono text-muted-foreground">
                       {c ? `•• ${c.last4}` : "—"}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{t.country ?? "—"}</TableCell>
-                    <TableCell><Badge variant="secondary" className="font-normal">{t.category}</Badge></TableCell>
                     <TableCell>{statusBadge(t.status)}</TableCell>
+                    <TableCell>{approvalBadge(approval)}</TableCell>
                     <TableCell>
                       {t.receipt ? (
                         <FileText className="h-4 w-4 text-success" />
