@@ -274,21 +274,17 @@ function FeesAccountCard() {
         </div>
 
         <div className="mt-4 space-y-1.5">
-          <Label>Default VAT rate on fees (%)</Label>
+          <Label>Default VAT rate on fees</Label>
           <Select value={vatRate} onValueChange={handleVatChange}>
             <SelectTrigger>
               <SelectValue placeholder="Select VAT rate" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0">0% (No VAT)</SelectItem>
-              <SelectItem value="5">5%</SelectItem>
-              <SelectItem value="7.5">7.5%</SelectItem>
-              <SelectItem value="10">10%</SelectItem>
-              <SelectItem value="15">15%</SelectItem>
-              <SelectItem value="18">18%</SelectItem>
-              <SelectItem value="19">19%</SelectItem>
-              <SelectItem value="20">20%</SelectItem>
-              <SelectItem value="21">21%</SelectItem>
+              {vatRates.map((v) => (
+                <SelectItem key={v.code} value={v.code}>
+                  {v.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
