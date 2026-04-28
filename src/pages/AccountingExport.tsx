@@ -658,6 +658,8 @@ function InvoicesTab() {
                             total={r.amount}
                             lines={r.splits ?? []}
                             onChange={(lines) => update(r.id, { splits: lines })}
+                            showCredit
+                            defaultCreditAccount={r.creditAccount}
                           />
                         </TableCell>
                       </TableRow>
