@@ -241,6 +241,9 @@ export const chartOfAccounts = [
   { code: "5090", name: "Bank & Card Fees", type: "Expense" },
   { code: "1010", name: "Cash — Corporate Wallet", type: "Asset" },
   { code: "1020", name: "Bank Account — Operating", type: "Asset" },
+  { code: "2010", name: "Accounts Payable", type: "Liability" },
+  { code: "2020", name: "Employee Reimbursements Payable", type: "Liability" },
+  { code: "2030", name: "Credit Card Clearing", type: "Liability" },
 ];
 
 export const vatRates = [
