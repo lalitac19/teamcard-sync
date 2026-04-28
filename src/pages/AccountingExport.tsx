@@ -57,8 +57,8 @@ const splitTotal = (lines: SplitLine[]) =>
 const splitsBalanced = (lines: SplitLine[], total: number) =>
   Math.abs(splitTotal(lines) - total) < 0.005;
 
-const splitsReady = (lines: SplitLine[]) =>
-  lines.length > 0 && lines.every((l) => !!l.debitAccount && (!!l.vatRate || l.nonBusiness));
+const splitsReady = (lines: SplitLine[], requireCredit = false) =>
+  lines.length > 0 && lines.every((l) => !!l.debitAccount && (!!l.vatRate || l.nonBusiness) && (!requireCredit || !!l.creditAccount));
 
 /* ---------- Reusable selects ---------- */
 const AccountingHeader = ({ count, onExport }: { count: number; onExport: () => void }) => (
