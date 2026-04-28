@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 
 const FEES_ACCOUNT_KEY = "accounting:feesAccount";
+const FEES_VAT_RATE_KEY = "accounting:feesVatRate";
 
 const Settings = () => {
   return (
