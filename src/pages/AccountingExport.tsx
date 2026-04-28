@@ -34,15 +34,17 @@ const getDefaultFeesAccount = () => {
 interface SplitLine {
   id: string;
   debitAccount?: string;
+  creditAccount?: string;
   amount: string; // string for input
   vatRate?: string;
   nonBusiness: boolean;
   memo: string;
 }
 
-const newLine = (amount: number, debitAccount?: string, vatRate?: string): SplitLine => ({
+const newLine = (amount: number, debitAccount?: string, vatRate?: string, creditAccount?: string): SplitLine => ({
   id: crypto.randomUUID(),
   debitAccount,
+  creditAccount,
   amount: amount.toFixed(2),
   vatRate,
   nonBusiness: false,
