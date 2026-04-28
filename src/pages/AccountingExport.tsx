@@ -552,6 +552,8 @@ function InvoicesTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      creditAccount: "2010" as string | undefined,
+      vendorName: i.vendor as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
@@ -586,6 +588,7 @@ function InvoicesTab() {
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
@@ -600,7 +603,9 @@ function InvoicesTab() {
                     <TableRow data-state={r.selected ? "selected" : undefined}>
                       <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
-                      <TableCell className="text-sm font-medium">{r.vendor}</TableCell>
+                      <TableCell>
+                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
@@ -608,6 +613,9 @@ function InvoicesTab() {
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <CreditAccountSelect value={r.creditAccount} onChange={(v) => update(r.id, { creditAccount: v })} />
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -633,7 +641,7 @@ function InvoicesTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={10} className="bg-muted/20 p-3">
+                        <TableCell colSpan={11} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
