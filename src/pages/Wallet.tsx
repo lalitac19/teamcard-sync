@@ -31,8 +31,7 @@ import { toast } from "sonner";
 
 const directionLabel = (d: TransferDirection) => {
   if (d === "wallet_to_card") return "Wallet → Card";
-  if (d === "card_to_wallet") return "Card → Wallet";
-  return "Card → Card (via Wallet)";
+  return "Card → Wallet";
 };
 
 const transferStatusBadge = (s: "pending" | "approved" | "rejected") => {
