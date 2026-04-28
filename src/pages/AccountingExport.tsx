@@ -697,9 +697,8 @@ function TopUpsTab() {
       ...w,
       selected: false,
       account: undefined as string | undefined,
+      sourceAccount: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      splitOpen: false,
-      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -725,63 +724,38 @@ function TopUpsTab() {
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
-                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = rowReady(r, r.amount);
-                const isSplit = !!r.splitOpen;
+                const ready = !!r.account && !!r.vatRate && !!r.sourceAccount;
                 return (
-                  <Fragment key={r.id}>
-                    <TableRow data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                      <TableCell className="font-mono text-xs">{r.reference}</TableCell>
-                      <TableCell className="text-sm">{r.source}</TableCell>
-                      <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
-                      <TableCell>
-                        {isSplit
-                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
-                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
-                      </TableCell>
-                      <TableCell>
-                        {isSplit
-                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
-                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
-                      </TableCell>
-                      <TableCell>
-                        <SplitToggle
-                          open={isSplit}
-                          onClick={() => update(r.id, {
-                            splitOpen: !isSplit,
-                            splits: !isSplit
-                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
-                              : r.splits,
-                          })}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {r.status === "processing"
-                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
-                      </TableCell>
-                    </TableRow>
-                    {isSplit && (
-                      <TableRow>
-                        <TableCell colSpan={9} className="bg-muted/20 p-3">
-                          <SplitEditor
-                            total={r.amount}
-                            lines={r.splits ?? []}
-                            onChange={(lines) => update(r.id, { splits: lines })}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </Fragment>
+                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
+                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                    <TableCell className="font-mono text-xs">{r.reference}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-muted-foreground">{r.source}</span>
+                        <BankAccountSelect value={r.sourceAccount} onChange={(v) => update(r.id, { sourceAccount: v })} />
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
+                    <TableCell>
+                      <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
+                    </TableCell>
+                    <TableCell>
+                      <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />
+                    </TableCell>
+                    <TableCell>
+                      {r.status === "processing"
+                        ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
+                        : ready
+                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                          : <Badge variant="secondary">Needs mapping</Badge>}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>
