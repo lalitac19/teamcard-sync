@@ -268,8 +268,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Limits
   const [perTxnLimit, setPerTxnLimit] = useState(String(card.spendLimit));
-  const [limitPeriod, setLimitPeriod] = useState(card.limitPeriod);
-  const [periodLimit, setPeriodLimit] = useState(String(card.spendLimit));
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
@@ -366,42 +364,41 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   : "Card is active and accepting transactions per the configured limits and controls."}
               </p>
             </div>
+
+            <section className="space-y-3 rounded-lg border border-destructive/40 p-4">
+              <p className="text-sm font-medium text-destructive flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" /> Terminate card
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Permanently cancels the card. Remaining balance ({formatCurrency(card.balance)}) will
+                be returned to the wallet. This action cannot be undone.
+              </p>
+              <div className="space-y-1.5">
+                <Label>Type <span className="font-mono">TERMINATE</span> to confirm</Label>
+                <Input
+                  value={terminateConfirm}
+                  onChange={(e) => setTerminateConfirm(e.target.value)}
+                  placeholder="TERMINATE"
+                />
+              </div>
+              <Button variant="destructive" onClick={handleTerminate} className="gap-2">
+                <Ban className="h-4 w-4" /> Terminate card
+              </Button>
+            </section>
           </TabsContent>
 
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Per-transaction limit (USD)</Label>
-                <Input
-                  type="number"
-                  value={perTxnLimit}
-                  onChange={(e) => setPerTxnLimit(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Limit period</Label>
-                <Select value={limitPeriod} onValueChange={(v) => setLimitPeriod(v as typeof limitPeriod)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="per-transaction">Per transaction only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5 col-span-2">
-                <Label>{limitPeriod === "per-transaction" ? "Lifetime cap" : `${limitPeriod[0].toUpperCase() + limitPeriod.slice(1)} cap`} (USD)</Label>
-                <Input
-                  type="number"
-                  value={periodLimit}
-                  onChange={(e) => setPeriodLimit(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Maximum total spend allowed within the selected window.
-                </p>
-              </div>
+            <div className="space-y-1.5">
+              <Label>Per-transaction limit (USD)</Label>
+              <Input
+                type="number"
+                value={perTxnLimit}
+                onChange={(e) => setPerTxnLimit(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Maximum amount allowed for a single transaction on this card.
+              </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
@@ -534,26 +531,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               </Button>
             </section>
 
-            <section className="space-y-3 rounded-lg border border-destructive/40 p-4">
-              <p className="text-sm font-medium text-destructive flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" /> Terminate card
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Permanently cancels the card. Remaining balance ({formatCurrency(card.balance)}) will
-                be returned to the wallet. This action cannot be undone.
-              </p>
-              <div className="space-y-1.5">
-                <Label>Type <span className="font-mono">TERMINATE</span> to confirm</Label>
-                <Input
-                  value={terminateConfirm}
-                  onChange={(e) => setTerminateConfirm(e.target.value)}
-                  placeholder="TERMINATE"
-                />
-              </div>
-              <Button variant="destructive" onClick={handleTerminate} className="gap-2">
-                <Ban className="h-4 w-4" /> Terminate card
-              </Button>
-            </section>
           </TabsContent>
         </Tabs>
       </DialogContent>
