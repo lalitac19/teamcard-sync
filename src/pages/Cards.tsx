@@ -148,6 +148,7 @@ const Cards = () => {
                         <CardFundsDialog card={card} mode="add" />
                         <CardFundsDialog card={card} mode="withdraw" />
                         <ManageCardDialog card={card} />
+                        <AuditTrailDialog card={card} />
                       </div>
                     </TableCell>
                   </TableRow>
