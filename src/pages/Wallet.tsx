@@ -261,7 +261,7 @@ function MoveMoneyDialog() {
             </Select>
           </div>
 
-          {(direction === "card_to_wallet" || direction === "card_to_card") && (
+          {direction === "card_to_wallet" && (
             <div className="space-y-1.5">
               <Label>From card</Label>
               <Select value={fromCard} onValueChange={setFromCard}>
