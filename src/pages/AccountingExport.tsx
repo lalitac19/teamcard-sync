@@ -433,6 +433,8 @@ function ReimbursementsTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      creditAccount: "2020" as string | undefined,
+      vendorName: "" as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
