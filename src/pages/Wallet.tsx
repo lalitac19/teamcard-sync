@@ -257,7 +257,6 @@ function MoveMoneyDialog() {
               <SelectContent>
                 <SelectItem value="wallet_to_card">Main wallet → Card</SelectItem>
                 <SelectItem value="card_to_wallet">Card → Main wallet</SelectItem>
-                <SelectItem value="card_to_card">Card → Card (routed via wallet)</SelectItem>
               </SelectContent>
             </Select>
           </div>
