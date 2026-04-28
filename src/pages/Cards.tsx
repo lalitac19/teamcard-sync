@@ -268,8 +268,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Limits
   const [perTxnLimit, setPerTxnLimit] = useState(String(card.spendLimit));
-  const [limitPeriod, setLimitPeriod] = useState(card.limitPeriod);
-  const [periodLimit, setPeriodLimit] = useState(String(card.spendLimit));
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
