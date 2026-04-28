@@ -368,38 +368,16 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Per-transaction limit (USD)</Label>
-                <Input
-                  type="number"
-                  value={perTxnLimit}
-                  onChange={(e) => setPerTxnLimit(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Limit period</Label>
-                <Select value={limitPeriod} onValueChange={(v) => setLimitPeriod(v as typeof limitPeriod)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="per-transaction">Per transaction only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5 col-span-2">
-                <Label>{limitPeriod === "per-transaction" ? "Lifetime cap" : `${limitPeriod[0].toUpperCase() + limitPeriod.slice(1)} cap`} (USD)</Label>
-                <Input
-                  type="number"
-                  value={periodLimit}
-                  onChange={(e) => setPeriodLimit(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Maximum total spend allowed within the selected window.
-                </p>
-              </div>
+            <div className="space-y-1.5">
+              <Label>Per-transaction limit (USD)</Label>
+              <Input
+                type="number"
+                value={perTxnLimit}
+                onChange={(e) => setPerTxnLimit(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Maximum amount allowed for a single transaction on this card.
+              </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
