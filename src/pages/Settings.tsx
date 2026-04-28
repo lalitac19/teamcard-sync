@@ -5,11 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle2, ShieldCheck } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, ShieldCheck, Plus, Trash2, Lock } from "lucide-react";
 import {
   defaultRolePermissions,
   permissionCatalog,
@@ -108,31 +118,164 @@ const Settings = () => {
   );
 };
 
-function RolesPermissions() {
-  const [roles, setRoles] = useState<RolePermissions[]>(defaultRolePermissions);
-  const [activeRole, setActiveRole] = useState<string>(defaultRolePermissions[0].role);
+const CUSTOM_ROLES_KEY = "roles:custom";
 
-  const current = roles.find((r) => r.role === activeRole)!;
+type ExtendedRole = RolePermissions & { custom?: boolean };
+
+function RolesPermissions() {
+  const [roles, setRoles] = useState<ExtendedRole[]>(defaultRolePermissions);
+  const [activeRole, setActiveRole] = useState<string>(defaultRolePermissions[0].role);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [cloneFrom, setCloneFrom] = useState<string>("__blank__");
+
+  useEffect(() => {
+    const stored = localStorage.getItem(CUSTOM_ROLES_KEY);
+    if (stored) {
+      try {
+        const custom: ExtendedRole[] = JSON.parse(stored);
+        setRoles([...defaultRolePermissions, ...custom.map((c) => ({ ...c, custom: true }))]);
+      } catch {/* ignore */}
+    }
+  }, []);
+
+  const persistCustom = (all: ExtendedRole[]) => {
+    const custom = all.filter((r) => r.custom);
+    localStorage.setItem(CUSTOM_ROLES_KEY, JSON.stringify(custom));
+  };
+
+  const current = roles.find((r) => r.role === activeRole) ?? roles[0];
 
   const togglePerm = (key: string) => {
-    setRoles((prev) =>
-      prev.map((r) =>
-        r.role === activeRole
+    setRoles((prev) => {
+      const next = prev.map((r) =>
+        r.role === current.role
           ? { ...r, permissions: { ...r.permissions, [key]: !r.permissions[key] } }
           : r,
-      ),
-    );
+      );
+      persistCustom(next);
+      return next;
+    });
+  };
+
+  const updateMeta = (field: "label" | "description", value: string) => {
+    setRoles((prev) => {
+      const next = prev.map((r) =>
+        r.role === current.role ? { ...r, [field]: value } : r,
+      );
+      persistCustom(next);
+      return next;
+    });
+  };
+
+  const handleCreate = () => {
+    const trimmed = newName.trim();
+    if (!trimmed) {
+      toast.error("Role name is required");
+      return;
+    }
+    const slug = `custom_${trimmed.toLowerCase().replace(/[^a-z0-9]+/g, "_")}_${Date.now().toString(36)}`;
+    const basePerms =
+      cloneFrom === "__blank__"
+        ? Object.fromEntries(permissionCatalog.map((p) => [p.key, false]))
+        : { ...(roles.find((r) => r.role === cloneFrom)?.permissions ?? {}) };
+
+    const created: ExtendedRole = {
+      role: slug as any,
+      label: trimmed,
+      description: newDesc.trim() || "Custom role",
+      permissions: basePerms,
+      custom: true,
+    };
+    setRoles((prev) => {
+      const next = [...prev, created];
+      persistCustom(next);
+      return next;
+    });
+    setActiveRole(slug);
+    setNewName("");
+    setNewDesc("");
+    setCloneFrom("__blank__");
+    setCreateOpen(false);
+    toast.success(`Role "${trimmed}" created`);
+  };
+
+  const handleDelete = (roleKey: string) => {
+    setRoles((prev) => {
+      const next = prev.filter((r) => r.role !== roleKey);
+      persistCustom(next);
+      return next;
+    });
+    if (activeRole === roleKey) setActiveRole(defaultRolePermissions[0].role);
+    toast.success("Role deleted");
   };
 
   const groups = Array.from(new Set(permissionCatalog.map((p) => p.group)));
+  const enabledCount = Object.values(current.permissions).filter(Boolean).length;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
+    <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
       <Card className="shadow-soft">
         <CardContent className="p-3">
-          <p className="px-2 pb-2 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Roles
-          </p>
+          <div className="flex items-center justify-between px-2 pb-2 pt-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Roles
+            </p>
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="ghost" className="h-7 gap-1 px-2">
+                  <Plus className="h-3.5 w-3.5" /> New
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create custom role</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label>Role name</Label>
+                    <Input
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      placeholder="e.g. Finance Reviewer"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={newDesc}
+                      onChange={(e) => setNewDesc(e.target.value)}
+                      placeholder="What this role can do"
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Start from</Label>
+                    <Select value={cloneFrom} onValueChange={setCloneFrom}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__blank__">Blank (no permissions)</SelectItem>
+                        {roles.map((r) => (
+                          <SelectItem key={r.role} value={r.role}>
+                            Clone from {r.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setCreateOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreate}>Create role</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
           <div className="space-y-1">
             {roles.map((r) => (
               <button
@@ -144,7 +287,29 @@ function RolesPermissions() {
                     : "hover:bg-secondary"
                 }`}
               >
-                <div className="font-medium">{r.label}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="font-medium truncate">{r.label}</div>
+                  {r.custom ? (
+                    <Badge
+                      variant="outline"
+                      className={`h-5 shrink-0 px-1.5 text-[10px] ${
+                        activeRole === r.role
+                          ? "border-primary-foreground/40 text-primary-foreground"
+                          : ""
+                      }`}
+                    >
+                      Custom
+                    </Badge>
+                  ) : (
+                    <Lock
+                      className={`h-3 w-3 shrink-0 ${
+                        activeRole === r.role
+                          ? "text-primary-foreground/70"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  )}
+                </div>
                 <div
                   className={`text-xs ${
                     activeRole === r.role
@@ -163,13 +328,66 @@ function RolesPermissions() {
       <Card className="shadow-soft">
         <CardContent className="p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="text-base font-semibold">{current.label}</h3>
-              <p className="text-sm text-muted-foreground">{current.description}</p>
+            <div className="flex-1 min-w-0 space-y-2">
+              {current.custom ? (
+                <>
+                  <Input
+                    value={current.label}
+                    onChange={(e) => updateMeta("label", e.target.value)}
+                    className="h-9 text-base font-semibold"
+                  />
+                  <Textarea
+                    value={current.description}
+                    onChange={(e) => updateMeta("description", e.target.value)}
+                    rows={2}
+                    className="text-sm"
+                  />
+                </>
+              ) : (
+                <>
+                  <h3 className="text-base font-semibold flex items-center gap-2">
+                    {current.label}
+                    <Badge variant="secondary" className="text-[10px]">System</Badge>
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{current.description}</p>
+                </>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {enabledCount} of {permissionCatalog.length} permissions enabled
+              </p>
             </div>
-            <Button size="sm" onClick={() => toast.success(`${current.label} permissions saved`)}>
-              Save changes
-            </Button>
+            <div className="flex items-center gap-2">
+              {current.custom && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5">
+                      <Trash2 className="h-3.5 w-3.5" /> Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete role "{current.label}"?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Members assigned to this role will need to be reassigned.
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete(current.role)}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              <Button size="sm" onClick={() => {
+                persistCustom(roles);
+                toast.success(`${current.label} permissions saved`);
+              }}>
+                Save changes
+              </Button>
+            </div>
           </div>
 
           <div className="mt-6 space-y-6">
