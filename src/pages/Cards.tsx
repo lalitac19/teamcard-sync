@@ -147,12 +147,7 @@ const Cards = () => {
                       <div className="flex justify-end gap-1">
                         <CardFundsDialog card={card} mode="add" />
                         <CardFundsDialog card={card} mode="withdraw" />
-                        <Button size="sm" variant="ghost" title="Freeze">
-                          <Snowflake className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        <ManageCardDialog card={card} />
                       </div>
                     </TableCell>
                   </TableRow>
