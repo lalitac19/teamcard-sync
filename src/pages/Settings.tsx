@@ -213,10 +213,13 @@ function Toggle({ label, defaultChecked }: { label: string; defaultChecked?: boo
 
 function FeesAccountCard() {
   const [account, setAccount] = useState<string>("5090");
+  const [vatRate, setVatRate] = useState<string>("20");
 
   useEffect(() => {
     const stored = localStorage.getItem(FEES_ACCOUNT_KEY);
     if (stored) setAccount(stored);
+    const storedVat = localStorage.getItem(FEES_VAT_RATE_KEY);
+    if (storedVat) setVatRate(storedVat);
   }, []);
 
   const handleChange = (v: string) => {
@@ -226,7 +229,18 @@ function FeesAccountCard() {
     toast.success(`Card fees will auto-map to ${acc?.code} · ${acc?.name}`);
   };
 
+  const handleVatChange = (v: string) => {
+    setVatRate(v);
+    localStorage.setItem(FEES_VAT_RATE_KEY, v);
+    toast.success(`Default VAT rate on fees set to ${v}% (inclusive)`);
+  };
+
   const expenseAccounts = chartOfAccounts.filter((a) => a.type === "Expense");
+
+  const rate = parseFloat(vatRate) || 0;
+  const sampleGross = 100;
+  const sampleNet = rate > 0 ? sampleGross / (1 + rate / 100) : sampleGross;
+  const sampleVat = sampleGross - sampleNet;
 
   return (
     <Card className="shadow-soft">
@@ -254,6 +268,40 @@ function FeesAccountCard() {
             Only the amount paid to the vendor needs manual mapping in the
             Accounting Export.
           </p>
+        </div>
+
+        <div className="mt-4 space-y-1.5">
+          <Label>Default VAT rate on fees (%)</Label>
+          <Select value={vatRate} onValueChange={handleVatChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select VAT rate" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">0% (No VAT)</SelectItem>
+              <SelectItem value="5">5%</SelectItem>
+              <SelectItem value="7.5">7.5%</SelectItem>
+              <SelectItem value="10">10%</SelectItem>
+              <SelectItem value="15">15%</SelectItem>
+              <SelectItem value="18">18%</SelectItem>
+              <SelectItem value="19">19%</SelectItem>
+              <SelectItem value="20">20%</SelectItem>
+              <SelectItem value="21">21%</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Fees are always treated as <strong>inclusive of VAT</strong>. The VAT
+            portion is split out automatically on export.
+          </p>
+          {rate > 0 && (
+            <div className="mt-2 rounded-md border border-border bg-secondary/40 p-3 text-xs">
+              <p className="font-medium">Example on $100 fee (inclusive)</p>
+              <div className="mt-1 grid grid-cols-3 gap-2 text-muted-foreground">
+                <div>Net: <span className="font-mono text-foreground">${sampleNet.toFixed(2)}</span></div>
+                <div>VAT ({rate}%): <span className="font-mono text-foreground">${sampleVat.toFixed(2)}</span></div>
+                <div>Gross: <span className="font-mono text-foreground">${sampleGross.toFixed(2)}</span></div>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
