@@ -34,15 +34,17 @@ const getDefaultFeesAccount = () => {
 interface SplitLine {
   id: string;
   debitAccount?: string;
+  creditAccount?: string;
   amount: string; // string for input
   vatRate?: string;
   nonBusiness: boolean;
   memo: string;
 }
 
-const newLine = (amount: number, debitAccount?: string, vatRate?: string): SplitLine => ({
+const newLine = (amount: number, debitAccount?: string, vatRate?: string, creditAccount?: string): SplitLine => ({
   id: crypto.randomUUID(),
   debitAccount,
+  creditAccount,
   amount: amount.toFixed(2),
   vatRate,
   nonBusiness: false,
@@ -55,8 +57,8 @@ const splitTotal = (lines: SplitLine[]) =>
 const splitsBalanced = (lines: SplitLine[], total: number) =>
   Math.abs(splitTotal(lines) - total) < 0.005;
 
-const splitsReady = (lines: SplitLine[]) =>
-  lines.length > 0 && lines.every((l) => !!l.debitAccount && (!!l.vatRate || l.nonBusiness));
+const splitsReady = (lines: SplitLine[], requireCredit = false) =>
+  lines.length > 0 && lines.every((l) => !!l.debitAccount && (!!l.vatRate || l.nonBusiness) && (!requireCredit || !!l.creditAccount));
 
 /* ---------- Reusable selects ---------- */
 const AccountingHeader = ({ count, onExport }: { count: number; onExport: () => void }) => (
@@ -109,6 +111,21 @@ const CreditAccountSelect = ({ value, onChange, placeholder = "Map credit accoun
   </Select>
 );
 
+const BankAccountSelect = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => (
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="h-8 w-[220px] border-dashed text-xs">
+      <SelectValue placeholder="Map bank account…" />
+    </SelectTrigger>
+    <SelectContent>
+      {chartOfAccounts.filter((a) => a.type === "Asset").map((a) => (
+        <SelectItem key={a.code} value={a.code}>
+          <span className="font-mono text-muted-foreground">{a.code}</span> · {a.name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
 const VendorInput = ({ value, onChange, placeholder = "Vendor name" }: { value?: string; onChange: (v: string) => void; placeholder?: string }) => (
   <Input
     value={value ?? ""}
@@ -133,11 +150,13 @@ const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v
 
 /* ---------- Reusable split editor ---------- */
 function SplitEditor({
-  total, lines, onChange,
+  total, lines, onChange, showCredit = false, defaultCreditAccount,
 }: {
   total: number;
   lines: SplitLine[];
   onChange: (lines: SplitLine[]) => void;
+  showCredit?: boolean;
+  defaultCreditAccount?: string;
 }) {
   const update = (id: string, patch: Partial<SplitLine>) =>
     onChange(lines.map((l) => (l.id === id ? { ...l, ...patch } : l)));
@@ -145,7 +164,7 @@ function SplitEditor({
   const add = () => {
     const allocated = splitTotal(lines);
     const remaining = Math.max(0, +(total - allocated).toFixed(2));
-    onChange([...lines, newLine(remaining)]);
+    onChange([...lines, newLine(remaining, undefined, undefined, defaultCreditAccount)]);
   };
 
   const allocated = splitTotal(lines);
@@ -164,6 +183,7 @@ function SplitEditor({
         <TableHeader>
           <TableRow>
             <TableHead className="h-8 text-xs">Debit account</TableHead>
+            {showCredit && <TableHead className="h-8 text-xs">Credit account</TableHead>}
             <TableHead className="h-8 w-28 text-xs">Amount</TableHead>
             <TableHead className="h-8 w-28 text-xs">VAT</TableHead>
             <TableHead className="h-8 w-24 text-xs">Non-business</TableHead>
@@ -177,6 +197,11 @@ function SplitEditor({
               <TableCell className="py-1.5">
                 <AccountSelect value={l.debitAccount} onChange={(v) => update(l.id, { debitAccount: v })} size="xs" />
               </TableCell>
+              {showCredit && (
+                <TableCell className="py-1.5">
+                  <CreditAccountSelect value={l.creditAccount} onChange={(v) => update(l.id, { creditAccount: v })} />
+                </TableCell>
+              )}
               <TableCell className="py-1.5">
                 <Input
                   type="number" step="0.01" value={l.amount}
@@ -510,7 +535,7 @@ function ReimbursementsTab() {
                           onClick={() => update(r.id, {
                             splitOpen: !isSplit,
                             splits: !isSplit
-                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate, r.creditAccount)])
                               : r.splits,
                           })}
                         />
@@ -528,6 +553,8 @@ function ReimbursementsTab() {
                             total={r.amount}
                             lines={r.splits ?? []}
                             onChange={(lines) => update(r.id, { splits: lines })}
+                            showCredit
+                            defaultCreditAccount={r.creditAccount}
                           />
                         </TableCell>
                       </TableRow>
@@ -628,7 +655,7 @@ function InvoicesTab() {
                           onClick={() => update(r.id, {
                             splitOpen: !isSplit,
                             splits: !isSplit
-                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate, r.creditAccount)])
                               : r.splits,
                           })}
                         />
@@ -646,6 +673,8 @@ function InvoicesTab() {
                             total={r.amount}
                             lines={r.splits ?? []}
                             onChange={(lines) => update(r.id, { splits: lines })}
+                            showCredit
+                            defaultCreditAccount={r.creditAccount}
                           />
                         </TableCell>
                       </TableRow>
@@ -668,9 +697,8 @@ function TopUpsTab() {
       ...w,
       selected: false,
       account: undefined as string | undefined,
+      sourceAccount: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      splitOpen: false,
-      splits: [] as SplitLine[],
     })),
   );
   const selectedCount = rows.filter((r) => r.selected).length;
@@ -696,63 +724,38 @@ function TopUpsTab() {
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
-                <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = rowReady(r, r.amount);
-                const isSplit = !!r.splitOpen;
+                const ready = !!r.account && !!r.vatRate && !!r.sourceAccount;
                 return (
-                  <Fragment key={r.id}>
-                    <TableRow data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                      <TableCell className="font-mono text-xs">{r.reference}</TableCell>
-                      <TableCell className="text-sm">{r.source}</TableCell>
-                      <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
-                      <TableCell>
-                        {isSplit
-                          ? <span className="text-xs text-muted-foreground italic">Per line below</span>
-                          : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
-                      </TableCell>
-                      <TableCell>
-                        {isSplit
-                          ? <span className="text-xs text-muted-foreground italic">Per line</span>
-                          : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
-                      </TableCell>
-                      <TableCell>
-                        <SplitToggle
-                          open={isSplit}
-                          onClick={() => update(r.id, {
-                            splitOpen: !isSplit,
-                            splits: !isSplit
-                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
-                              : r.splits,
-                          })}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {r.status === "processing"
-                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
-                      </TableCell>
-                    </TableRow>
-                    {isSplit && (
-                      <TableRow>
-                        <TableCell colSpan={9} className="bg-muted/20 p-3">
-                          <SplitEditor
-                            total={r.amount}
-                            lines={r.splits ?? []}
-                            onChange={(lines) => update(r.id, { splits: lines })}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </Fragment>
+                  <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
+                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
+                    <TableCell className="font-mono text-xs">{r.reference}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-muted-foreground">{r.source}</span>
+                        <BankAccountSelect value={r.sourceAccount} onChange={(v) => update(r.id, { sourceAccount: v })} />
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
+                    <TableCell>
+                      <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
+                    </TableCell>
+                    <TableCell>
+                      <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />
+                    </TableCell>
+                    <TableCell>
+                      {r.status === "processing"
+                        ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
+                        : ready
+                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                          : <Badge variant="secondary">Needs mapping</Badge>}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>
