@@ -723,13 +723,12 @@ function TopUpsTab() {
                 <TableHead>Source</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
-                <TableHead>VAT</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = !!r.account && !!r.vatRate && !!r.sourceAccount;
+                const ready = !!r.account && !!r.sourceAccount;
                 return (
                   <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
                     <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
@@ -744,9 +743,6 @@ function TopUpsTab() {
                     <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
                     <TableCell>
                       <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
-                    </TableCell>
-                    <TableCell>
-                      <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />
                     </TableCell>
                     <TableCell>
                       {r.status === "processing"
