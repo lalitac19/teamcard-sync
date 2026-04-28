@@ -94,6 +94,30 @@ const AccountSelect = ({ value, onChange, size = "sm" }: { value?: string; onCha
   </Select>
 );
 
+const CreditAccountSelect = ({ value, onChange, placeholder = "Map credit account…" }: { value?: string; onChange: (v: string) => void; placeholder?: string }) => (
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="h-8 w-[220px] border-dashed text-xs">
+      <SelectValue placeholder={placeholder} />
+    </SelectTrigger>
+    <SelectContent>
+      {chartOfAccounts.filter((a) => a.type === "Liability" || a.type === "Asset").map((a) => (
+        <SelectItem key={a.code} value={a.code}>
+          <span className="font-mono text-muted-foreground">{a.code}</span> · {a.name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
+const VendorInput = ({ value, onChange, placeholder = "Vendor name" }: { value?: string; onChange: (v: string) => void; placeholder?: string }) => (
+  <Input
+    value={value ?? ""}
+    onChange={(e) => onChange(e.target.value)}
+    placeholder={placeholder}
+    className="h-8 w-[180px] text-xs"
+  />
+);
+
 const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v: string) => void; disabled?: boolean }) => (
   <Select value={value} onValueChange={onChange} disabled={disabled}>
     <SelectTrigger className="h-8 w-[110px] border-dashed text-xs">
@@ -409,6 +433,8 @@ function ReimbursementsTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      creditAccount: "2020" as string | undefined,
+      vendorName: "" as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
@@ -441,7 +467,9 @@ function ReimbursementsTab() {
                 <TableHead>Member</TableHead>
                 <TableHead>Merchant / Description</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Vendor</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
@@ -461,9 +489,15 @@ function ReimbursementsTab() {
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.description}</p></TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
                       <TableCell>
+                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={m?.name || "Vendor"} />
+                      </TableCell>
+                      <TableCell>
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <CreditAccountSelect value={r.creditAccount} onChange={(v) => update(r.id, { creditAccount: v })} />
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -489,7 +523,7 @@ function ReimbursementsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                        <TableCell colSpan={11} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
@@ -518,6 +552,8 @@ function InvoicesTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
+      creditAccount: "2010" as string | undefined,
+      vendorName: i.vendor as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
@@ -552,6 +588,7 @@ function InvoicesTab() {
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
@@ -566,7 +603,9 @@ function InvoicesTab() {
                     <TableRow data-state={r.selected ? "selected" : undefined}>
                       <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
-                      <TableCell className="text-sm font-medium">{r.vendor}</TableCell>
+                      <TableCell>
+                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
@@ -574,6 +613,9 @@ function InvoicesTab() {
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <CreditAccountSelect value={r.creditAccount} onChange={(v) => update(r.id, { creditAccount: v })} />
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -599,7 +641,7 @@ function InvoicesTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={10} className="bg-muted/20 p-3">
+                        <TableCell colSpan={11} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
