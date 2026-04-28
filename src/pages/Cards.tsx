@@ -211,13 +211,6 @@ function CardFundsDialog({ card, mode }: { card: CardModel; mode: "add" | "withd
   );
 }
 
-const MERCHANT_CATEGORIES = [
-  "Software & SaaS", "Travel & Airlines", "Hotels & Lodging",
-  "Restaurants & Dining", "Office Supplies", "Advertising & Marketing",
-  "Transportation & Ride-share", "Fuel", "Telecom & Utilities",
-  "Professional Services", "Education & Training", "Hardware & Electronics",
-];
-
 const COUNTRIES = [
   { code: "US", name: "United States" },
   { code: "CA", name: "Canada" },
