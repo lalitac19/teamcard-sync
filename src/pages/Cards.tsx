@@ -561,4 +561,146 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   );
 }
 
+type AuditEvent = {
+  id: string;
+  ts: string;
+  actor: string;
+  action: string;
+  category: "lifecycle" | "limits" | "controls" | "funds" | "security";
+  detail: string;
+};
+
+const auditEventsForCard = (card: CardModel): AuditEvent[] => {
+  const member = memberById(card.memberId)?.name ?? "Unknown";
+  return [
+    {
+      id: "a1",
+      ts: "2024-10-22 14:32",
+      actor: "Sarah Chen (Admin)",
+      action: "Updated per-transaction limit",
+      category: "limits",
+      detail: `Changed from $${(card.spendLimit * 0.8).toFixed(0)} to $${card.spendLimit}`,
+    },
+    {
+      id: "a2",
+      ts: "2024-10-20 09:14",
+      actor: "Sarah Chen (Admin)",
+      action: "Added merchant restriction",
+      category: "controls",
+      detail: "Blocked category: ATM & Cash",
+    },
+    {
+      id: "a3",
+      ts: "2024-10-18 17:05",
+      actor: "System",
+      action: "Transaction declined",
+      category: "security",
+      detail: "Geo restriction — attempted use in blocked region",
+    },
+    {
+      id: "a4",
+      ts: "2024-10-15 11:48",
+      actor: "Marcus Patel (Admin)",
+      action: card.status === "frozen" ? "Card frozen" : "Card unfrozen",
+      category: "lifecycle",
+      detail: "Manual action via card management",
+    },
+    {
+      id: "a5",
+      ts: "2024-10-10 08:22",
+      actor: "Sarah Chen (Admin)",
+      action: "Wallet → Card top-up",
+      category: "funds",
+      detail: `+$${card.balance.toFixed(2)} loaded onto card`,
+    },
+    {
+      id: "a6",
+      ts: card.createdAt,
+      actor: "Sarah Chen (Admin)",
+      action: "Card issued",
+      category: "lifecycle",
+      detail: `${card.type} card assigned to ${member}`,
+    },
+  ];
+};
+
+const categoryMeta: Record<AuditEvent["category"], { label: string; icon: typeof History; className: string }> = {
+  lifecycle: { label: "Lifecycle", icon: PlusIcon, className: "bg-info/10 text-info border-0" },
+  limits: { label: "Limits", icon: Pencil, className: "bg-warning/10 text-warning border-0" },
+  controls: { label: "Controls", icon: Store, className: "bg-accent/20 text-accent-foreground border-0" },
+  funds: { label: "Funds", icon: ArrowLeftRight, className: "bg-success/10 text-success border-0" },
+  security: { label: "Security", icon: ShieldAlert, className: "bg-destructive/10 text-destructive border-0" },
+};
+
+function AuditTrailDialog({ card }: { card: CardModel }) {
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState<"all" | AuditEvent["category"]>("all");
+  const events = auditEventsForCard(card);
+  const filtered = filter === "all" ? events : events.filter((e) => e.category === filter);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="ghost" title="Audit trail">
+          <History className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Audit trail · •• {card.last4}</DialogTitle>
+          <DialogDescription>
+            Chronological log of every change and action performed on this card.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-wrap gap-2 pt-2">
+          {(["all", "lifecycle", "limits", "controls", "funds", "security"] as const).map((f) => (
+            <Button
+              key={f}
+              size="sm"
+              variant={filter === f ? "default" : "outline"}
+              onClick={() => setFilter(f)}
+              className="capitalize"
+            >
+              {f === "all" ? "All events" : categoryMeta[f].label}
+            </Button>
+          ))}
+        </div>
+
+        <div className="space-y-3 pt-2">
+          {filtered.map((e) => {
+            const meta = categoryMeta[e.category];
+            const Icon = meta.icon;
+            return (
+              <div key={e.id} className="flex gap-3 rounded-lg border p-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary">
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium">{e.action}</p>
+                    <Badge className={meta.className}>{meta.label}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{e.detail}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {e.ts} · {e.actor}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-6">No events for this filter.</p>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
+          <Button onClick={() => toast.success("Audit log exported (CSV)")}>Export CSV</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default Cards;
