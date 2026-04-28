@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, Sun, AlertTriangle, RefreshCcw, Ban, ShieldCheck } from "lucide-react";
+import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, Sun, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, MapPin, Store } from "lucide-react";
 import { toast } from "sonner";
 
 const MERCHANT_CATEGORIES = [
