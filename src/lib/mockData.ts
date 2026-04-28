@@ -117,15 +117,15 @@ export interface Card {
   createdAt: string;
 }
 
-export type TransferDirection = "wallet_to_card" | "card_to_wallet" | "card_to_card";
+export type TransferDirection = "wallet_to_card" | "card_to_wallet";
 
 export interface WalletTransfer {
   id: string;
   date: string;
   direction: TransferDirection;
   amount: number;
-  fromCardId?: string; // present for card_to_wallet & card_to_card
-  toCardId?: string;   // present for wallet_to_card & card_to_card
+  fromCardId?: string; // present for card_to_wallet
+  toCardId?: string;   // present for wallet_to_card
   requestedBy: string; // memberId
   reason?: string;
   status: "pending" | "approved" | "rejected";
@@ -338,7 +338,7 @@ export const topUpRequests: TopUpRequest[] = [
 
 export const walletTransfers: WalletTransfer[] = [
   { id: "wt1", date: "2024-10-22", direction: "wallet_to_card", amount: 2000, toCardId: "c1", requestedBy: "m1", reason: "Top up for travel week", status: "pending" },
-  { id: "wt2", date: "2024-10-21", direction: "card_to_card", amount: 500, fromCardId: "c5", toCardId: "c3", requestedBy: "m1", reason: "Reallocate unused SaaS budget", status: "pending" },
+  { id: "wt2", date: "2024-10-21", direction: "card_to_wallet", amount: 500, fromCardId: "c5", requestedBy: "m1", reason: "Reallocate unused SaaS budget", status: "pending" },
   { id: "wt3", date: "2024-10-20", direction: "card_to_wallet", amount: 1500, fromCardId: "c6", requestedBy: "m1", reason: "Card frozen — return funds", status: "approved" },
   { id: "wt4", date: "2024-10-18", direction: "wallet_to_card", amount: 3000, toCardId: "c4", requestedBy: "m1", reason: "Q4 ad spend", status: "approved" },
 ];

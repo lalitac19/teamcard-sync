@@ -31,8 +31,7 @@ import { toast } from "sonner";
 
 const directionLabel = (d: TransferDirection) => {
   if (d === "wallet_to_card") return "Wallet → Card";
-  if (d === "card_to_wallet") return "Card → Wallet";
-  return "Card → Card (via Wallet)";
+  return "Card → Wallet";
 };
 
 const transferStatusBadge = (s: "pending" | "approved" | "rejected") => {
@@ -225,10 +224,10 @@ function MoveMoneyDialog() {
 
   const submit = () => {
     if (!amount) return toast.error("Enter an amount");
-    if ((direction === "card_to_wallet" || direction === "card_to_card") && !fromCard) {
+    if (direction === "card_to_wallet" && !fromCard) {
       return toast.error("Select a source card");
     }
-    if ((direction === "wallet_to_card" || direction === "card_to_card") && !toCard) {
+    if (direction === "wallet_to_card" && !toCard) {
       return toast.error("Select a destination card");
     }
     toast.success("Transfer submitted for approval");
@@ -258,12 +257,11 @@ function MoveMoneyDialog() {
               <SelectContent>
                 <SelectItem value="wallet_to_card">Main wallet → Card</SelectItem>
                 <SelectItem value="card_to_wallet">Card → Main wallet</SelectItem>
-                <SelectItem value="card_to_card">Card → Card (routed via wallet)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {(direction === "card_to_wallet" || direction === "card_to_card") && (
+          {direction === "card_to_wallet" && (
             <div className="space-y-1.5">
               <Label>From card</Label>
               <Select value={fromCard} onValueChange={setFromCard}>
@@ -279,7 +277,7 @@ function MoveMoneyDialog() {
             </div>
           )}
 
-          {(direction === "wallet_to_card" || direction === "card_to_card") && (
+          {direction === "wallet_to_card" && (
             <div className="space-y-1.5">
               <Label>To card</Label>
               <Select value={toCard} onValueChange={setToCard}>
