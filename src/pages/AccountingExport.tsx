@@ -745,9 +745,6 @@ function TopUpsTab() {
                       <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
                     </TableCell>
                     <TableCell>
-                      <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />
-                    </TableCell>
-                    <TableCell>
                       {r.status === "processing"
                         ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
                         : ready
