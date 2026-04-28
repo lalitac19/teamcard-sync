@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import {
   transactions, formatCurrency, formatDate, memberById, cardById,
-  cards as allCards, members, allCountries,
+  cards as allCards, members, allCountries, txnApprovals,
 } from "@/lib/mockData";
 import { Download, FileText, Inbox } from "lucide-react";
 import { TableFilters, ALL } from "@/components/TableFilters";
