@@ -467,7 +467,9 @@ function ReimbursementsTab() {
                 <TableHead>Member</TableHead>
                 <TableHead>Merchant / Description</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Vendor</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
@@ -487,9 +489,15 @@ function ReimbursementsTab() {
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.description}</p></TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
                       <TableCell>
+                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={m?.name || "Vendor"} />
+                      </TableCell>
+                      <TableCell>
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                      </TableCell>
+                      <TableCell>
+                        <CreditAccountSelect value={r.creditAccount} onChange={(v) => update(r.id, { creditAccount: v })} />
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -515,7 +523,7 @@ function ReimbursementsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                        <TableCell colSpan={11} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
