@@ -224,10 +224,10 @@ function MoveMoneyDialog() {
 
   const submit = () => {
     if (!amount) return toast.error("Enter an amount");
-    if ((direction === "card_to_wallet" || direction === "card_to_card") && !fromCard) {
+    if (direction === "card_to_wallet" && !fromCard) {
       return toast.error("Select a source card");
     }
-    if ((direction === "wallet_to_card" || direction === "card_to_card") && !toCard) {
+    if (direction === "wallet_to_card" && !toCard) {
       return toast.error("Select a destination card");
     }
     toast.success("Transfer submitted for approval");
