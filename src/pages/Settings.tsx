@@ -214,7 +214,7 @@ function Toggle({ label, defaultChecked }: { label: string; defaultChecked?: boo
 
 function FeesAccountCard() {
   const [account, setAccount] = useState<string>("5090");
-  const [vatRate, setVatRate] = useState<string>("20");
+  const [vatRate, setVatRate] = useState<string>("STD_5");
 
   useEffect(() => {
     const stored = localStorage.getItem(FEES_ACCOUNT_KEY);
