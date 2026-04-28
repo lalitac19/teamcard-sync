@@ -18,7 +18,13 @@ import type { Transaction } from "@/lib/mockData";
 const statusBadge = (s: string) => {
   if (s === "posted") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Posted</Badge>;
   if (s === "pending") return <Badge className="bg-warning/10 text-warning-foreground hover:bg-warning/10 border-0">Pending</Badge>;
-  return <Badge variant="destructive">Declined</Badge>;
+};
+
+const approvalBadge = (s?: "pending" | "approved" | "rejected") => {
+  if (s === "approved") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Approved</Badge>;
+  if (s === "pending") return <Badge className="bg-warning/10 text-warning-foreground hover:bg-warning/10 border-0">Pending</Badge>;
+  if (s === "rejected") return <Badge variant="destructive">Rejected</Badge>;
+  return <span className="text-xs text-muted-foreground">Auto-approved</span>;
 };
 
 const inRange = (iso: string, from?: Date, to?: Date) => {
