@@ -723,7 +723,6 @@ function TopUpsTab() {
                 <TableHead>Source</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
-                <TableHead>VAT</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
