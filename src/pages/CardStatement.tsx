@@ -136,28 +136,6 @@ const CardStatement = () => {
             category: "card_to_wallet",
             amount: -w.amount,
           });
-        } else if (w.direction === "card_to_card") {
-          if (w.toCardId === card.id) {
-            const src = w.fromCardId ? cardById(w.fromCardId) : undefined;
-            list.push({
-              id: `wt-${w.id}-in`,
-              date: w.date,
-              description: `Received from card •• ${src?.last4 ?? "—"}${w.reason ? ` — ${w.reason}` : ""}`,
-              reference: w.id.toUpperCase(),
-              category: "card_to_card_in",
-              amount: w.amount,
-            });
-          } else if (w.fromCardId === card.id) {
-            const dst = w.toCardId ? cardById(w.toCardId) : undefined;
-            list.push({
-              id: `wt-${w.id}-out`,
-              date: w.date,
-              description: `Sent to card •• ${dst?.last4 ?? "—"}${w.reason ? ` — ${w.reason}` : ""}`,
-              reference: w.id.toUpperCase(),
-              category: "card_to_card_out",
-              amount: -w.amount,
-            });
-          }
         }
       });
 
