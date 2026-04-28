@@ -233,12 +233,14 @@ function FeesAccountCard() {
   const handleVatChange = (v: string) => {
     setVatRate(v);
     localStorage.setItem(FEES_VAT_RATE_KEY, v);
-    toast.success(`Default VAT rate on fees set to ${v}% (inclusive)`);
+    const vr = vatRates.find((r) => r.code === v);
+    toast.success(`Default VAT rate on fees set to ${vr?.label} (inclusive)`);
   };
 
   const expenseAccounts = chartOfAccounts.filter((a) => a.type === "Expense");
 
-  const rate = parseFloat(vatRate) || 0;
+  const selectedVat = vatRates.find((r) => r.code === vatRate);
+  const rate = selectedVat?.rate ?? 0;
   const sampleGross = 100;
   const sampleNet = rate > 0 ? sampleGross / (1 + rate / 100) : sampleGross;
   const sampleVat = sampleGross - sampleNet;
