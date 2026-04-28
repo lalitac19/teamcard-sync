@@ -728,7 +728,7 @@ function TopUpsTab() {
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = !!r.account && !!r.vatRate && !!r.sourceAccount;
+                const ready = !!r.account && !!r.sourceAccount;
                 return (
                   <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
                     <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
