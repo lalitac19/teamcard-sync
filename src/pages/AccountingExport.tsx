@@ -640,7 +640,7 @@ function InvoicesTab() {
                           onClick={() => update(r.id, {
                             splitOpen: !isSplit,
                             splits: !isSplit
-                              ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
+                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate, r.creditAccount)])
                               : r.splits,
                           })}
                         />
