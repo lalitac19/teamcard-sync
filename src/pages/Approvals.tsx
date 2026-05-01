@@ -431,11 +431,11 @@ const Approvals = () => {
         <TabsContent value="topup" className="mt-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              Top-up requests submitted by cardholders. On approval, the requested amount is transferred from the main wallet to the card — subject to wallet availability.
+              Limit-increase requests submitted by cardholders. On approval, additional limit is reserved from the primary card's unallocated balance.
             </p>
             <p className="text-xs">
-              <span className="text-muted-foreground">Main wallet available: </span>
-              <span className="font-semibold">{formatCurrency(wallet)}</span>
+              <span className="text-muted-foreground">Primary card unallocated: </span>
+              <span className="font-semibold">{formatCurrency(available)}</span>
             </p>
           </div>
           {lReqs.length === 0 ? <EmptyState /> : (
@@ -447,8 +447,8 @@ const Approvals = () => {
                       <TableHead>Date</TableHead>
                       <TableHead>Member</TableHead>
                       <TableHead>Card</TableHead>
-                      <TableHead className="text-right">Current balance</TableHead>
-                      <TableHead className="text-right">Requested top-up</TableHead>
+                      <TableHead className="text-right">Current limit</TableHead>
+                      <TableHead className="text-right">Requested increase</TableHead>
                       <TableHead>Reason</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Action</TableHead>
@@ -458,7 +458,7 @@ const Approvals = () => {
                     {lReqs.map((r) => {
                       const m = memberById(r.memberId);
                       const c = cardById(r.cardId);
-                      const insufficient = r.status === "pending" && r.requestedAmount > wallet;
+                      const insufficient = r.status === "pending" && r.requestedAmount > available;
                       return (
                         <TableRow key={r.id}>
                           <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
@@ -469,7 +469,7 @@ const Approvals = () => {
                             {formatCurrency(r.requestedAmount)}
                             {insufficient && (
                               <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium text-warning">
-                                <AlertTriangle className="h-3 w-3" /> low wallet
+                                <AlertTriangle className="h-3 w-3" /> low headroom
                               </span>
                             )}
                           </TableCell>
@@ -478,10 +478,10 @@ const Approvals = () => {
                             <div className="flex flex-col gap-1">
                               {statusBadge(r.status)}
                               {r.status === "approved" && r.fundingStatus === "insufficient_funds" && (
-                                <span className="text-[10px] text-warning">Transfer on hold — wallet underfunded</span>
+                                <span className="text-[10px] text-warning">On hold — primary card underfunded</span>
                               )}
                               {r.status === "approved" && r.fundingStatus === "funded" && (
-                                <span className="text-[10px] text-muted-foreground">Wallet → card transferred</span>
+                                <span className="text-[10px] text-muted-foreground">Limit increase applied</span>
                               )}
                             </div>
                           </TableCell>
@@ -489,61 +489,6 @@ const Approvals = () => {
                             <ActionCell status={r.status}
                               onApprove={() => updateTopUp(r.id, "approved")}
                               onReject={() => updateTopUp(r.id, "rejected")} />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* 6. Wallet ↔ card transfers */}
-        <TabsContent value="transfer" className="mt-4">
-          <p className="mb-3 text-xs text-muted-foreground">
-            All wallet ↔ card and card ↔ card movements require admin approval before funds settle.
-          </p>
-          {transfers.length === 0 ? <EmptyState /> : (
-            <Card className="shadow-soft">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Direction</TableHead>
-                      <TableHead>From</TableHead>
-                      <TableHead>To</TableHead>
-                      <TableHead>Reason</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transfers.map((r) => {
-                      const fromCard = r.fromCardId ? cardById(r.fromCardId) : undefined;
-                      const toCard = r.toCardId ? cardById(r.toCardId) : undefined;
-                      const fromLabel = r.direction === "wallet_to_card"
-                        ? "Main wallet"
-                        : fromCard ? `${memberById(fromCard.memberId)?.name} •• ${fromCard.last4}` : "—";
-                      const toLabel = r.direction === "card_to_wallet"
-                        ? "Main wallet"
-                        : toCard ? `${memberById(toCard.memberId)?.name} •• ${toCard.last4}` : "—";
-                      return (
-                        <TableRow key={r.id}>
-                          <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                          <TableCell className="text-xs">{directionLabel(r.direction)}</TableCell>
-                          <TableCell className="text-sm">{fromLabel}</TableCell>
-                          <TableCell className="text-sm">{toLabel}</TableCell>
-                          <TableCell className="text-xs text-muted-foreground">{r.reason ?? "—"}</TableCell>
-                          <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                          <TableCell>{statusBadge(r.status)}</TableCell>
-                          <TableCell className="text-right">
-                            <ActionCell status={r.status}
-                              onApprove={() => updateTransfer(r.id, "approved")}
-                              onReject={() => updateTransfer(r.id, "rejected")} />
                           </TableCell>
                         </TableRow>
                       );
