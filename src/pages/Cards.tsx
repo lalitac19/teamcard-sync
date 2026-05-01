@@ -405,15 +405,18 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   // Status / lifecycle
   const [frozen, setFrozen] = useState(card.status === "frozen");
 
-  // Limits
-  const [perTxnLimit, setPerTxnLimit] = useState(String(card.spendLimit));
-  // Allocated limit (supplementary cards only)
-  const [allocatedLimit, setAllocatedLimit] = useState(String(card.spendLimit));
+  // Limits — two distinct caps:
+  //   spendLimit = overall spend limit for the period (also the allocation from primary for supplementary cards)
+  //   txnLimit   = max amount per single transaction
+  const [spendLimit, setSpendLimit] = useState(String(card.spendLimit));
+  const [perTxnLimit, setPerTxnLimit] = useState(card.txnLimit ? String(card.txnLimit) : "");
   const isPrimary = !!card.isPrimary;
   // Headroom available to raise this card's allocation: primary's unallocated EXCLUDING this card's current allocation.
   const otherCardsAllocated = !isPrimary ? primaryUnallocated(card.id) : 0;
-  const newLimit = Number(allocatedLimit) || 0;
-  const exceedsAllocation = !isPrimary && newLimit > otherCardsAllocated;
+  const newSpendLimit = Number(spendLimit) || 0;
+  const newPerTxn = Number(perTxnLimit) || 0;
+  const exceedsAllocation = !isPrimary && newSpendLimit > otherCardsAllocated;
+  const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
