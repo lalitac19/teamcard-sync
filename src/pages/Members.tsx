@@ -138,6 +138,13 @@ const Members = () => {
   };
 
   const handleRemove = (id: string) => {
+    // Terminate any cards linked to this member (irreversible)
+    const linked = cards.filter((c) => c.memberId === id);
+    linked.forEach((c) => {
+      c.status = "terminated";
+      c.spendLimit = 0;
+      c.txnLimit = 0;
+    });
     setMembers((prev) => prev.filter((m) => m.id !== id));
     setTeams((prev) =>
       prev.map((t) => ({
@@ -146,7 +153,11 @@ const Members = () => {
         leadId: t.leadId === id ? t.memberIds.find((mid) => mid !== id) ?? "" : t.leadId,
       })),
     );
-    toast.success("Member removed");
+    if (linked.length > 0) {
+      toast.success(`Member removed. ${linked.length} card${linked.length === 1 ? "" : "s"} terminated.`);
+    } else {
+      toast.success("Member removed");
+    }
   };
 
   const handleUpdateMember = (
