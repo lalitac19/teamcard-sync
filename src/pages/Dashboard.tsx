@@ -29,10 +29,9 @@ import {
   walletTopUps,
   txnApprovals,
   cardRequests,
-  topUpRequests,
-  walletTransfers,
-  walletBalance,
-  walletReserved,
+  primaryCard,
+  primaryUnallocated,
+  totalAllocatedLimits,
   formatCurrency,
   formatDate,
   memberById,
@@ -41,7 +40,9 @@ import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   // ---------- Aggregations ----------
-  const allocatedToCards = useMemo(() => cards.reduce((s, c) => s + c.balance, 0), []);
+  const primary = primaryCard();
+  const allocatedToCards = useMemo(() => totalAllocatedLimits(), []);
+  const unallocated = useMemo(() => primaryUnallocated(), []);
   const processingTopUps = useMemo(
     () => walletTopUps.filter((w) => w.status === "processing").reduce((s, w) => s + w.amount, 0),
     [],
@@ -58,8 +59,6 @@ const Dashboard = () => {
   const pendingApprovalsTotal =
     txnApprovals.filter((t) => t.status === "pending").length +
     cardRequests.filter((c) => c.status === "pending").length +
-    topUpRequests.filter((l) => l.status === "pending").length +
-    walletTransfers.filter((w) => w.status === "pending").length +
     pendingReimb.length +
     pendingInvoices.length;
 
@@ -103,7 +102,7 @@ const Dashboard = () => {
   }, []);
 
   // Runway = wallet / monthly spend
-  const runwayMonths = thisMonthTotal > 0 ? walletBalance / thisMonthTotal : null;
+  const runwayMonths = thisMonthTotal > 0 ? primary.balance / thisMonthTotal : null;
 
   // Spend by category (top 5)
   const categories = useMemo(() => {
