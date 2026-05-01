@@ -533,6 +533,27 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
+            {!isPrimary && (
+              <div className="space-y-1.5">
+                <Label>Allocated limit (USD)</Label>
+                <Input
+                  type="number"
+                  value={allocatedLimit}
+                  onChange={(e) => setAllocatedLimit(e.target.value)}
+                />
+                <p className={`text-xs ${exceedsAllocation ? "text-destructive" : "text-muted-foreground"}`}>
+                  {exceedsAllocation
+                    ? `Exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}). Reduce another card's limit or top up the primary card.`
+                    : `Reserved from the primary card. Maximum currently available: ${formatCurrency(otherCardsAllocated)}.`}
+                </p>
+              </div>
+            )}
+            {isPrimary && (
+              <div className="rounded-md border bg-secondary/40 p-3 text-xs text-muted-foreground">
+                The primary card spends from its unallocated balance — currently <span className="font-semibold text-foreground">{formatCurrency(primaryUnallocated())}</span>.
+                Top up the primary card to raise this headroom.
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>Per-transaction limit (USD)</Label>
               <Input
@@ -546,7 +567,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={saveControls}>Save limits</Button>
+              <Button onClick={saveLimits} disabled={!isPrimary && exceedsAllocation}>Save limits</Button>
             </DialogFooter>
           </TabsContent>
 
