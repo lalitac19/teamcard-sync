@@ -285,14 +285,20 @@ function IssueCardDialog() {
   const requested = Number(allocatedLimit) || 0;
   const exceeds = requested > unallocated;
 
+  const perTxn = Number(perTxnLimit) || 0;
+  const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
+
   const submit = () => {
-    if (!requested || requested <= 0) return toast.error("Enter the limit to allocate to this card");
+    if (!requested || requested <= 0) return toast.error("Enter the spending limit to allocate to this card");
     if (exceeds) {
       return toast.error(
-        `Limit exceeds primary card's unallocated balance (${formatCurrency(unallocated)}). Top up the primary card or reduce another card's limit.`,
+        `Spending limit exceeds primary card's unallocated balance (${formatCurrency(unallocated)}). Top up the primary card or reduce another card's limit.`,
       );
     }
-    toast.success(`Card issued with ${formatCurrency(requested)} limit allocated from primary card`);
+    if (perTxnExceedsSpend) {
+      return toast.error("Per-transaction limit cannot exceed the spending limit");
+    }
+    toast.success(`Card issued · ${formatCurrency(requested)} spending limit${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
   };
 
   return (
