@@ -163,6 +163,9 @@ const Cards = () => {
                         <p className="text-[10px] font-normal text-muted-foreground">unallocated</p>
                       )}
                     </TableCell>
+                    <TableCell className="text-right text-sm">
+                      {card.txnLimit ? formatCurrency(card.txnLimit) : <span className="text-muted-foreground">—</span>}
+                    </TableCell>
                     <TableCell className="text-right text-sm text-muted-foreground">{formatCurrency(card.spent)}</TableCell>
                     <TableCell className="text-right text-sm">{formatCurrency(remaining)}</TableCell>
                     <TableCell>
