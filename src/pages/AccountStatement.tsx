@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/table";
 import {
   transactions, walletTopUps, statementExtras, memberById, cardById,
-  cards as allCards, members, allCountries,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import { Download, Printer, ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
-import { TableFilters, ALL } from "@/components/TableFilters";
+import { ALL } from "@/components/TableFilters";
 
 type Row = {
   id: string;
