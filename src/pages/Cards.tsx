@@ -450,12 +450,15 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   const saveLimits = () => {
     if (!isPrimary) {
-      if (newLimit <= 0) return toast.error("Allocated limit must be greater than zero");
+      if (newSpendLimit <= 0) return toast.error("Spending limit must be greater than zero");
       if (exceedsAllocation) {
         return toast.error(
-          `New limit exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}).`,
+          `Spending limit exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}).`,
         );
       }
+    }
+    if (perTxnExceedsSpend) {
+      return toast.error("Per-transaction limit cannot exceed the spending limit");
     }
     toast.success("Card limits updated");
     setOpen(false);
