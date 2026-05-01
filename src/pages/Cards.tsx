@@ -118,7 +118,8 @@ const Cards = () => {
                 <TableHead>Role</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Limit</TableHead>
+                <TableHead className="text-right">Spend limit</TableHead>
+                <TableHead className="text-right">Per-txn limit</TableHead>
                 <TableHead className="text-right">Spent</TableHead>
                 <TableHead className="text-right">Remaining</TableHead>
                 <TableHead className="w-[120px] text-right">Actions</TableHead>
