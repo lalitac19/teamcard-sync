@@ -873,14 +873,6 @@ const auditEventsForCard = (card: CardModel): AuditEvent[] => {
       detail: "Manual action via card management",
     },
     {
-      id: "a5",
-      ts: "2024-10-10 08:22",
-      actor: "Sarah Chen (Admin)",
-      action: "Wallet → Card top-up",
-      category: "funds",
-      detail: `+$${card.balance.toFixed(2)} loaded onto card`,
-    },
-    {
       id: "a6",
       ts: card.createdAt,
       actor: "Sarah Chen (Admin)",
@@ -921,7 +913,7 @@ function AuditTrailDialog({ card }: { card: CardModel }) {
         </DialogHeader>
 
         <div className="flex flex-wrap gap-2 pt-2">
-          {(["all", "lifecycle", "limits", "controls", "funds", "security"] as const).map((f) => (
+          {(["all", "lifecycle", "limits", "controls", "security"] as const).map((f) => (
             <Button
               key={f}
               size="sm"
