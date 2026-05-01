@@ -203,7 +203,7 @@ const Cards = () => {
               <TableRow>
                 <TableHead>Card</TableHead>
                 <TableHead>Cardholder</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>Card Type</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Spend limit</TableHead>
