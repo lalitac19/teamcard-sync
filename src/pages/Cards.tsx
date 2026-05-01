@@ -34,8 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { cards, formatCurrency, memberById, primaryCard, primaryUnallocated, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store } from "lucide-react";
+import { cards, formatCurrency, memberById, members, primaryCard, primaryUnallocated, type Card as CardModel } from "@/lib/mockData";
+import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 const MERCHANT_CATEGORIES = [
@@ -75,7 +75,37 @@ const typeBadge = (type: string) => {
 
 const Cards = () => {
   const [filter, setFilter] = useState<"all" | "virtual" | "physical" | "single-use">("all");
-  const filtered = filter === "all" ? cards : cards.filter((c) => c.type === filter);
+  const [cardholderId, setCardholderId] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "frozen" | "expired">("all");
+  const [search, setSearch] = useState("");
+
+  const cardholderOptions = (() => {
+    const ids = new Set(cards.map((c) => c.memberId));
+    return members.filter((m) => ids.has(m.id));
+  })();
+
+  const searchQ = search.trim().toLowerCase();
+  const filtered = cards.filter((c) => {
+    if (filter !== "all" && c.type !== filter) return false;
+    if (cardholderId !== "all" && c.memberId !== cardholderId) return false;
+    if (statusFilter !== "all" && c.status !== statusFilter) return false;
+    if (searchQ) {
+      const m = memberById(c.memberId);
+      const hay = `${c.last4} ${m?.name ?? ""} ${m?.department ?? ""}`.toLowerCase();
+      if (!hay.includes(searchQ)) return false;
+    }
+    return true;
+  });
+
+  const hasActiveFilter =
+    filter !== "all" || cardholderId !== "all" || statusFilter !== "all" || searchQ.length > 0;
+  const resetFilters = () => {
+    setFilter("all");
+    setCardholderId("all");
+    setStatusFilter("all");
+    setSearch("");
+  };
+
   const primary = primaryCard();
   const unallocated = primaryUnallocated();
 
@@ -94,7 +124,8 @@ const Cards = () => {
         </Dialog>
       }
     >
-      <div className="mb-6 flex flex-wrap gap-2">
+      {/* Type quick filters */}
+      <div className="mb-3 flex flex-wrap gap-2">
         {(["all", "virtual", "physical", "single-use"] as const).map((f) => (
           <Button
             key={f}
@@ -107,6 +138,63 @@ const Cards = () => {
           </Button>
         ))}
       </div>
+
+      {/* Filter bar */}
+      <Card className="mb-4 shadow-soft">
+        <CardContent className="flex flex-wrap items-end gap-3 p-4">
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs text-muted-foreground">Search</Label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Last 4, name, dept…"
+                className="h-9 w-[220px] pl-8"
+              />
+            </div>
+          </div>
+
+          {cardholderOptions.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs text-muted-foreground">Cardholder</Label>
+              <Select value={cardholderId} onValueChange={setCardholderId}>
+                <SelectTrigger className="h-9 w-[200px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All cardholders</SelectItem>
+                  {cardholderOptions.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs text-muted-foreground">Status</Label>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
+              <SelectTrigger className="h-9 w-[160px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="frozen">Frozen</SelectItem>
+                <SelectItem value="expired">Expired</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="ml-auto flex items-center gap-3 self-end">
+            <span className="text-xs text-muted-foreground">
+              Showing {filtered.length} of {cards.length}
+            </span>
+            {hasActiveFilter && (
+              <Button variant="ghost" size="sm" className="gap-1" onClick={resetFilters}>
+                <X className="h-3.5 w-3.5" /> Clear
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="shadow-soft">
         <CardContent className="p-0">

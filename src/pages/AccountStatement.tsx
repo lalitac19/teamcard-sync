@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/table";
 import {
   transactions, walletTopUps, statementExtras, memberById, cardById,
-  cards as allCards, members, allCountries,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import { Download, Printer, ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
-import { TableFilters, ALL } from "@/components/TableFilters";
+import { ALL } from "@/components/TableFilters";
 
 type Row = {
   id: string;
@@ -54,39 +53,13 @@ const typeLabel = (t: string) => {
 
 const AccountStatement = () => {
   const [period, setPeriod] = useState("2024-10");
-  const [cardholderId, setCardholderId] = useState<string>(ALL);
-  const [cardId, setCardId] = useState<string>(ALL);
-  const [merchant, setMerchant] = useState("");
-  const [country, setCountry] = useState<string>(ALL);
 
-  const cardholderOptions = useMemo(() => {
-    const ids = new Set(allCards.map((c) => c.memberId));
-    return members
-      .filter((m) => ids.has(m.id))
-      .map((m) => ({ value: m.id, label: m.name }));
-  }, []);
-
-  const cardOptions = useMemo(() => {
-    const scoped = cardholderId === ALL
-      ? allCards
-      : allCards.filter((c) => c.memberId === cardholderId);
-    return scoped.map((c) => {
-      const m = memberById(c.memberId);
-      return { value: c.id, label: `•• ${c.last4} — ${m?.name ?? ""}` };
-    });
-  }, [cardholderId]);
-
-  const activeCardId = useMemo(() => {
-    if (cardId === ALL) return ALL;
-    if (cardholderId === ALL) return cardId;
-    const owns = allCards.find((c) => c.id === cardId)?.memberId === cardholderId;
-    return owns ? cardId : ALL;
-  }, [cardId, cardholderId]);
-
-  const countries = useMemo(() => allCountries(), []);
-
-  // Card-related filters narrow scope to card spend only (and hide top-ups/extras when filtering).
-  const isCardScoped = cardholderId !== ALL || activeCardId !== ALL || merchant.trim() !== "" || country !== ALL;
+  // Filters removed — statement always shows the full monthly account view.
+  const cardholderId = ALL;
+  const activeCardId = ALL;
+  const merchant = "";
+  const country = ALL;
+  const isCardScoped = false;
 
   const rows = useMemo<Row[]>(() => {
     const list: Row[] = [];
@@ -185,27 +158,6 @@ const AccountStatement = () => {
         </>
       }
     >
-      {/* Filters */}
-      <TableFilters
-        cardholders={cardholderOptions}
-        cardholderId={cardholderId}
-        onCardholderChange={(v) => { setCardholderId(v); setCardId(ALL); }}
-        cards={cardOptions}
-        cardId={activeCardId}
-        onCardChange={setCardId}
-        merchant={merchant}
-        onMerchantChange={setMerchant}
-        countries={countries}
-        country={country}
-        onCountryChange={setCountry}
-        onReset={() => { setCardholderId(ALL); setCardId(ALL); setMerchant(""); setCountry(ALL); }}
-      />
-      {isCardScoped && (
-        <p className="mt-2 text-xs text-muted-foreground">
-          Filtering active — only matching card spend is shown. Wallet top-ups and adjustments (refunds, fees) are hidden while a card-related filter is applied.
-        </p>
-      )}
-
       {/* Summary */}
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card className="shadow-soft">
