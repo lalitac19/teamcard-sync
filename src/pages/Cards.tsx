@@ -392,7 +392,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={exceeds || !requested}>Issue card</Button>
+        <Button onClick={submit} disabled={exceeds || !requested || perTxnExceedsSpend}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
