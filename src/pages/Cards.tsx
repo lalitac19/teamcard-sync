@@ -430,6 +430,19 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     setOpen(false);
   };
 
+  const saveLimits = () => {
+    if (!isPrimary) {
+      if (newLimit <= 0) return toast.error("Allocated limit must be greater than zero");
+      if (exceedsAllocation) {
+        return toast.error(
+          `New limit exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}).`,
+        );
+      }
+    }
+    toast.success("Card limits updated");
+    setOpen(false);
+  };
+
   const handleFreezeToggle = (val: boolean) => {
     setFrozen(val);
     toast.success(val ? "Card frozen" : "Card unfrozen");
