@@ -285,14 +285,14 @@ export const teams: Team[] = [
 
 export const cards: Card[] = [
   // Primary card — its `balance` is the total funds topped up to the workspace.
-  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, spent: 8420, balance: 60000, limitPeriod: "monthly", createdAt: "2024-01-15", isPrimary: true },
+  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, txnLimit: 5000, spent: 8420, balance: 60000, limitPeriod: "monthly", createdAt: "2024-01-15", isPrimary: true },
   // Supplementary cards — `spendLimit` is the limit allocated from the primary card.
-  { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, spent: 11200, balance: 0, limitPeriod: "monthly", createdAt: "2024-02-05" },
-  { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, spent: 1280, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
-  { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, spent: 6450, balance: 0, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
-  { id: "c5", memberId: "m4", type: "virtual", status: "active", last4: "7788", spendLimit: 3000, spent: 980, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-03-08" },
-  { id: "c6", memberId: "m5", type: "physical", status: "frozen", last4: "1199", spendLimit: 1500, spent: 0, balance: 0, limitPeriod: "monthly", createdAt: "2024-03-25" },
-  { id: "c7", memberId: "m3", type: "single-use", status: "active", last4: "2255", spendLimit: 1200, spent: 0, balance: 0, limitPeriod: "per-transaction", createdAt: "2024-10-20" },
+  { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, txnLimit: 2500, spent: 11200, balance: 0, limitPeriod: "monthly", createdAt: "2024-02-05" },
+  { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, txnLimit: 1000, spent: 1280, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
+  { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, txnLimit: 2000, spent: 6450, balance: 0, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
+  { id: "c5", memberId: "m4", type: "virtual", status: "active", last4: "7788", spendLimit: 3000, txnLimit: 800, spent: 980, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-03-08" },
+  { id: "c6", memberId: "m5", type: "physical", status: "frozen", last4: "1199", spendLimit: 1500, txnLimit: 500, spent: 0, balance: 0, limitPeriod: "monthly", createdAt: "2024-03-25" },
+  { id: "c7", memberId: "m3", type: "single-use", status: "active", last4: "2255", spendLimit: 1200, txnLimit: 1200, spent: 0, balance: 0, limitPeriod: "per-transaction", createdAt: "2024-10-20" },
 ];
 
 export const transactions: Transaction[] = [
