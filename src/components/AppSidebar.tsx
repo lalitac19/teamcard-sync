@@ -30,10 +30,10 @@ import {
 
 const mainItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Primary card", url: "/wallet", icon: Wallet },
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "Members", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
-  { title: "Primary card", url: "/wallet", icon: Wallet },
 ];
 
 const approvalItems = [
