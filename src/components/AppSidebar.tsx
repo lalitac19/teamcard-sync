@@ -33,7 +33,7 @@ const mainItems = [
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "Members", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
-  { title: "Wallet", url: "/wallet", icon: Wallet },
+  { title: "Primary card", url: "/wallet", icon: Wallet },
 ];
 
 const approvalItems = [
@@ -45,7 +45,6 @@ const approvalItems = [
 const accountingItems = [
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Card Statement", url: "/statement/cards", icon: CreditCard },
-  { title: "Wallet Internal", url: "/statement/wallet-internal", icon: Wallet },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
 ];
 
