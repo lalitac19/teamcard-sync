@@ -392,6 +392,13 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Limits
   const [perTxnLimit, setPerTxnLimit] = useState(String(card.spendLimit));
+  // Allocated limit (supplementary cards only)
+  const [allocatedLimit, setAllocatedLimit] = useState(String(card.spendLimit));
+  const isPrimary = !!card.isPrimary;
+  // Headroom available to raise this card's allocation: primary's unallocated EXCLUDING this card's current allocation.
+  const otherCardsAllocated = !isPrimary ? primaryUnallocated(card.id) : 0;
+  const newLimit = Number(allocatedLimit) || 0;
+  const exceedsAllocation = !isPrimary && newLimit > otherCardsAllocated;
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
