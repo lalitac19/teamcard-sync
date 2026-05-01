@@ -15,14 +15,12 @@ import {
   invoices as seedInvoices,
   cardRequests as seedCardRequests,
   topUpRequests as seedTopUpRequests,
-  walletTransfers as seedTransfers,
   cardById,
-  walletBalance,
+  primaryUnallocated,
   cards as allCards, members, allCountries,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
   type CardRequest, type TopUpRequest,
-  type WalletTransfer, type TransferDirection,
 } from "@/lib/mockData";
 import { Check, X, Inbox, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -67,10 +65,9 @@ const Approvals = () => {
   const [invs, setInvs] = useState<Invoice[]>(seedInvoices);
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<TopUpRequest[]>(seedTopUpRequests);
-  const [transfers, setTransfers] = useState<WalletTransfer[]>(seedTransfers);
 
-  // Track wallet balance locally so approved top-ups visibly draw it down.
-  const [wallet, setWallet] = useState<number>(walletBalance);
+  // Available headroom on the primary card to grant new/raised allocations.
+  const [available, setAvailable] = useState<number>(primaryUnallocated());
 
   // ── Filter state (shared across the three "expense" tabs) ────────────────
   const [from, setFrom] = useState<Date | undefined>();
@@ -146,8 +143,7 @@ const Approvals = () => {
     inv: invs.filter((r) => r.status === "pending").length,
     card: cReqs.filter((r) => r.status === "pending").length,
     topup: lReqs.filter((r) => r.status === "pending").length,
-    transfer: transfers.filter((r) => r.status === "pending").length,
-  }), [txns, oop, invs, cReqs, lReqs, transfers]);
+  }), [txns, oop, invs, cReqs, lReqs]);
 
   const setField = <T extends { id: string; status: ApprovalStatus }>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -161,37 +157,30 @@ const Approvals = () => {
   const updateOop = setField(setOop, "Reimbursement");
   const updateInv = setField(setInvs, "Invoice");
   const updateCard = setField(setCReqs, "Card request");
-  const updateTransfer = setField(setTransfers, "Transfer");
 
-  // Top-up approval has special handling: when approved, attempt the wallet→card transfer.
   const updateTopUp = (id: string, status: ApprovalStatus) => {
     setLReqs((rs) => rs.map((r) => {
       if (r.id !== id) return r;
       if (status !== "approved") {
-        toast.success(`Top-up request ${status}`);
+        toast.success(`Limit-increase request ${status}`);
         return { ...r, status };
       }
-      // Approved: check wallet availability
-      if (wallet >= r.requestedAmount) {
-        setWallet((w) => w - r.requestedAmount);
+      const delta = r.requestedAmount;
+      if (available >= delta) {
+        setAvailable((w) => w - delta);
         const member = memberById(r.memberId);
         const card = cardById(r.cardId);
         toast.success(
-          `Top-up approved — ${formatCurrency(r.requestedAmount)} transferred from main wallet to ${member?.name ?? "cardholder"} •• ${card?.last4 ?? ""}`,
+          `Limit increase approved — ${formatCurrency(delta)} additional allocation granted to ${member?.name ?? "cardholder"} •• ${card?.last4 ?? ""}`,
         );
         return { ...r, status: "approved", fundingStatus: "funded" };
       }
       toast.error(
-        `Approved, but main wallet has only ${formatCurrency(wallet)} — transfer is on hold pending wallet top-up.`,
+        `Approved, but primary card has only ${formatCurrency(available)} unallocated — increase is on hold pending more funds.`,
       );
       return { ...r, status: "approved", fundingStatus: "insufficient_funds" };
     }));
   };
-
-  const directionLabel = (d: TransferDirection) =>
-    d === "wallet_to_card" ? "Wallet → Card"
-    : d === "card_to_wallet" ? "Card → Wallet"
-    : "Card → Card";
 
   return (
     <AppLayout
@@ -199,13 +188,12 @@ const Approvals = () => {
       subtitle="Review approval requests from members across transactions, expenses, invoices, and card controls."
     >
       <Tabs defaultValue="txn" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 md:max-w-4xl">
+        <TabsList className="grid w-full grid-cols-5 md:max-w-3xl">
           <TabsTrigger value="txn">Transactions ({counts.txn})</TabsTrigger>
           <TabsTrigger value="oop">Out-of-Pocket ({counts.oop})</TabsTrigger>
           <TabsTrigger value="inv">Vendor Invoices ({counts.inv})</TabsTrigger>
           <TabsTrigger value="card">Card requests ({counts.card})</TabsTrigger>
-          <TabsTrigger value="topup">Top-up requests ({counts.topup})</TabsTrigger>
-          <TabsTrigger value="transfer">Transfers ({counts.transfer})</TabsTrigger>
+          <TabsTrigger value="topup">Limit increases ({counts.topup})</TabsTrigger>
         </TabsList>
 
         {/* 1. Transaction approvals — tagging only */}
@@ -443,11 +431,11 @@ const Approvals = () => {
         <TabsContent value="topup" className="mt-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              Top-up requests submitted by cardholders. On approval, the requested amount is transferred from the main wallet to the card — subject to wallet availability.
+              Limit-increase requests submitted by cardholders. On approval, additional limit is reserved from the primary card's unallocated balance.
             </p>
             <p className="text-xs">
-              <span className="text-muted-foreground">Main wallet available: </span>
-              <span className="font-semibold">{formatCurrency(wallet)}</span>
+              <span className="text-muted-foreground">Primary card unallocated: </span>
+              <span className="font-semibold">{formatCurrency(available)}</span>
             </p>
           </div>
           {lReqs.length === 0 ? <EmptyState /> : (
@@ -459,8 +447,8 @@ const Approvals = () => {
                       <TableHead>Date</TableHead>
                       <TableHead>Member</TableHead>
                       <TableHead>Card</TableHead>
-                      <TableHead className="text-right">Current balance</TableHead>
-                      <TableHead className="text-right">Requested top-up</TableHead>
+                      <TableHead className="text-right">Current limit</TableHead>
+                      <TableHead className="text-right">Requested increase</TableHead>
                       <TableHead>Reason</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Action</TableHead>
@@ -470,7 +458,7 @@ const Approvals = () => {
                     {lReqs.map((r) => {
                       const m = memberById(r.memberId);
                       const c = cardById(r.cardId);
-                      const insufficient = r.status === "pending" && r.requestedAmount > wallet;
+                      const insufficient = r.status === "pending" && r.requestedAmount > available;
                       return (
                         <TableRow key={r.id}>
                           <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
@@ -481,7 +469,7 @@ const Approvals = () => {
                             {formatCurrency(r.requestedAmount)}
                             {insufficient && (
                               <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-medium text-warning">
-                                <AlertTriangle className="h-3 w-3" /> low wallet
+                                <AlertTriangle className="h-3 w-3" /> low headroom
                               </span>
                             )}
                           </TableCell>
@@ -490,10 +478,10 @@ const Approvals = () => {
                             <div className="flex flex-col gap-1">
                               {statusBadge(r.status)}
                               {r.status === "approved" && r.fundingStatus === "insufficient_funds" && (
-                                <span className="text-[10px] text-warning">Transfer on hold — wallet underfunded</span>
+                                <span className="text-[10px] text-warning">On hold — primary card underfunded</span>
                               )}
                               {r.status === "approved" && r.fundingStatus === "funded" && (
-                                <span className="text-[10px] text-muted-foreground">Wallet → card transferred</span>
+                                <span className="text-[10px] text-muted-foreground">Limit increase applied</span>
                               )}
                             </div>
                           </TableCell>
@@ -501,61 +489,6 @@ const Approvals = () => {
                             <ActionCell status={r.status}
                               onApprove={() => updateTopUp(r.id, "approved")}
                               onReject={() => updateTopUp(r.id, "rejected")} />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* 6. Wallet ↔ card transfers */}
-        <TabsContent value="transfer" className="mt-4">
-          <p className="mb-3 text-xs text-muted-foreground">
-            All wallet ↔ card and card ↔ card movements require admin approval before funds settle.
-          </p>
-          {transfers.length === 0 ? <EmptyState /> : (
-            <Card className="shadow-soft">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Direction</TableHead>
-                      <TableHead>From</TableHead>
-                      <TableHead>To</TableHead>
-                      <TableHead>Reason</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transfers.map((r) => {
-                      const fromCard = r.fromCardId ? cardById(r.fromCardId) : undefined;
-                      const toCard = r.toCardId ? cardById(r.toCardId) : undefined;
-                      const fromLabel = r.direction === "wallet_to_card"
-                        ? "Main wallet"
-                        : fromCard ? `${memberById(fromCard.memberId)?.name} •• ${fromCard.last4}` : "—";
-                      const toLabel = r.direction === "card_to_wallet"
-                        ? "Main wallet"
-                        : toCard ? `${memberById(toCard.memberId)?.name} •• ${toCard.last4}` : "—";
-                      return (
-                        <TableRow key={r.id}>
-                          <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                          <TableCell className="text-xs">{directionLabel(r.direction)}</TableCell>
-                          <TableCell className="text-sm">{fromLabel}</TableCell>
-                          <TableCell className="text-sm">{toLabel}</TableCell>
-                          <TableCell className="text-xs text-muted-foreground">{r.reason ?? "—"}</TableCell>
-                          <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                          <TableCell>{statusBadge(r.status)}</TableCell>
-                          <TableCell className="text-right">
-                            <ActionCell status={r.status}
-                              onApprove={() => updateTransfer(r.id, "approved")}
-                              onReject={() => updateTransfer(r.id, "rejected")} />
                           </TableCell>
                         </TableRow>
                       );

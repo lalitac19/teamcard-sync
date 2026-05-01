@@ -16,7 +16,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import {
-  cards, transactions, walletTransfers, memberById, cardById,
+  cards, transactions, memberById,
   members, allCountries,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
@@ -114,30 +114,7 @@ const CardStatement = () => {
         });
       });
 
-    // Internal transfers (approved only) affecting this card
-    walletTransfers
-      .filter((w) => w.status === "approved" && inRange(w.date, from, to))
-      .forEach((w) => {
-        if (w.direction === "wallet_to_card" && w.toCardId === card.id) {
-          list.push({
-            id: `wt-${w.id}`,
-            date: w.date,
-            description: `Funds added from main wallet${w.reason ? ` — ${w.reason}` : ""}`,
-            reference: w.id.toUpperCase(),
-            category: "wallet_to_card",
-            amount: w.amount,
-          });
-        } else if (w.direction === "card_to_wallet" && w.fromCardId === card.id) {
-          list.push({
-            id: `wt-${w.id}`,
-            date: w.date,
-            description: `Funds returned to main wallet${w.reason ? ` — ${w.reason}` : ""}`,
-            reference: w.id.toUpperCase(),
-            category: "card_to_wallet",
-            amount: -w.amount,
-          });
-        }
-      });
+    // Internal wallet/card transfers no longer exist in the primary/supplementary model.
 
     return list.sort((a, b) => a.date.localeCompare(b.date));
   }, [card, from, to, merchantQ, country]);

@@ -34,8 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, Sun, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, MapPin, Store } from "lucide-react";
+import { cards, formatCurrency, memberById, primaryCard, primaryUnallocated, type Card as CardModel } from "@/lib/mockData";
+import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store } from "lucide-react";
 import { toast } from "sonner";
 
 const MERCHANT_CATEGORIES = [
@@ -76,16 +76,18 @@ const typeBadge = (type: string) => {
 const Cards = () => {
   const [filter, setFilter] = useState<"all" | "virtual" | "physical" | "single-use">("all");
   const filtered = filter === "all" ? cards : cards.filter((c) => c.type === filter);
+  const primary = primaryCard();
+  const unallocated = primaryUnallocated();
 
   return (
     <AppLayout
       title="Cards"
-      subtitle={`${cards.length} cards issued across your team.`}
+      subtitle={`${cards.length} cards issued · ${formatCurrency(unallocated)} unallocated on primary card.`}
       actions={
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" /> Issue new card
+              <Plus className="h-4 w-4" /> Issue supplementary card
             </Button>
           </DialogTrigger>
           <IssueCardDialog />
@@ -113,22 +115,27 @@ const Cards = () => {
               <TableRow>
                 <TableHead>Card</TableHead>
                 <TableHead>Cardholder</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="text-right">Limit</TableHead>
                 <TableHead className="text-right">Spent</TableHead>
-                <TableHead className="text-right">Per-txn limit</TableHead>
-                <TableHead className="w-[260px] text-right">Actions</TableHead>
+                <TableHead className="text-right">Remaining</TableHead>
+                <TableHead className="w-[120px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((card) => {
                 const member = memberById(card.memberId);
+                const isPrimary = !!card.isPrimary;
+                // Primary card "limit" displayed = unallocated (its actual spendable headroom)
+                const displayLimit = isPrimary ? primaryUnallocated() : card.spendLimit;
+                const remaining = Math.max(0, displayLimit - card.spent);
                 return (
-                  <TableRow key={card.id}>
+                  <TableRow key={card.id} className={isPrimary ? "bg-primary/5" : undefined}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-10 items-center justify-center rounded-md bg-secondary text-muted-foreground">
+                        <div className={`flex h-8 w-10 items-center justify-center rounded-md ${isPrimary ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>
                           <CreditCard className="h-4 w-4" />
                         </div>
                         <span className="font-mono text-sm">•• {card.last4}</span>
@@ -138,15 +145,27 @@ const Cards = () => {
                       <p className="text-sm font-medium">{member?.name ?? "—"}</p>
                       <p className="text-xs text-muted-foreground">{member?.department}</p>
                     </TableCell>
+                    <TableCell>
+                      {isPrimary ? (
+                        <Badge className="bg-primary/10 text-primary hover:bg-primary/10 border-0 gap-1">
+                          <ShieldCheck className="h-3 w-3" /> Primary
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Supplementary</Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{typeBadge(card.type)}</TableCell>
                     <TableCell>{statusBadge(card.status)}</TableCell>
-                    <TableCell className="text-right font-semibold">{formatCurrency(card.balance)}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{formatCurrency(card.spent)}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{formatCurrency(card.spendLimit)}</TableCell>
+                    <TableCell className="text-right text-sm font-semibold">
+                      {formatCurrency(displayLimit)}
+                      {isPrimary && (
+                        <p className="text-[10px] font-normal text-muted-foreground">unallocated</p>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right text-sm text-muted-foreground">{formatCurrency(card.spent)}</TableCell>
+                    <TableCell className="text-right text-sm">{formatCurrency(remaining)}</TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
-                        <CardFundsDialog card={card} mode="add" />
-                        <CardFundsDialog card={card} mode="withdraw" />
                         <ManageCardDialog card={card} />
                         <AuditTrailDialog card={card} />
                       </div>
@@ -162,54 +181,7 @@ const Cards = () => {
   );
 };
 
-function CardFundsDialog({ card, mode }: { card: CardModel; mode: "add" | "withdraw" }) {
-  const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [reason, setReason] = useState("");
-  const isAdd = mode === "add";
-
-  const submit = () => {
-    if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount");
-    if (!isAdd && Number(amount) > card.balance) return toast.error("Amount exceeds card balance");
-    toast.success(`Transfer submitted for approval (${isAdd ? "Wallet → Card" : "Card → Wallet"})`);
-    setOpen(false);
-    setAmount(""); setReason("");
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="ghost" className="gap-1" title={isAdd ? "Add funds" : "Withdraw"}>
-          {isAdd ? <Plus className="h-3.5 w-3.5" /> : <ArrowLeftRight className="h-3.5 w-3.5" />}
-          <span className="hidden lg:inline">{isAdd ? "Add" : "Withdraw"}</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{isAdd ? "Add funds to card" : "Withdraw funds from card"}</DialogTitle>
-          <DialogDescription>
-            •• {card.last4} · {memberById(card.memberId)?.name} · current balance {formatCurrency(card.balance)}.
-            All transfers require admin approval.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label>Amount (USD)</Label>
-            <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Reason (optional)</Label>
-            <Input placeholder="e.g. Top up for travel" value={reason} onChange={(e) => setReason(e.target.value)} />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={submit}>Submit for approval</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
+// (Funds add/withdraw dialog removed — supplementary cards are governed by limit allocation, not balance transfers.)
 
 const COUNTRIES = [
   { code: "US", name: "United States" },
@@ -302,14 +274,45 @@ function MultiSelectChips({
 function IssueCardDialog() {
   const [categories, setCategories] = useState<string[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
+  const [allocatedLimit, setAllocatedLimit] = useState("");
+  const [perTxnLimit, setPerTxnLimit] = useState("");
+
+  const unallocated = primaryUnallocated();
+  const requested = Number(allocatedLimit) || 0;
+  const exceeds = requested > unallocated;
+
+  const submit = () => {
+    if (!requested || requested <= 0) return toast.error("Enter the limit to allocate to this card");
+    if (exceeds) {
+      return toast.error(
+        `Limit exceeds primary card's unallocated balance (${formatCurrency(unallocated)}). Top up the primary card or reduce another card's limit.`,
+      );
+    }
+    toast.success(`Card issued with ${formatCurrency(requested)} limit allocated from primary card`);
+  };
 
   return (
-    <DialogContent className="sm:max-w-md">
+    <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Issue a new card</DialogTitle>
-        <DialogDescription>Configure the card type, limits, and assigned member.</DialogDescription>
+        <DialogTitle>Issue a supplementary card</DialogTitle>
+        <DialogDescription>
+          Allocates a spending limit from the primary card's unallocated balance. There are no fund transfers — just a limit reservation.
+        </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
+        <div className="rounded-md border bg-secondary/40 p-3 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Primary card unallocated</span>
+            <span className="font-semibold">{formatCurrency(unallocated)}</span>
+          </div>
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-muted-foreground">After this allocation</span>
+            <span className={exceeds ? "font-semibold text-destructive" : "font-semibold"}>
+              {formatCurrency(Math.max(0, unallocated - requested))}
+            </span>
+          </div>
+        </div>
+
         <div className="space-y-1.5">
           <Label>Card type</Label>
           <Select defaultValue="virtual">
@@ -333,9 +336,27 @@ function IssueCardDialog() {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Per-transaction limit</Label>
-          <Input type="number" placeholder="5000" />
-          <p className="text-xs text-muted-foreground">Maximum amount allowed for a single transaction.</p>
+          <Label>Allocated limit (USD)</Label>
+          <Input
+            type="number"
+            placeholder="5000"
+            value={allocatedLimit}
+            onChange={(e) => setAllocatedLimit(e.target.value)}
+          />
+          <p className={`text-xs ${exceeds ? "text-destructive" : "text-muted-foreground"}`}>
+            {exceeds
+              ? `Exceeds primary card unallocated balance (${formatCurrency(unallocated)}). Top up or reduce another card's limit.`
+              : `Reserved from primary card. Max ${formatCurrency(unallocated)} available.`}
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Per-transaction limit (optional)</Label>
+          <Input
+            type="number"
+            placeholder="e.g. 1000"
+            value={perTxnLimit}
+            onChange={(e) => setPerTxnLimit(e.target.value)}
+          />
         </div>
         <MultiSelectChips
           label="Allowed merchant categories"
@@ -356,7 +377,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={() => toast.success("Card issued")}>Issue card</Button>
+        <Button onClick={submit} disabled={exceeds || !requested}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
@@ -371,6 +392,13 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Limits
   const [perTxnLimit, setPerTxnLimit] = useState(String(card.spendLimit));
+  // Allocated limit (supplementary cards only)
+  const [allocatedLimit, setAllocatedLimit] = useState(String(card.spendLimit));
+  const isPrimary = !!card.isPrimary;
+  // Headroom available to raise this card's allocation: primary's unallocated EXCLUDING this card's current allocation.
+  const otherCardsAllocated = !isPrimary ? primaryUnallocated(card.id) : 0;
+  const newLimit = Number(allocatedLimit) || 0;
+  const exceedsAllocation = !isPrimary && newLimit > otherCardsAllocated;
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
@@ -399,6 +427,19 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   const saveControls = () => {
     toast.success("Card controls updated");
+    setOpen(false);
+  };
+
+  const saveLimits = () => {
+    if (!isPrimary) {
+      if (newLimit <= 0) return toast.error("Allocated limit must be greater than zero");
+      if (exceedsAllocation) {
+        return toast.error(
+          `New limit exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}).`,
+        );
+      }
+    }
+    toast.success("Card limits updated");
     setOpen(false);
   };
 
@@ -492,6 +533,27 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
+            {!isPrimary && (
+              <div className="space-y-1.5">
+                <Label>Allocated limit (USD)</Label>
+                <Input
+                  type="number"
+                  value={allocatedLimit}
+                  onChange={(e) => setAllocatedLimit(e.target.value)}
+                />
+                <p className={`text-xs ${exceedsAllocation ? "text-destructive" : "text-muted-foreground"}`}>
+                  {exceedsAllocation
+                    ? `Exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}). Reduce another card's limit or top up the primary card.`
+                    : `Reserved from the primary card. Maximum currently available: ${formatCurrency(otherCardsAllocated)}.`}
+                </p>
+              </div>
+            )}
+            {isPrimary && (
+              <div className="rounded-md border bg-secondary/40 p-3 text-xs text-muted-foreground">
+                The primary card spends from its unallocated balance — currently <span className="font-semibold text-foreground">{formatCurrency(primaryUnallocated())}</span>.
+                Top up the primary card to raise this headroom.
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label>Per-transaction limit (USD)</Label>
               <Input
@@ -505,7 +567,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={saveControls}>Save limits</Button>
+              <Button onClick={saveLimits} disabled={!isPrimary && exceedsAllocation}>Save limits</Button>
             </DialogFooter>
           </TabsContent>
 

@@ -109,12 +109,22 @@ export interface Card {
   type: CardType;
   status: CardStatus;
   last4: string;
+  /**
+   * For the primary card: the card's own per-period spend cap (the unallocated portion is also spendable here).
+   * For supplementary cards: the limit allocated from the primary card balance.
+   */
   spendLimit: number;
   spent: number;
-  balance: number; // funds prepaid onto this card from the main wallet
+  /**
+   * Primary card only: total funds topped up to the workspace.
+   * Supplementary cards do not hold a balance — they spend against their allocated limit.
+   */
+  balance: number;
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
   merchantCategories?: string[];
   createdAt: string;
+  /** Marks the workspace's single primary card. All other cards are supplementary. */
+  isPrimary?: boolean;
 }
 
 export type TransferDirection = "wallet_to_card" | "card_to_wallet";
@@ -271,13 +281,15 @@ export const teams: Team[] = [
 ];
 
 export const cards: Card[] = [
-  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, spent: 8420, balance: 4200, limitPeriod: "monthly", createdAt: "2024-01-15" },
-  { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, spent: 11200, balance: 1800, limitPeriod: "monthly", createdAt: "2024-02-05" },
-  { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, spent: 1280, balance: 720, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
-  { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, spent: 6450, balance: 2550, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
-  { id: "c5", memberId: "m4", type: "virtual", status: "active", last4: "7788", spendLimit: 3000, spent: 980, balance: 1020, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-03-08" },
-  { id: "c6", memberId: "m5", type: "physical", status: "frozen", last4: "1199", spendLimit: 10000, spent: 0, balance: 0, limitPeriod: "monthly", createdAt: "2024-03-25" },
-  { id: "c7", memberId: "m3", type: "single-use", status: "active", last4: "2255", spendLimit: 1200, spent: 0, balance: 1200, limitPeriod: "per-transaction", createdAt: "2024-10-20" },
+  // Primary card — its `balance` is the total funds topped up to the workspace.
+  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, spent: 8420, balance: 60000, limitPeriod: "monthly", createdAt: "2024-01-15", isPrimary: true },
+  // Supplementary cards — `spendLimit` is the limit allocated from the primary card.
+  { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, spent: 11200, balance: 0, limitPeriod: "monthly", createdAt: "2024-02-05" },
+  { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, spent: 1280, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
+  { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, spent: 6450, balance: 0, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
+  { id: "c5", memberId: "m4", type: "virtual", status: "active", last4: "7788", spendLimit: 3000, spent: 980, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-03-08" },
+  { id: "c6", memberId: "m5", type: "physical", status: "frozen", last4: "1199", spendLimit: 1500, spent: 0, balance: 0, limitPeriod: "monthly", createdAt: "2024-03-25" },
+  { id: "c7", memberId: "m3", type: "single-use", status: "active", last4: "2255", spendLimit: 1200, spent: 0, balance: 0, limitPeriod: "per-transaction", createdAt: "2024-10-20" },
 ];
 
 export const transactions: Transaction[] = [
@@ -369,6 +381,26 @@ export const statementExtras: StatementExtra[] = [
 
 export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
+
+/** The single primary card for the workspace. */
+export const primaryCard = (): Card => cards.find((c) => c.isPrimary) ?? cards[0];
+
+/** All non-primary (supplementary) cards. */
+export const supplementaryCards = (): Card[] => cards.filter((c) => !c.isPrimary);
+
+/** Sum of limits allocated to supplementary cards (frozen/expired excluded only if they shouldn't reserve funds — kept inclusive here). */
+export const totalAllocatedLimits = (excludeId?: string): number =>
+  supplementaryCards()
+    .filter((c) => c.id !== excludeId)
+    .reduce((s, c) => s + c.spendLimit, 0);
+
+/**
+ * Funds on the primary card that are NOT yet allocated to supplementary cards.
+ * This is what's available to issue new supplementary cards (or raise existing limits)
+ * AND what the primary card itself can still spend on.
+ */
+export const primaryUnallocated = (excludeId?: string): number =>
+  Math.max(0, primaryCard().balance - totalAllocatedLimits(excludeId));
 
 /** Distinct countries appearing across transactions, reimbursements, and invoices. */
 export const allCountries = (): string[] => {
