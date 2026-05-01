@@ -346,7 +346,7 @@ function IssueCardDialog() {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Allocated limit (USD)</Label>
+          <Label>Spending limit (USD)</Label>
           <Input
             type="number"
             placeholder="5000"
@@ -356,17 +356,22 @@ function IssueCardDialog() {
           <p className={`text-xs ${exceeds ? "text-destructive" : "text-muted-foreground"}`}>
             {exceeds
               ? `Exceeds primary card unallocated balance (${formatCurrency(unallocated)}). Top up or reduce another card's limit.`
-              : `Reserved from primary card. Max ${formatCurrency(unallocated)} available.`}
+              : `Total amount this card can spend in the period. Reserved from primary card. Max ${formatCurrency(unallocated)} available.`}
           </p>
         </div>
         <div className="space-y-1.5">
-          <Label>Per-transaction limit (optional)</Label>
+          <Label>Per-transaction limit (USD, optional)</Label>
           <Input
             type="number"
             placeholder="e.g. 1000"
             value={perTxnLimit}
             onChange={(e) => setPerTxnLimit(e.target.value)}
           />
+          <p className={`text-xs ${perTxnExceedsSpend ? "text-destructive" : "text-muted-foreground"}`}>
+            {perTxnExceedsSpend
+              ? "Per-transaction limit cannot exceed the spending limit."
+              : "Caps the size of any single transaction. Leave blank for no per-transaction cap."}
+          </p>
         </div>
         <MultiSelectChips
           label="Allowed merchant categories"
