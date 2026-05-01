@@ -274,14 +274,45 @@ function MultiSelectChips({
 function IssueCardDialog() {
   const [categories, setCategories] = useState<string[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
+  const [allocatedLimit, setAllocatedLimit] = useState("");
+  const [perTxnLimit, setPerTxnLimit] = useState("");
+
+  const unallocated = primaryUnallocated();
+  const requested = Number(allocatedLimit) || 0;
+  const exceeds = requested > unallocated;
+
+  const submit = () => {
+    if (!requested || requested <= 0) return toast.error("Enter the limit to allocate to this card");
+    if (exceeds) {
+      return toast.error(
+        `Limit exceeds primary card's unallocated balance (${formatCurrency(unallocated)}). Top up the primary card or reduce another card's limit.`,
+      );
+    }
+    toast.success(`Card issued with ${formatCurrency(requested)} limit allocated from primary card`);
+  };
 
   return (
-    <DialogContent className="sm:max-w-md">
+    <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Issue a new card</DialogTitle>
-        <DialogDescription>Configure the card type, limits, and assigned member.</DialogDescription>
+        <DialogTitle>Issue a supplementary card</DialogTitle>
+        <DialogDescription>
+          Allocates a spending limit from the primary card's unallocated balance. There are no fund transfers — just a limit reservation.
+        </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
+        <div className="rounded-md border bg-secondary/40 p-3 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Primary card unallocated</span>
+            <span className="font-semibold">{formatCurrency(unallocated)}</span>
+          </div>
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-muted-foreground">After this allocation</span>
+            <span className={exceeds ? "font-semibold text-destructive" : "font-semibold"}>
+              {formatCurrency(Math.max(0, unallocated - requested))}
+            </span>
+          </div>
+        </div>
+
         <div className="space-y-1.5">
           <Label>Card type</Label>
           <Select defaultValue="virtual">
@@ -305,9 +336,27 @@ function IssueCardDialog() {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Per-transaction limit</Label>
-          <Input type="number" placeholder="5000" />
-          <p className="text-xs text-muted-foreground">Maximum amount allowed for a single transaction.</p>
+          <Label>Allocated limit (USD)</Label>
+          <Input
+            type="number"
+            placeholder="5000"
+            value={allocatedLimit}
+            onChange={(e) => setAllocatedLimit(e.target.value)}
+          />
+          <p className={`text-xs ${exceeds ? "text-destructive" : "text-muted-foreground"}`}>
+            {exceeds
+              ? `Exceeds primary card unallocated balance (${formatCurrency(unallocated)}). Top up or reduce another card's limit.`
+              : `Reserved from primary card. Max ${formatCurrency(unallocated)} available.`}
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Per-transaction limit (optional)</Label>
+          <Input
+            type="number"
+            placeholder="e.g. 1000"
+            value={perTxnLimit}
+            onChange={(e) => setPerTxnLimit(e.target.value)}
+          />
         </div>
         <MultiSelectChips
           label="Allowed merchant categories"
@@ -328,7 +377,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={() => toast.success("Card issued")}>Issue card</Button>
+        <Button onClick={submit} disabled={exceeds || !requested}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
