@@ -159,27 +159,6 @@ const AccountStatement = () => {
         </>
       }
     >
-      {/* Filters */}
-      <TableFilters
-        cardholders={cardholderOptions}
-        cardholderId={cardholderId}
-        onCardholderChange={(v) => { setCardholderId(v); setCardId(ALL); }}
-        cards={cardOptions}
-        cardId={activeCardId}
-        onCardChange={setCardId}
-        merchant={merchant}
-        onMerchantChange={setMerchant}
-        countries={countries}
-        country={country}
-        onCountryChange={setCountry}
-        onReset={() => { setCardholderId(ALL); setCardId(ALL); setMerchant(""); setCountry(ALL); }}
-      />
-      {isCardScoped && (
-        <p className="mt-2 text-xs text-muted-foreground">
-          Filtering active — only matching card spend is shown. Wallet top-ups and adjustments (refunds, fees) are hidden while a card-related filter is applied.
-        </p>
-      )}
-
       {/* Summary */}
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card className="shadow-soft">
