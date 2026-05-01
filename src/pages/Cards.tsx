@@ -34,8 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { cards, formatCurrency, memberById, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, Sun, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, MapPin, Store } from "lucide-react";
+import { cards, formatCurrency, memberById, primaryCard, primaryUnallocated, type Card as CardModel } from "@/lib/mockData";
+import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store } from "lucide-react";
 import { toast } from "sonner";
 
 const MERCHANT_CATEGORIES = [
@@ -76,16 +76,18 @@ const typeBadge = (type: string) => {
 const Cards = () => {
   const [filter, setFilter] = useState<"all" | "virtual" | "physical" | "single-use">("all");
   const filtered = filter === "all" ? cards : cards.filter((c) => c.type === filter);
+  const primary = primaryCard();
+  const unallocated = primaryUnallocated();
 
   return (
     <AppLayout
       title="Cards"
-      subtitle={`${cards.length} cards issued across your team.`}
+      subtitle={`${cards.length} cards issued · ${formatCurrency(unallocated)} unallocated on primary card.`}
       actions={
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" /> Issue new card
+              <Plus className="h-4 w-4" /> Issue supplementary card
             </Button>
           </DialogTrigger>
           <IssueCardDialog />
@@ -113,22 +115,27 @@ const Cards = () => {
               <TableRow>
                 <TableHead>Card</TableHead>
                 <TableHead>Cardholder</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="text-right">Limit</TableHead>
                 <TableHead className="text-right">Spent</TableHead>
-                <TableHead className="text-right">Per-txn limit</TableHead>
-                <TableHead className="w-[260px] text-right">Actions</TableHead>
+                <TableHead className="text-right">Remaining</TableHead>
+                <TableHead className="w-[120px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((card) => {
                 const member = memberById(card.memberId);
+                const isPrimary = !!card.isPrimary;
+                // Primary card "limit" displayed = unallocated (its actual spendable headroom)
+                const displayLimit = isPrimary ? primaryUnallocated() : card.spendLimit;
+                const remaining = Math.max(0, displayLimit - card.spent);
                 return (
-                  <TableRow key={card.id}>
+                  <TableRow key={card.id} className={isPrimary ? "bg-primary/5" : undefined}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-10 items-center justify-center rounded-md bg-secondary text-muted-foreground">
+                        <div className={`flex h-8 w-10 items-center justify-center rounded-md ${isPrimary ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>
                           <CreditCard className="h-4 w-4" />
                         </div>
                         <span className="font-mono text-sm">•• {card.last4}</span>
@@ -138,15 +145,27 @@ const Cards = () => {
                       <p className="text-sm font-medium">{member?.name ?? "—"}</p>
                       <p className="text-xs text-muted-foreground">{member?.department}</p>
                     </TableCell>
+                    <TableCell>
+                      {isPrimary ? (
+                        <Badge className="bg-primary/10 text-primary hover:bg-primary/10 border-0 gap-1">
+                          <ShieldCheck className="h-3 w-3" /> Primary
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Supplementary</Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{typeBadge(card.type)}</TableCell>
                     <TableCell>{statusBadge(card.status)}</TableCell>
-                    <TableCell className="text-right font-semibold">{formatCurrency(card.balance)}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{formatCurrency(card.spent)}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{formatCurrency(card.spendLimit)}</TableCell>
+                    <TableCell className="text-right text-sm font-semibold">
+                      {formatCurrency(displayLimit)}
+                      {isPrimary && (
+                        <p className="text-[10px] font-normal text-muted-foreground">unallocated</p>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right text-sm text-muted-foreground">{formatCurrency(card.spent)}</TableCell>
+                    <TableCell className="text-right text-sm">{formatCurrency(remaining)}</TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
-                        <CardFundsDialog card={card} mode="add" />
-                        <CardFundsDialog card={card} mode="withdraw" />
                         <ManageCardDialog card={card} />
                         <AuditTrailDialog card={card} />
                       </div>
