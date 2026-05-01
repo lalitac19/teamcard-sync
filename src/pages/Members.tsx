@@ -138,6 +138,13 @@ const Members = () => {
   };
 
   const handleRemove = (id: string) => {
+    // Terminate any cards linked to this member (irreversible)
+    const linked = cards.filter((c) => c.memberId === id);
+    linked.forEach((c) => {
+      c.status = "terminated";
+      c.spendLimit = 0;
+      c.txnLimit = 0;
+    });
     setMembers((prev) => prev.filter((m) => m.id !== id));
     setTeams((prev) =>
       prev.map((t) => ({
@@ -146,7 +153,11 @@ const Members = () => {
         leadId: t.leadId === id ? t.memberIds.find((mid) => mid !== id) ?? "" : t.leadId,
       })),
     );
-    toast.success("Member removed");
+    if (linked.length > 0) {
+      toast.success(`Member removed. ${linked.length} card${linked.length === 1 ? "" : "s"} terminated.`);
+    } else {
+      toast.success("Member removed");
+    }
   };
 
   const handleUpdateMember = (
@@ -744,9 +755,44 @@ function MemberRowActions({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove {member.name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              They'll lose access to the workspace and any active cards will be frozen. This
-              action cannot be undone.
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                {(() => {
+                  const linkedCards = cards.filter(
+                    (c) => c.memberId === member.id && c.status !== "terminated" && c.status !== "expired",
+                  );
+                  if (linkedCards.length === 0) {
+                    return (
+                      <p>
+                        They'll lose access to the workspace. This action cannot be undone.
+                      </p>
+                    );
+                  }
+                  return (
+                    <>
+                      <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-destructive">
+                        <p className="text-sm font-semibold">
+                          Warning: {linkedCards.length} card{linkedCards.length === 1 ? "" : "s"} linked to this member will be permanently terminated.
+                        </p>
+                        <p className="mt-1 text-xs">
+                          This action is irreversible. Terminated cards cannot be reactivated and any pending authorizations may fail.
+                        </p>
+                      </div>
+                      <ul className="space-y-1 rounded-md bg-muted/40 p-2 text-xs">
+                        {linkedCards.map((c) => (
+                          <li key={c.id} className="flex items-center justify-between">
+                            <span className="font-medium capitalize">{c.type.replace("-", " ")} card</span>
+                            <span className="text-muted-foreground">•••• {c.last4}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="text-xs text-muted-foreground">
+                        The member will also lose access to the workspace.
+                      </p>
+                    </>
+                  );
+                })()}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -755,7 +801,7 @@ function MemberRowActions({
               onClick={() => onRemove(member.id)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Remove member
+              Remove & terminate cards
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
