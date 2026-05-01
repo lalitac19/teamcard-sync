@@ -188,13 +188,12 @@ const Approvals = () => {
       subtitle="Review approval requests from members across transactions, expenses, invoices, and card controls."
     >
       <Tabs defaultValue="txn" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 md:max-w-4xl">
+        <TabsList className="grid w-full grid-cols-5 md:max-w-3xl">
           <TabsTrigger value="txn">Transactions ({counts.txn})</TabsTrigger>
           <TabsTrigger value="oop">Out-of-Pocket ({counts.oop})</TabsTrigger>
           <TabsTrigger value="inv">Vendor Invoices ({counts.inv})</TabsTrigger>
           <TabsTrigger value="card">Card requests ({counts.card})</TabsTrigger>
-          <TabsTrigger value="topup">Top-up requests ({counts.topup})</TabsTrigger>
-          <TabsTrigger value="transfer">Transfers ({counts.transfer})</TabsTrigger>
+          <TabsTrigger value="topup">Limit increases ({counts.topup})</TabsTrigger>
         </TabsList>
 
         {/* 1. Transaction approvals — tagging only */}
