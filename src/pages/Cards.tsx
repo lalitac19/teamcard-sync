@@ -65,6 +65,7 @@ const REGIONS = [
 const statusBadge = (status: string) => {
   if (status === "active") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Active</Badge>;
   if (status === "frozen") return <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Frozen</Badge>;
+  if (status === "terminated") return <Badge className="bg-destructive/10 text-destructive hover:bg-destructive/10 border-0">Terminated</Badge>;
   return <Badge variant="secondary">Expired</Badge>;
 };
 

@@ -1,7 +1,7 @@
 // Centralized mock data for the corporate card portal
 
 export type CardType = "virtual" | "physical" | "single-use";
-export type CardStatus = "active" | "frozen" | "expired";
+export type CardStatus = "active" | "frozen" | "expired" | "terminated";
 
 export type MemberRole = "admin" | "accountant" | "external_auditor" | "team_member";
 
