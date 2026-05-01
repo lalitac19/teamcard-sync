@@ -34,8 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { cards, formatCurrency, memberById, primaryCard, primaryUnallocated, type Card as CardModel } from "@/lib/mockData";
-import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store } from "lucide-react";
+import { cards, formatCurrency, memberById, members, primaryCard, primaryUnallocated, type Card as CardModel } from "@/lib/mockData";
+import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 const MERCHANT_CATEGORIES = [
