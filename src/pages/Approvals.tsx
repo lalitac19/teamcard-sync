@@ -15,14 +15,12 @@ import {
   invoices as seedInvoices,
   cardRequests as seedCardRequests,
   topUpRequests as seedTopUpRequests,
-  walletTransfers as seedTransfers,
   cardById,
-  walletBalance,
+  primaryUnallocated,
   cards as allCards, members, allCountries,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
   type CardRequest, type TopUpRequest,
-  type WalletTransfer, type TransferDirection,
 } from "@/lib/mockData";
 import { Check, X, Inbox, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -67,10 +65,9 @@ const Approvals = () => {
   const [invs, setInvs] = useState<Invoice[]>(seedInvoices);
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<TopUpRequest[]>(seedTopUpRequests);
-  const [transfers, setTransfers] = useState<WalletTransfer[]>(seedTransfers);
 
-  // Track wallet balance locally so approved top-ups visibly draw it down.
-  const [wallet, setWallet] = useState<number>(walletBalance);
+  // Available headroom on the primary card to grant new/raised allocations.
+  const [available, setAvailable] = useState<number>(primaryUnallocated());
 
   // ── Filter state (shared across the three "expense" tabs) ────────────────
   const [from, setFrom] = useState<Date | undefined>();
@@ -146,8 +143,7 @@ const Approvals = () => {
     inv: invs.filter((r) => r.status === "pending").length,
     card: cReqs.filter((r) => r.status === "pending").length,
     topup: lReqs.filter((r) => r.status === "pending").length,
-    transfer: transfers.filter((r) => r.status === "pending").length,
-  }), [txns, oop, invs, cReqs, lReqs, transfers]);
+  }), [txns, oop, invs, cReqs, lReqs]);
 
   const setField = <T extends { id: string; status: ApprovalStatus }>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
