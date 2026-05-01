@@ -157,37 +157,30 @@ const Approvals = () => {
   const updateOop = setField(setOop, "Reimbursement");
   const updateInv = setField(setInvs, "Invoice");
   const updateCard = setField(setCReqs, "Card request");
-  const updateTransfer = setField(setTransfers, "Transfer");
 
-  // Top-up approval has special handling: when approved, attempt the wallet→card transfer.
   const updateTopUp = (id: string, status: ApprovalStatus) => {
     setLReqs((rs) => rs.map((r) => {
       if (r.id !== id) return r;
       if (status !== "approved") {
-        toast.success(`Top-up request ${status}`);
+        toast.success(`Limit-increase request ${status}`);
         return { ...r, status };
       }
-      // Approved: check wallet availability
-      if (wallet >= r.requestedAmount) {
-        setWallet((w) => w - r.requestedAmount);
+      const delta = r.requestedAmount;
+      if (available >= delta) {
+        setAvailable((w) => w - delta);
         const member = memberById(r.memberId);
         const card = cardById(r.cardId);
         toast.success(
-          `Top-up approved — ${formatCurrency(r.requestedAmount)} transferred from main wallet to ${member?.name ?? "cardholder"} •• ${card?.last4 ?? ""}`,
+          `Limit increase approved — ${formatCurrency(delta)} additional allocation granted to ${member?.name ?? "cardholder"} •• ${card?.last4 ?? ""}`,
         );
         return { ...r, status: "approved", fundingStatus: "funded" };
       }
       toast.error(
-        `Approved, but main wallet has only ${formatCurrency(wallet)} — transfer is on hold pending wallet top-up.`,
+        `Approved, but primary card has only ${formatCurrency(available)} unallocated — increase is on hold pending more funds.`,
       );
       return { ...r, status: "approved", fundingStatus: "insufficient_funds" };
     }));
   };
-
-  const directionLabel = (d: TransferDirection) =>
-    d === "wallet_to_card" ? "Wallet → Card"
-    : d === "card_to_wallet" ? "Card → Wallet"
-    : "Card → Card";
 
   return (
     <AppLayout
