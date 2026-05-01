@@ -556,23 +556,31 @@ function ManageCardDialog({ card }: { card: CardModel }) {
           <TabsContent value="limits" className="space-y-4 pt-4">
             {!isPrimary && (
               <div className="space-y-1.5">
-                <Label>Allocated limit (USD)</Label>
+                <Label>Spending limit (USD)</Label>
                 <Input
                   type="number"
-                  value={allocatedLimit}
-                  onChange={(e) => setAllocatedLimit(e.target.value)}
+                  value={spendLimit}
+                  onChange={(e) => setSpendLimit(e.target.value)}
                 />
                 <p className={`text-xs ${exceedsAllocation ? "text-destructive" : "text-muted-foreground"}`}>
                   {exceedsAllocation
                     ? `Exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}). Reduce another card's limit or top up the primary card.`
-                    : `Reserved from the primary card. Maximum currently available: ${formatCurrency(otherCardsAllocated)}.`}
+                    : `Total amount this card can spend in the period. Increase up to ${formatCurrency(otherCardsAllocated)} (primary unallocated, excluding this card) or decrease at any time.`}
                 </p>
               </div>
             )}
             {isPrimary && (
-              <div className="rounded-md border bg-secondary/40 p-3 text-xs text-muted-foreground">
-                The primary card spends from its unallocated balance — currently <span className="font-semibold text-foreground">{formatCurrency(primaryUnallocated())}</span>.
-                Top up the primary card to raise this headroom.
+              <div className="space-y-1.5">
+                <Label>Spending limit (USD)</Label>
+                <Input
+                  type="number"
+                  value={spendLimit}
+                  onChange={(e) => setSpendLimit(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  The primary card spends from its unallocated balance — currently <span className="font-semibold text-foreground">{formatCurrency(primaryUnallocated())}</span>.
+                  Top up the primary card to raise this headroom.
+                </p>
               </div>
             )}
             <div className="space-y-1.5">
@@ -581,14 +589,22 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 type="number"
                 value={perTxnLimit}
                 onChange={(e) => setPerTxnLimit(e.target.value)}
+                placeholder="Leave blank for no per-txn cap"
               />
-              <p className="text-xs text-muted-foreground">
-                Maximum amount allowed for a single transaction on this card.
+              <p className={`text-xs ${perTxnExceedsSpend ? "text-destructive" : "text-muted-foreground"}`}>
+                {perTxnExceedsSpend
+                  ? "Per-transaction limit cannot exceed the spending limit."
+                  : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending limit."}
               </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={saveLimits} disabled={!isPrimary && exceedsAllocation}>Save limits</Button>
+              <Button
+                onClick={saveLimits}
+                disabled={(!isPrimary && exceedsAllocation) || perTxnExceedsSpend}
+              >
+                Save limits
+              </Button>
             </DialogFooter>
           </TabsContent>
 
