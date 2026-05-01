@@ -110,10 +110,13 @@ export interface Card {
   status: CardStatus;
   last4: string;
   /**
+   * Overall spending limit for the period.
    * For the primary card: the card's own per-period spend cap (the unallocated portion is also spendable here).
    * For supplementary cards: the limit allocated from the primary card balance.
    */
   spendLimit: number;
+  /** Maximum amount allowed for a single transaction on this card. */
+  txnLimit?: number;
   spent: number;
   /**
    * Primary card only: total funds topped up to the workspace.
