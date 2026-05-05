@@ -74,8 +74,8 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-sidebar-accent-foreground">Northwind</span>
-              <span className="text-xs text-sidebar-foreground/70">Corporate Cards</span>
+              <span className="text-sm font-semibold text-sidebar-accent-foreground">Peko</span>
+              <span className="text-xs text-sidebar-foreground/70">Commercial Corporate Card</span>
             </div>
           )}
         </div>

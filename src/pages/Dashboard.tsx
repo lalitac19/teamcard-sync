@@ -157,7 +157,7 @@ const Dashboard = () => {
   return (
     <AppLayout
       title="Dashboard"
-      subtitle="Real-time spend, balances, and activity across Northwind."
+      subtitle="Real-time spend, balances, and activity across Peko."
     >
       {/* Action center strip */}
       {actionItems.length > 0 && (
