@@ -55,11 +55,11 @@ const Settings = () => {
                 <div className="mt-4 space-y-3">
                   <div className="space-y-1.5">
                     <Label>Company name</Label>
-                    <Input defaultValue="Northwind Inc." />
+                    <Input defaultValue="Peko Inc." />
                   </div>
                   <div className="space-y-1.5">
                     <Label>Billing email</Label>
-                    <Input defaultValue="finance@northwind.co" />
+                    <Input defaultValue="finance@peko.co" />
                   </div>
                 </div>
               </CardContent>
@@ -94,7 +94,7 @@ const Settings = () => {
                     <div>
                       <p className="text-sm font-medium">QuickBooks Online</p>
                       <p className="flex items-center gap-1 text-xs text-success">
-                        <CheckCircle2 className="h-3 w-3" /> Connected • Northwind Inc.
+                        <CheckCircle2 className="h-3 w-3" /> Connected • Peko Inc.
                       </p>
                     </div>
                     <Button variant="outline" size="sm">Manage</Button>

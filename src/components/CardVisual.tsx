@@ -32,7 +32,7 @@ export function CardVisual({ card, size = "md" }: CardVisualProps) {
           <p className="text-[10px] uppercase tracking-widest text-white/60">
             {card.type === "single-use" ? "Single-use" : card.type}
           </p>
-          <p className="mt-1 font-semibold">Northwind</p>
+          <p className="mt-1 font-semibold">Peko</p>
         </div>
         <Wifi className="h-4 w-4 rotate-90 text-white/70" />
       </div>
