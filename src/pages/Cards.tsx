@@ -116,6 +116,7 @@ const Cards = () => {
       actions={
         <div className="flex gap-2">
           <FreezeAllDialog />
+          <UnfreezeAllDialog />
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
