@@ -292,7 +292,7 @@ function FreezeAllDialog() {
     cards.forEach((c) => {
       if (selected.includes(c.id)) c.status = "frozen";
     });
-    toast.success(`Froze ${count} card${count === 1 ? "" : "s"}`);
+    toast.success(`Bulk froze ${count} card${count === 1 ? "" : "s"}`);
     setOpen(false);
     reset();
   };
@@ -307,14 +307,14 @@ function FreezeAllDialog() {
     >
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-2" disabled={freezable.length === 0}>
-          <Snowflake className="h-4 w-4" /> Freeze cards
+          <Snowflake className="h-4 w-4" /> Bulk freeze
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         {step === "select" ? (
           <>
             <DialogHeader>
-              <DialogTitle>Freeze cards</DialogTitle>
+              <DialogTitle>Bulk freeze cards</DialogTitle>
               <DialogDescription>
                 Choose which active cards to freeze. New transactions will be declined until they are unfrozen.
               </DialogDescription>
@@ -356,7 +356,7 @@ function FreezeAllDialog() {
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-4 w-4" /> Confirm freeze
+                <AlertTriangle className="h-4 w-4" /> Confirm bulk freeze
               </DialogTitle>
               <DialogDescription>
                 You are about to freeze <span className="font-semibold text-foreground">{count}</span> card
@@ -411,7 +411,7 @@ function UnfreezeAllDialog() {
     cards.forEach((c) => {
       if (selected.includes(c.id)) c.status = "active";
     });
-    toast.success(`Unfroze ${count} card${count === 1 ? "" : "s"}`);
+    toast.success(`Bulk unfroze ${count} card${count === 1 ? "" : "s"}`);
     setOpen(false);
     reset();
   };
@@ -426,12 +426,12 @@ function UnfreezeAllDialog() {
     >
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-2" disabled={unfreezable.length === 0}>
-          <Snowflake className="h-4 w-4" /> Unfreeze cards
+          <Snowflake className="h-4 w-4" /> Bulk unfreeze
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Unfreeze cards</DialogTitle>
+          <DialogTitle>Bulk unfreeze cards</DialogTitle>
           <DialogDescription>
             Choose which frozen cards to reactivate. They will resume accepting transactions immediately.
           </DialogDescription>
