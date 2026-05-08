@@ -110,24 +110,19 @@ export interface Card {
   status: CardStatus;
   last4: string;
   /**
-   * Overall spending limit for the period.
-   * For the primary card: the card's own per-period spend cap (the unallocated portion is also spendable here).
-   * For supplementary cards: the limit allocated from the primary card balance.
+   * Allocated spending limit for the period. Funds equal to this limit are
+   * locked in the wallet and reserved exclusively for this card until an
+   * admin reallocates them.
    */
   spendLimit: number;
   /** Maximum amount allowed for a single transaction on this card. */
   txnLimit?: number;
   spent: number;
-  /**
-   * Primary card only: total funds topped up to the workspace.
-   * Supplementary cards do not hold a balance — they spend against their allocated limit.
-   */
+  /** Cards do not hold a balance — they spend against their allocated wallet limit. */
   balance: number;
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
   merchantCategories?: string[];
   createdAt: string;
-  /** Marks the workspace's single primary card. All other cards are supplementary. */
-  isPrimary?: boolean;
 }
 
 export type TransferDirection = "wallet_to_card" | "card_to_wallet";
