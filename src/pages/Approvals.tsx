@@ -66,8 +66,8 @@ const Approvals = () => {
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<TopUpRequest[]>(seedTopUpRequests);
 
-  // Available headroom on the primary card to grant new/raised allocations.
-  const [available, setAvailable] = useState<number>(primaryUnallocated());
+  // Available headroom in the wallet to grant new/raised allocations.
+  const [available, setAvailable] = useState<number>(walletAvailable());
 
   // ── Filter state (shared across the three "expense" tabs) ────────────────
   const [from, setFrom] = useState<Date | undefined>();
