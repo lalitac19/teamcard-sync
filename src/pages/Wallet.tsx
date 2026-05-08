@@ -16,26 +16,27 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  walletTopUps, supplementaryCards, primaryCard, primaryUnallocated,
+  walletTopUps, cards as allCards, walletBalance, walletAvailable,
   totalAllocatedLimits, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import {
-  ArrowDownLeft, ArrowUpRight, Plus, Banknote, ShieldCheck,
+  ArrowDownLeft, ArrowUpRight, Plus, Banknote, Wallet as WalletIcon, Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 
 const Wallet = () => {
-  const primary = primaryCard();
   const allocated = useMemo(() => totalAllocatedLimits(), []);
-  const unallocated = useMemo(() => primaryUnallocated(), []);
-  const supps = useMemo(() => supplementaryCards(), []);
-  const primaryHolder = memberById(primary.memberId);
+  const available = useMemo(() => walletAvailable(), []);
+  const activeCards = useMemo(
+    () => allCards.filter((c) => c.status !== "terminated"),
+    [],
+  );
 
   return (
     <AppLayout
-      title="Primary card"
-      subtitle="Your primary card holds all topped-up funds. Allocate limits from this balance to supplementary cards."
+      title="Wallet"
+      subtitle="Top up the wallet, then allocate limits to cards. Allocated funds are locked to that card until you reallocate."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
@@ -46,25 +47,25 @@ const Wallet = () => {
         <Card className="md:col-span-2 gradient-hero text-white border-0 shadow-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-widest text-white/60">Primary card · Total balance</p>
+              <p className="text-xs uppercase tracking-widest text-white/60">Wallet · Total balance</p>
               <Badge className="bg-white/15 text-white border-0 hover:bg-white/15 gap-1">
-                <ShieldCheck className="h-3 w-3" /> Primary
+                <WalletIcon className="h-3 w-3" /> Wallet
               </Badge>
             </div>
-            <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(primary.balance)}</p>
+            <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
             <p className="mt-1 text-xs text-white/60">
-              {primaryHolder?.name} · •• {primary.last4} · {primary.type}
+              The wallet is a pool of funds — not a card. Money is spent only after it is allocated to a card as a limit.
             </p>
             <div className="mt-6 grid grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
               <div>
-                <p className="text-white/60">Allocated to supplementary cards</p>
+                <p className="text-white/60 flex items-center gap-1"><Lock className="h-3 w-3" /> Locked to cards</p>
                 <p className="mt-1 font-semibold">{formatCurrency(allocated)}</p>
-                <p className="text-xs text-white/50">{supps.length} cards</p>
+                <p className="text-xs text-white/50">{activeCards.length} cards</p>
               </div>
               <div>
-                <p className="text-white/60">Unallocated · primary can spend</p>
-                <p className="mt-1 font-semibold">{formatCurrency(unallocated)}</p>
-                <p className="text-xs text-white/50">Available to issue more cards</p>
+                <p className="text-white/60">Available to allocate</p>
+                <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
+                <p className="text-xs text-white/50">Issue cards or raise limits</p>
               </div>
               <div>
                 <p className="text-white/60">Funding account</p>
@@ -88,7 +89,7 @@ const Wallet = () => {
         <Tabs defaultValue="topups">
           <TabsList>
             <TabsTrigger value="topups">Top-up history</TabsTrigger>
-            <TabsTrigger value="allocations">Allocated limits</TabsTrigger>
+            <TabsTrigger value="allocations">Locked allocations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="topups" className="mt-4">
@@ -135,13 +136,13 @@ const Wallet = () => {
                       <TableHead>Cardholder</TableHead>
                       <TableHead>Card</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Allocated limit</TableHead>
+                      <TableHead className="text-right">Locked limit</TableHead>
                       <TableHead className="text-right">Spent</TableHead>
                       <TableHead className="text-right">Remaining</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {supps.map((c) => {
+                    {activeCards.map((c) => {
                       const m = memberById(c.memberId);
                       const remaining = Math.max(0, c.spendLimit - c.spent);
                       return (
@@ -156,10 +157,10 @@ const Wallet = () => {
                       );
                     })}
                     <TableRow className="bg-muted/30">
-                      <TableCell colSpan={3} className="text-sm font-medium">Total allocated</TableCell>
+                      <TableCell colSpan={3} className="text-sm font-medium">Total locked</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(allocated)}</TableCell>
                       <TableCell colSpan={2} className="text-right text-xs text-muted-foreground">
-                        Unallocated: {formatCurrency(unallocated)} of {formatCurrency(primary.balance)}
+                        Available: {formatCurrency(available)} of {formatCurrency(walletBalance)}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -188,13 +189,13 @@ function TopUpDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Top up primary card</Button>
+        <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Top up wallet</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Top up primary card</DialogTitle>
+          <DialogTitle>Top up wallet</DialogTitle>
           <DialogDescription>
-            Funds added here become spendable on the primary card and available to allocate as limits to supplementary cards.
+            Funds added here become available to allocate as spending limits to cards. Allocating a limit locks that amount in the wallet until you reallocate it.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
