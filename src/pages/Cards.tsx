@@ -635,6 +635,17 @@ function IssueCardDialog() {
           </Select>
         </div>
         <div className="space-y-1.5">
+          <Label>Name on card</Label>
+          <Input
+            placeholder="e.g. Marcus Patel"
+            value={cardName}
+            onChange={(e) => setCardName(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Name printed on the card. Defaults to the member name if left blank.
+          </p>
+        </div>
+        <div className="space-y-1.5">
           <Label>Spending limit (USD)</Label>
           <Input
             type="number"
