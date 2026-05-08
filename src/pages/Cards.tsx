@@ -482,12 +482,11 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   //   txnLimit   = max amount per single transaction
   const [spendLimit, setSpendLimit] = useState(String(card.spendLimit));
   const [perTxnLimit, setPerTxnLimit] = useState(card.txnLimit ? String(card.txnLimit) : "");
-  const isPrimary = !!card.isPrimary;
-  // Headroom available to raise this card's allocation: primary's unallocated EXCLUDING this card's current allocation.
-  const otherCardsAllocated = !isPrimary ? primaryUnallocated(card.id) : 0;
+  // Headroom available to raise this card's allocation: wallet available EXCLUDING this card's current allocation.
+  const otherCardsAllocated = walletAvailable(card.id);
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
-  const exceedsAllocation = !isPrimary && newSpendLimit > otherCardsAllocated;
+  const exceedsAllocation = newSpendLimit > otherCardsAllocated;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
 
   // Merchant controls
