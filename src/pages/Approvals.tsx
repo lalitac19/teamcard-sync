@@ -16,7 +16,7 @@ import {
   cardRequests as seedCardRequests,
   topUpRequests as seedTopUpRequests,
   cardById,
-  primaryUnallocated,
+  walletAvailable,
   cards as allCards, members, allCountries,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
