@@ -101,7 +101,7 @@ const Dashboard = () => {
   }, []);
 
   // Runway = wallet / monthly spend
-  const runwayMonths = thisMonthTotal > 0 ? primary.balance / thisMonthTotal : null;
+  const runwayMonths = thisMonthTotal > 0 ? walletBalance / thisMonthTotal : null;
 
   // Spend by category (top 5)
   const categories = useMemo(() => {
