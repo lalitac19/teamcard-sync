@@ -478,7 +478,7 @@ const Approvals = () => {
                             <div className="flex flex-col gap-1">
                               {statusBadge(r.status)}
                               {r.status === "approved" && r.fundingStatus === "insufficient_funds" && (
-                                <span className="text-[10px] text-warning">On hold — primary card underfunded</span>
+                                <span className="text-[10px] text-warning">On hold — wallet underfunded</span>
                               )}
                               {r.status === "approved" && r.fundingStatus === "funded" && (
                                 <span className="text-[10px] text-muted-foreground">Limit increase applied</span>
