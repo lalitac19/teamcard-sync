@@ -676,8 +676,8 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   };
 
   const handleTerminate = () => {
-    if (terminateConfirm.trim().toUpperCase() !== "FREEZE") {
-      return toast.error('Type "FREEZE" to confirm');
+    if (terminateConfirm.trim().toUpperCase() !== "TERMINATE") {
+      return toast.error('Type "TERMINATE" to confirm');
     }
     toast.success(`Card •• ${card.last4} terminated`);
     setOpen(false);
@@ -740,11 +740,11 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 be returned to the wallet. This action cannot be undone.
               </p>
               <div className="space-y-1.5">
-                <Label>Type <span className="font-mono">FREEZE</span> to confirm</Label>
+                <Label>Type <span className="font-mono">TERMINATE</span> to confirm</Label>
                 <Input
                   value={terminateConfirm}
                   onChange={(e) => setTerminateConfirm(e.target.value)}
-                  placeholder="FREEZE"
+                  placeholder="TERMINATE"
                 />
               </div>
               <Button variant="destructive" onClick={handleTerminate} className="gap-2">
