@@ -44,7 +44,7 @@ export function CardVisual({ card, size = "md" }: CardVisualProps) {
         <div className="mt-3 flex items-end justify-between">
           <div>
             <p className="text-[9px] uppercase tracking-widest text-white/50">Cardholder</p>
-            <p className="text-xs font-medium">{member?.name ?? "—"}</p>
+            <p className="text-xs font-medium">{card.cardName ?? member?.name ?? "—"}</p>
           </div>
           <div className="flex h-7 w-10 items-center justify-center rounded bg-gradient-to-br from-yellow-200 to-yellow-400 text-[8px] font-bold text-black/70">
             VISA
