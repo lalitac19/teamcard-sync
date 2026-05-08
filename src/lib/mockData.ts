@@ -351,7 +351,7 @@ export const walletTransfers: WalletTransfer[] = [
   { id: "wt4", date: "2024-10-18", direction: "wallet_to_card", amount: 3000, toCardId: "c4", requestedBy: "m1", reason: "Q4 ad spend", status: "approved" },
 ];
 
-export const walletBalance = 47820.50;
+export const walletBalance = 60000;
 export const walletReserved = 12400.00;
 
 // Statement-only entries (refunds, cashback, fees). Internal wallet<->card transfers are excluded by design.
@@ -378,25 +378,21 @@ export const statementExtras: StatementExtra[] = [
 export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
 
-/** The single primary card for the workspace. */
-export const primaryCard = (): Card => cards.find((c) => c.isPrimary) ?? cards[0];
-
-/** All non-primary (supplementary) cards. */
-export const supplementaryCards = (): Card[] => cards.filter((c) => !c.isPrimary);
-
-/** Sum of limits allocated to supplementary cards (frozen/expired excluded only if they shouldn't reserve funds — kept inclusive here). */
+/**
+ * Sum of spending limits allocated to all cards. These funds are LOCKED in
+ * the wallet and reserved for those cards until an admin reallocates them.
+ */
 export const totalAllocatedLimits = (excludeId?: string): number =>
-  supplementaryCards()
-    .filter((c) => c.id !== excludeId)
+  cards
+    .filter((c) => c.id !== excludeId && c.status !== "terminated")
     .reduce((s, c) => s + c.spendLimit, 0);
 
 /**
- * Funds on the primary card that are NOT yet allocated to supplementary cards.
- * This is what's available to issue new supplementary cards (or raise existing limits)
- * AND what the primary card itself can still spend on.
+ * Funds in the wallet that are NOT locked to any card.
+ * Available to issue new cards or raise existing limits.
  */
-export const primaryUnallocated = (excludeId?: string): number =>
-  Math.max(0, primaryCard().balance - totalAllocatedLimits(excludeId));
+export const walletAvailable = (excludeId?: string): number =>
+  Math.max(0, walletBalance - totalAllocatedLimits(excludeId));
 
 /** Distinct countries appearing across transactions, reimbursements, and invoices. */
 export const allCountries = (): string[] => {
