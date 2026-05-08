@@ -285,8 +285,8 @@ function FreezeAllDialog() {
   };
 
   const handleFreeze = () => {
-    if (confirmText.trim().toUpperCase() !== "TERMINATE") {
-      return toast.error('Type "TERMINATE" to confirm');
+    if (confirmText.trim().toUpperCase() !== "FREEZE") {
+      return toast.error('Type "FREEZE" to confirm');
     }
     cards.forEach((c) => {
       if (selected.includes(c.id)) c.status = "frozen";
@@ -359,7 +359,7 @@ function FreezeAllDialog() {
               </DialogTitle>
               <DialogDescription>
                 You are about to freeze <span className="font-semibold text-foreground">{count}</span> card
-                {count === 1 ? "" : "s"}. Type <span className="font-mono font-semibold">TERMINATE</span> below to confirm.
+                {count === 1 ? "" : "s"}. Type <span className="font-mono font-semibold">FREEZE</span> below to confirm.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-1.5 py-2">
@@ -367,7 +367,7 @@ function FreezeAllDialog() {
               <Input
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
-                placeholder="TERMINATE"
+                placeholder="FREEZE"
                 autoFocus
               />
             </div>
@@ -376,7 +376,7 @@ function FreezeAllDialog() {
               <Button
                 variant="destructive"
                 onClick={handleFreeze}
-                disabled={confirmText.trim().toUpperCase() !== "TERMINATE"}
+                disabled={confirmText.trim().toUpperCase() !== "FREEZE"}
                 className="gap-2"
               >
                 <Snowflake className="h-4 w-4" /> Freeze {count} card{count === 1 ? "" : "s"}
@@ -676,8 +676,8 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   };
 
   const handleTerminate = () => {
-    if (terminateConfirm.trim().toUpperCase() !== "TERMINATE") {
-      return toast.error('Type "TERMINATE" to confirm');
+    if (terminateConfirm.trim().toUpperCase() !== "FREEZE") {
+      return toast.error('Type "FREEZE" to confirm');
     }
     toast.success(`Card •• ${card.last4} terminated`);
     setOpen(false);
@@ -740,11 +740,11 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 be returned to the wallet. This action cannot be undone.
               </p>
               <div className="space-y-1.5">
-                <Label>Type <span className="font-mono">TERMINATE</span> to confirm</Label>
+                <Label>Type <span className="font-mono">FREEZE</span> to confirm</Label>
                 <Input
                   value={terminateConfirm}
                   onChange={(e) => setTerminateConfirm(e.target.value)}
-                  placeholder="TERMINATE"
+                  placeholder="FREEZE"
                 />
               </div>
               <Button variant="destructive" onClick={handleTerminate} className="gap-2">
