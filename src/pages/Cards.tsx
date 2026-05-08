@@ -353,9 +353,9 @@ function IssueCardDialog() {
   const [allocatedLimit, setAllocatedLimit] = useState("");
   const [perTxnLimit, setPerTxnLimit] = useState("");
 
-  const unallocated = primaryUnallocated();
+  const available = walletAvailable();
   const requested = Number(allocatedLimit) || 0;
-  const exceeds = requested > unallocated;
+  const exceeds = requested > available;
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
@@ -364,33 +364,33 @@ function IssueCardDialog() {
     if (!requested || requested <= 0) return toast.error("Enter the spending limit to allocate to this card");
     if (exceeds) {
       return toast.error(
-        `Spending limit exceeds primary card's unallocated balance (${formatCurrency(unallocated)}). Top up the primary card or reduce another card's limit.`,
+        `Spending limit exceeds wallet's available balance (${formatCurrency(available)}). Top up the wallet or reduce another card's limit.`,
       );
     }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending limit");
     }
-    toast.success(`Card issued · ${formatCurrency(requested)} spending limit${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
+    toast.success(`Card issued · ${formatCurrency(requested)} locked from wallet${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
   };
 
   return (
     <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Issue a supplementary card</DialogTitle>
+        <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Allocates a spending limit from the primary card's unallocated balance. There are no fund transfers — just a limit reservation.
+          Allocates a spending limit from the wallet's available balance. The amount is locked in the wallet and reserved for this card until reallocated.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
         <div className="rounded-md border bg-secondary/40 p-3 text-xs">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Primary card unallocated</span>
-            <span className="font-semibold">{formatCurrency(unallocated)}</span>
+            <span className="text-muted-foreground">Wallet available</span>
+            <span className="font-semibold">{formatCurrency(available)}</span>
           </div>
           <div className="mt-1 flex items-center justify-between">
             <span className="text-muted-foreground">After this allocation</span>
             <span className={exceeds ? "font-semibold text-destructive" : "font-semibold"}>
-              {formatCurrency(Math.max(0, unallocated - requested))}
+              {formatCurrency(Math.max(0, available - requested))}
             </span>
           </div>
         </div>
