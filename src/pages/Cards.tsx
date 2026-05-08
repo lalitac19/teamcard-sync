@@ -520,13 +520,11 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   };
 
   const saveLimits = () => {
-    if (!isPrimary) {
-      if (newSpendLimit <= 0) return toast.error("Spending limit must be greater than zero");
-      if (exceedsAllocation) {
-        return toast.error(
-          `Spending limit exceeds primary card's available unallocated balance (${formatCurrency(otherCardsAllocated)}).`,
-        );
-      }
+    if (newSpendLimit <= 0) return toast.error("Spending limit must be greater than zero");
+    if (exceedsAllocation) {
+      return toast.error(
+        `Spending limit exceeds wallet's available balance (${formatCurrency(otherCardsAllocated)}).`,
+      );
     }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending limit");
