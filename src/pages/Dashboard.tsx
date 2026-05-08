@@ -29,8 +29,8 @@ import {
   walletTopUps,
   txnApprovals,
   cardRequests,
-  primaryCard,
-  primaryUnallocated,
+  walletBalance,
+  walletAvailable,
   totalAllocatedLimits,
   formatCurrency,
   formatDate,
@@ -40,9 +40,8 @@ import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   // ---------- Aggregations ----------
-  const primary = primaryCard();
   const allocatedToCards = useMemo(() => totalAllocatedLimits(), []);
-  const unallocated = useMemo(() => primaryUnallocated(), []);
+  const available = useMemo(() => walletAvailable(), []);
   const processingTopUps = useMemo(
     () => walletTopUps.filter((w) => w.status === "processing").reduce((s, w) => s + w.amount, 0),
     [],
