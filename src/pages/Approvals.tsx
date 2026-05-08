@@ -431,10 +431,10 @@ const Approvals = () => {
         <TabsContent value="topup" className="mt-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              Limit-increase requests submitted by cardholders. On approval, additional limit is reserved from the primary card's unallocated balance.
+              Limit-increase requests submitted by cardholders. On approval, additional limit is locked from the wallet's available balance.
             </p>
             <p className="text-xs">
-              <span className="text-muted-foreground">Primary card unallocated: </span>
+              <span className="text-muted-foreground">Wallet available: </span>
               <span className="font-semibold">{formatCurrency(available)}</span>
             </p>
           </div>
