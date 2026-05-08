@@ -110,24 +110,19 @@ export interface Card {
   status: CardStatus;
   last4: string;
   /**
-   * Overall spending limit for the period.
-   * For the primary card: the card's own per-period spend cap (the unallocated portion is also spendable here).
-   * For supplementary cards: the limit allocated from the primary card balance.
+   * Allocated spending limit for the period. Funds equal to this limit are
+   * locked in the wallet and reserved exclusively for this card until an
+   * admin reallocates them.
    */
   spendLimit: number;
   /** Maximum amount allowed for a single transaction on this card. */
   txnLimit?: number;
   spent: number;
-  /**
-   * Primary card only: total funds topped up to the workspace.
-   * Supplementary cards do not hold a balance — they spend against their allocated limit.
-   */
+  /** Cards do not hold a balance — they spend against their allocated wallet limit. */
   balance: number;
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
   merchantCategories?: string[];
   createdAt: string;
-  /** Marks the workspace's single primary card. All other cards are supplementary. */
-  isPrimary?: boolean;
 }
 
 export type TransferDirection = "wallet_to_card" | "card_to_wallet";
@@ -284,9 +279,7 @@ export const teams: Team[] = [
 ];
 
 export const cards: Card[] = [
-  // Primary card — its `balance` is the total funds topped up to the workspace.
-  { id: "c1", memberId: "m1", type: "physical", status: "active", last4: "4821", spendLimit: 25000, txnLimit: 5000, spent: 8420, balance: 60000, limitPeriod: "monthly", createdAt: "2024-01-15", isPrimary: true },
-  // Supplementary cards — `spendLimit` is the limit allocated from the primary card.
+  // All cards spend against their allocated limit, which locks funds in the wallet.
   { id: "c2", memberId: "m2", type: "physical", status: "active", last4: "9012", spendLimit: 15000, txnLimit: 2500, spent: 11200, balance: 0, limitPeriod: "monthly", createdAt: "2024-02-05" },
   { id: "c3", memberId: "m2", type: "virtual", status: "active", last4: "3344", spendLimit: 5000, txnLimit: 1000, spent: 1280, balance: 0, limitPeriod: "monthly", merchantCategories: ["Software"], createdAt: "2024-04-10" },
   { id: "c4", memberId: "m3", type: "virtual", status: "active", last4: "5566", spendLimit: 8000, txnLimit: 2000, spent: 6450, balance: 0, limitPeriod: "monthly", merchantCategories: ["Marketing"], createdAt: "2024-02-20" },
@@ -358,7 +351,7 @@ export const walletTransfers: WalletTransfer[] = [
   { id: "wt4", date: "2024-10-18", direction: "wallet_to_card", amount: 3000, toCardId: "c4", requestedBy: "m1", reason: "Q4 ad spend", status: "approved" },
 ];
 
-export const walletBalance = 47820.50;
+export const walletBalance = 60000;
 export const walletReserved = 12400.00;
 
 // Statement-only entries (refunds, cashback, fees). Internal wallet<->card transfers are excluded by design.
@@ -385,25 +378,21 @@ export const statementExtras: StatementExtra[] = [
 export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
 
-/** The single primary card for the workspace. */
-export const primaryCard = (): Card => cards.find((c) => c.isPrimary) ?? cards[0];
-
-/** All non-primary (supplementary) cards. */
-export const supplementaryCards = (): Card[] => cards.filter((c) => !c.isPrimary);
-
-/** Sum of limits allocated to supplementary cards (frozen/expired excluded only if they shouldn't reserve funds — kept inclusive here). */
+/**
+ * Sum of spending limits allocated to all cards. These funds are LOCKED in
+ * the wallet and reserved for those cards until an admin reallocates them.
+ */
 export const totalAllocatedLimits = (excludeId?: string): number =>
-  supplementaryCards()
-    .filter((c) => c.id !== excludeId)
+  cards
+    .filter((c) => c.id !== excludeId && c.status !== "terminated")
     .reduce((s, c) => s + c.spendLimit, 0);
 
 /**
- * Funds on the primary card that are NOT yet allocated to supplementary cards.
- * This is what's available to issue new supplementary cards (or raise existing limits)
- * AND what the primary card itself can still spend on.
+ * Funds in the wallet that are NOT locked to any card.
+ * Available to issue new cards or raise existing limits.
  */
-export const primaryUnallocated = (excludeId?: string): number =>
-  Math.max(0, primaryCard().balance - totalAllocatedLimits(excludeId));
+export const walletAvailable = (excludeId?: string): number =>
+  Math.max(0, walletBalance - totalAllocatedLimits(excludeId));
 
 /** Distinct countries appearing across transactions, reimbursements, and invoices. */
 export const allCountries = (): string[] => {

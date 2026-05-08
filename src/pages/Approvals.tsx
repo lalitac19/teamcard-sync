@@ -16,7 +16,7 @@ import {
   cardRequests as seedCardRequests,
   topUpRequests as seedTopUpRequests,
   cardById,
-  primaryUnallocated,
+  walletAvailable,
   cards as allCards, members, allCountries,
   formatCurrency, formatDate, memberById,
   type TxnApproval, type Reimbursement, type Invoice,
@@ -66,8 +66,8 @@ const Approvals = () => {
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<TopUpRequest[]>(seedTopUpRequests);
 
-  // Available headroom on the primary card to grant new/raised allocations.
-  const [available, setAvailable] = useState<number>(primaryUnallocated());
+  // Available headroom in the wallet to grant new/raised allocations.
+  const [available, setAvailable] = useState<number>(walletAvailable());
 
   // ── Filter state (shared across the three "expense" tabs) ────────────────
   const [from, setFrom] = useState<Date | undefined>();
@@ -176,7 +176,7 @@ const Approvals = () => {
         return { ...r, status: "approved", fundingStatus: "funded" };
       }
       toast.error(
-        `Approved, but primary card has only ${formatCurrency(available)} unallocated — increase is on hold pending more funds.`,
+        `Approved, but wallet has only ${formatCurrency(available)} available — increase is on hold pending more funds.`,
       );
       return { ...r, status: "approved", fundingStatus: "insufficient_funds" };
     }));
@@ -431,10 +431,10 @@ const Approvals = () => {
         <TabsContent value="topup" className="mt-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              Limit-increase requests submitted by cardholders. On approval, additional limit is reserved from the primary card's unallocated balance.
+              Limit-increase requests submitted by cardholders. On approval, additional limit is locked from the wallet's available balance.
             </p>
             <p className="text-xs">
-              <span className="text-muted-foreground">Primary card unallocated: </span>
+              <span className="text-muted-foreground">Wallet available: </span>
               <span className="font-semibold">{formatCurrency(available)}</span>
             </p>
           </div>
@@ -478,7 +478,7 @@ const Approvals = () => {
                             <div className="flex flex-col gap-1">
                               {statusBadge(r.status)}
                               {r.status === "approved" && r.fundingStatus === "insufficient_funds" && (
-                                <span className="text-[10px] text-warning">On hold — primary card underfunded</span>
+                                <span className="text-[10px] text-warning">On hold — wallet underfunded</span>
                               )}
                               {r.status === "approved" && r.fundingStatus === "funded" && (
                                 <span className="text-[10px] text-muted-foreground">Limit increase applied</span>

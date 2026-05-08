@@ -29,8 +29,8 @@ import {
   walletTopUps,
   txnApprovals,
   cardRequests,
-  primaryCard,
-  primaryUnallocated,
+  walletBalance,
+  walletAvailable,
   totalAllocatedLimits,
   formatCurrency,
   formatDate,
@@ -40,9 +40,8 @@ import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   // ---------- Aggregations ----------
-  const primary = primaryCard();
   const allocatedToCards = useMemo(() => totalAllocatedLimits(), []);
-  const unallocated = useMemo(() => primaryUnallocated(), []);
+  const available = useMemo(() => walletAvailable(), []);
   const processingTopUps = useMemo(
     () => walletTopUps.filter((w) => w.status === "processing").reduce((s, w) => s + w.amount, 0),
     [],
@@ -102,7 +101,7 @@ const Dashboard = () => {
   }, []);
 
   // Runway = wallet / monthly spend
-  const runwayMonths = thisMonthTotal > 0 ? primary.balance / thisMonthTotal : null;
+  const runwayMonths = thisMonthTotal > 0 ? walletBalance / thisMonthTotal : null;
 
   // Spend by category (top 5)
   const categories = useMemo(() => {
@@ -184,11 +183,11 @@ const Dashboard = () => {
         <Card className="md:col-span-2 gradient-hero text-white shadow-card border-0">
           <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-widest text-white/60">Primary card balance</p>
-              <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(primary.balance)}</p>
+              <p className="text-xs uppercase tracking-widest text-white/60">Wallet balance</p>
+              <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
-                <span>Allocated to supplementary cards: {formatCurrency(allocatedToCards)}</span>
-                <span>Unallocated: {formatCurrency(unallocated)}</span>
+                <span>Locked to cards: {formatCurrency(allocatedToCards)}</span>
+                <span>Available: {formatCurrency(available)}</span>
                 {processingTopUps > 0 && (
                   <span className="text-accent">+ {formatCurrency(processingTopUps)} processing</span>
                 )}
