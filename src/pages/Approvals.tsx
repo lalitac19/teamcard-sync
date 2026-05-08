@@ -176,7 +176,7 @@ const Approvals = () => {
         return { ...r, status: "approved", fundingStatus: "funded" };
       }
       toast.error(
-        `Approved, but primary card has only ${formatCurrency(available)} unallocated — increase is on hold pending more funds.`,
+        `Approved, but wallet has only ${formatCurrency(available)} available — increase is on hold pending more funds.`,
       );
       return { ...r, status: "approved", fundingStatus: "insufficient_funds" };
     }));
