@@ -262,37 +262,128 @@ const Cards = () => {
 
 function FreezeAllDialog() {
   const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<"select" | "confirm">("select");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [confirmText, setConfirmText] = useState("");
+
   const freezable = cards.filter((c) => c.status === "active");
-  const count = freezable.length;
+  const allSelected = freezable.length > 0 && selected.length === freezable.length;
+  const count = selected.length;
+
+  const reset = () => {
+    setStep("select");
+    setSelected([]);
+    setConfirmText("");
+  };
+
+  const toggle = (id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const toggleAll = () => {
+    setSelected(allSelected ? [] : freezable.map((c) => c.id));
+  };
 
   const handleFreeze = () => {
-    freezable.forEach((c) => {
-      c.status = "frozen";
+    if (confirmText.trim().toUpperCase() !== "TERMINATE") {
+      return toast.error('Type "TERMINATE" to confirm');
+    }
+    cards.forEach((c) => {
+      if (selected.includes(c.id)) c.status = "frozen";
     });
-    toast.success(`Froze ${count} active card${count === 1 ? "" : "s"}`);
+    toast.success(`Froze ${count} card${count === 1 ? "" : "s"}`);
     setOpen(false);
+    reset();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) reset();
+      }}
+    >
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-2" disabled={count === 0}>
-          <Snowflake className="h-4 w-4" /> Freeze all cards
+        <Button size="sm" variant="outline" className="gap-2" disabled={freezable.length === 0}>
+          <Snowflake className="h-4 w-4" /> Freeze cards
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Freeze all issued cards</DialogTitle>
-          <DialogDescription>
-            This will freeze all <span className="font-semibold text-foreground">{count}</span> active card{count === 1 ? "" : "s"} immediately. New transactions will be declined. You can unfreeze any card individually at any time.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="destructive" onClick={handleFreeze} className="gap-2" disabled={count === 0}>
-            <Snowflake className="h-4 w-4" /> Freeze {count} card{count === 1 ? "" : "s"}
-          </Button>
-        </DialogFooter>
+        {step === "select" ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>Freeze cards</DialogTitle>
+              <DialogDescription>
+                Choose which active cards to freeze. New transactions will be declined until they are unfrozen.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-2">
+              <label className="flex items-center gap-2 rounded-md border bg-secondary/40 px-3 py-2 text-sm font-medium">
+                <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
+                Select all ({freezable.length})
+              </label>
+              <div className="max-h-64 space-y-1 overflow-y-auto rounded-md border p-2">
+                {freezable.map((c) => {
+                  const m = memberById(c.memberId);
+                  return (
+                    <label
+                      key={c.id}
+                      className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-secondary/60"
+                    >
+                      <Checkbox
+                        checked={selected.includes(c.id)}
+                        onCheckedChange={() => toggle(c.id)}
+                      />
+                      <span className="font-mono text-xs">•• {c.last4}</span>
+                      <span className="text-muted-foreground">·</span>
+                      <span>{m?.name ?? "—"}</span>
+                      <span className="ml-auto text-xs capitalize text-muted-foreground">{c.type}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button onClick={() => setStep("confirm")} disabled={count === 0}>
+                OK ({count})
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="h-4 w-4" /> Confirm freeze
+              </DialogTitle>
+              <DialogDescription>
+                You are about to freeze <span className="font-semibold text-foreground">{count}</span> card
+                {count === 1 ? "" : "s"}. Type <span className="font-mono font-semibold">TERMINATE</span> below to confirm.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-1.5 py-2">
+              <Label>Confirmation</Label>
+              <Input
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder="TERMINATE"
+                autoFocus
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setStep("select")}>Back</Button>
+              <Button
+                variant="destructive"
+                onClick={handleFreeze}
+                disabled={confirmText.trim().toUpperCase() !== "TERMINATE"}
+                className="gap-2"
+              >
+                <Snowflake className="h-4 w-4" /> Freeze {count} card{count === 1 ? "" : "s"}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
