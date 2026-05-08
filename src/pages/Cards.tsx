@@ -568,6 +568,7 @@ function IssueCardDialog() {
   const [countries, setCountries] = useState<string[]>([]);
   const [allocatedLimit, setAllocatedLimit] = useState("");
   const [perTxnLimit, setPerTxnLimit] = useState("");
+  const [cardName, setCardName] = useState("");
 
   const available = walletAvailable();
   const requested = Number(allocatedLimit) || 0;
