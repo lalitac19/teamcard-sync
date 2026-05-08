@@ -203,7 +203,6 @@ const Cards = () => {
               <TableRow>
                 <TableHead>Card</TableHead>
                 <TableHead>Cardholder</TableHead>
-                <TableHead>Card Type</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Spend limit</TableHead>
@@ -216,15 +215,12 @@ const Cards = () => {
             <TableBody>
               {filtered.map((card) => {
                 const member = memberById(card.memberId);
-                const isPrimary = !!card.isPrimary;
-                // Primary card "limit" displayed = unallocated (its actual spendable headroom)
-                const displayLimit = isPrimary ? primaryUnallocated() : card.spendLimit;
-                const remaining = Math.max(0, displayLimit - card.spent);
+                const remaining = Math.max(0, card.spendLimit - card.spent);
                 return (
-                  <TableRow key={card.id} className={isPrimary ? "bg-primary/5" : undefined}>
+                  <TableRow key={card.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className={`flex h-8 w-10 items-center justify-center rounded-md ${isPrimary ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>
+                        <div className="flex h-8 w-10 items-center justify-center rounded-md bg-secondary text-muted-foreground">
                           <CreditCard className="h-4 w-4" />
                         </div>
                         <span className="font-mono text-sm">•• {card.last4}</span>
@@ -234,22 +230,10 @@ const Cards = () => {
                       <p className="text-sm font-medium">{member?.name ?? "—"}</p>
                       <p className="text-xs text-muted-foreground">{member?.department}</p>
                     </TableCell>
-                    <TableCell>
-                      {isPrimary ? (
-                        <Badge className="bg-primary/10 text-primary hover:bg-primary/10 border-0 gap-1">
-                          <ShieldCheck className="h-3 w-3" /> Primary
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">Supplementary</Badge>
-                      )}
-                    </TableCell>
                     <TableCell>{typeBadge(card.type)}</TableCell>
                     <TableCell>{statusBadge(card.status)}</TableCell>
                     <TableCell className="text-right text-sm font-semibold">
-                      {formatCurrency(displayLimit)}
-                      {isPrimary && (
-                        <p className="text-[10px] font-normal text-muted-foreground">unallocated</p>
-                      )}
+                      {formatCurrency(card.spendLimit)}
                     </TableCell>
                     <TableCell className="text-right text-sm">
                       {card.txnLimit ? formatCurrency(card.txnLimit) : <span className="text-muted-foreground">—</span>}
