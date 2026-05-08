@@ -390,6 +390,89 @@ function FreezeAllDialog() {
   );
 }
 
+function UnfreezeAllDialog() {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const unfreezable = cards.filter((c) => c.status === "frozen");
+  const allSelected = unfreezable.length > 0 && selected.length === unfreezable.length;
+  const count = selected.length;
+
+  const reset = () => setSelected([]);
+
+  const toggle = (id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+  const toggleAll = () => {
+    setSelected(allSelected ? [] : unfreezable.map((c) => c.id));
+  };
+
+  const handleUnfreeze = () => {
+    cards.forEach((c) => {
+      if (selected.includes(c.id)) c.status = "active";
+    });
+    toast.success(`Unfroze ${count} card${count === 1 ? "" : "s"}`);
+    setOpen(false);
+    reset();
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) reset();
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="gap-2" disabled={unfreezable.length === 0}>
+          <Snowflake className="h-4 w-4" /> Unfreeze cards
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Unfreeze cards</DialogTitle>
+          <DialogDescription>
+            Choose which frozen cards to reactivate. They will resume accepting transactions immediately.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <label className="flex items-center gap-2 rounded-md border bg-secondary/40 px-3 py-2 text-sm font-medium">
+            <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
+            Select all ({unfreezable.length})
+          </label>
+          <div className="max-h-64 space-y-1 overflow-y-auto rounded-md border p-2">
+            {unfreezable.map((c) => {
+              const m = memberById(c.memberId);
+              return (
+                <label
+                  key={c.id}
+                  className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-secondary/60"
+                >
+                  <Checkbox
+                    checked={selected.includes(c.id)}
+                    onCheckedChange={() => toggle(c.id)}
+                  />
+                  <span className="font-mono text-xs">•• {c.last4}</span>
+                  <span className="text-muted-foreground">·</span>
+                  <span>{m?.name ?? "—"}</span>
+                  <span className="ml-auto text-xs capitalize text-muted-foreground">{c.type}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={handleUnfreeze} disabled={count === 0}>
+            Unfreeze {count > 0 ? `(${count})` : ""}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // (Funds add/withdraw dialog removed — supplementary cards are governed by limit allocation, not balance transfers.)
 
 const COUNTRIES = [
