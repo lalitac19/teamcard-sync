@@ -114,14 +114,17 @@ const Cards = () => {
       title="Cards"
       subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in wallet to allocate.`}
       actions={
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" /> Issue card
-            </Button>
-          </DialogTrigger>
-          <IssueCardDialog />
-        </Dialog>
+        <div className="flex gap-2">
+          <FreezeAllDialog />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-2">
+                <Plus className="h-4 w-4" /> Issue card
+              </Button>
+            </DialogTrigger>
+            <IssueCardDialog />
+          </Dialog>
+        </div>
       }
     >
       {/* Type quick filters */}
