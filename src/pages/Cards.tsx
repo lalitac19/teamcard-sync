@@ -260,6 +260,44 @@ const Cards = () => {
   );
 };
 
+function FreezeAllDialog() {
+  const [open, setOpen] = useState(false);
+  const freezable = cards.filter((c) => c.status === "active");
+  const count = freezable.length;
+
+  const handleFreeze = () => {
+    freezable.forEach((c) => {
+      c.status = "frozen";
+    });
+    toast.success(`Froze ${count} active card${count === 1 ? "" : "s"}`);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="gap-2" disabled={count === 0}>
+          <Snowflake className="h-4 w-4" /> Freeze all cards
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Freeze all issued cards</DialogTitle>
+          <DialogDescription>
+            This will freeze all <span className="font-semibold text-foreground">{count}</span> active card{count === 1 ? "" : "s"} immediately. New transactions will be declined. You can unfreeze any card individually at any time.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="destructive" onClick={handleFreeze} className="gap-2" disabled={count === 0}>
+            <Snowflake className="h-4 w-4" /> Freeze {count} card{count === 1 ? "" : "s"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // (Funds add/withdraw dialog removed — supplementary cards are governed by limit allocation, not balance transfers.)
 
 const COUNTRIES = [
