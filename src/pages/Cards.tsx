@@ -427,8 +427,8 @@ function IssueCardDialog() {
           />
           <p className={`text-xs ${exceeds ? "text-destructive" : "text-muted-foreground"}`}>
             {exceeds
-              ? `Exceeds primary card unallocated balance (${formatCurrency(unallocated)}). Top up or reduce another card's limit.`
-              : `Total amount this card can spend in the period. Reserved from primary card. Max ${formatCurrency(unallocated)} available.`}
+              ? `Exceeds wallet available balance (${formatCurrency(available)}). Top up the wallet or reduce another card's limit.`
+              : `Total amount this card can spend in the period. Locked from wallet. Max ${formatCurrency(available)} available.`}
           </p>
         </div>
         <div className="space-y-1.5">
