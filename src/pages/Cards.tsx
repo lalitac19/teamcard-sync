@@ -117,7 +117,7 @@ const Cards = () => {
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" /> Issue supplementary card
+              <Plus className="h-4 w-4" /> Issue card
             </Button>
           </DialogTrigger>
           <IssueCardDialog />
