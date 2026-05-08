@@ -109,6 +109,8 @@ export interface Card {
   type: CardType;
   status: CardStatus;
   last4: string;
+  /** Name printed on the card. Falls back to member name if omitted. */
+  cardName?: string;
   /**
    * Allocated spending limit for the period. Funds equal to this limit are
    * locked in the wallet and reserved exclusively for this card until an
