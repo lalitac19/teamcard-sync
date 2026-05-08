@@ -107,13 +107,12 @@ const Cards = () => {
     setSearch("");
   };
 
-  const primary = primaryCard();
-  const unallocated = primaryUnallocated();
+  const available = walletAvailable();
 
   return (
     <AppLayout
       title="Cards"
-      subtitle={`${cards.length} cards issued · ${formatCurrency(unallocated)} unallocated on primary card.`}
+      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in wallet to allocate.`}
       actions={
         <Dialog>
           <DialogTrigger asChild>
