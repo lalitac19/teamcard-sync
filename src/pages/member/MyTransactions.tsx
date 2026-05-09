@@ -23,9 +23,11 @@ import {
   cards as allCards,
   formatCurrency,
   formatDate,
+  type Transaction,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
 import { Search } from "lucide-react";
+import { MemberTxnDetailDialog } from "@/components/MemberTxnDetailDialog";
 
 const statusBadge = (s: string) => {
   if (s === "posted")
