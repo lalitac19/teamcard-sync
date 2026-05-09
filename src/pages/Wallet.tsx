@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle, DialogTrigger,
@@ -20,10 +18,18 @@ import {
   totalAllocatedLimits, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
-import {
-  ArrowDownLeft, ArrowUpRight, Plus, Banknote, Wallet as WalletIcon, Lock,
-} from "lucide-react";
+import { Plus, Wallet as WalletIcon, Lock, Copy, Info } from "lucide-react";
 import { toast } from "sonner";
+
+// Company-specific bank details (assigned on onboarding)
+const COMPANY_BANK = {
+  beneficiary: "Peko Technologies Inc.",
+  iban: "GB29 PEKO 0000 0012 3456 78",
+  bic: "PEKOGB2LXXX",
+  bankName: "Peko Banking Partner, London",
+  bankAddress: "1 Finsbury Avenue, London EC2M 2PP",
+  reference: "PEKO-CLIENT-00421",
+};
 
 const Wallet = () => {
   const allocated = useMemo(() => totalAllocatedLimits(), []);
@@ -43,47 +49,37 @@ const Wallet = () => {
         </div>
       }
     >
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="md:col-span-2 gradient-hero text-white border-0 shadow-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-widest text-white/60">Wallet · Total balance</p>
-              <Badge className="bg-white/15 text-white border-0 hover:bg-white/15 gap-1">
-                <WalletIcon className="h-3 w-3" /> Wallet
-              </Badge>
+      <Card className="gradient-hero text-white border-0 shadow-card">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-widest text-white/60">Wallet · Total balance</p>
+            <Badge className="bg-white/15 text-white border-0 hover:bg-white/15 gap-1">
+              <WalletIcon className="h-3 w-3" /> Wallet
+            </Badge>
+          </div>
+          <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
+          <p className="mt-1 text-xs text-white/60">
+            The wallet is a pool of funds — not a card. Money is spent only after it is allocated to a card as a limit.
+          </p>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
+            <div>
+              <p className="text-white/60 flex items-center gap-1"><Lock className="h-3 w-3" /> Locked to cards</p>
+              <p className="mt-1 font-semibold">{formatCurrency(allocated)}</p>
+              <p className="text-xs text-white/50">{activeCards.length} cards</p>
             </div>
-            <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
-            <p className="mt-1 text-xs text-white/60">
-              The wallet is a pool of funds — not a card. Money is spent only after it is allocated to a card as a limit.
-            </p>
-            <div className="mt-6 grid grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
-              <div>
-                <p className="text-white/60 flex items-center gap-1"><Lock className="h-3 w-3" /> Locked to cards</p>
-                <p className="mt-1 font-semibold">{formatCurrency(allocated)}</p>
-                <p className="text-xs text-white/50">{activeCards.length} cards</p>
-              </div>
-              <div>
-                <p className="text-white/60">Available to allocate</p>
-                <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
-                <p className="text-xs text-white/50">Issue cards or raise limits</p>
-              </div>
-              <div>
-                <p className="text-white/60">Funding account</p>
-                <p className="mt-1 font-mono text-xs">•••• 4521 USD</p>
-              </div>
+            <div>
+              <p className="text-white/60">Available to allocate</p>
+              <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
+              <p className="text-xs text-white/50">Issue cards or raise limits</p>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-soft">
-          <CardHeader><CardTitle className="text-base">Quick actions</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            <Button variant="outline" className="w-full justify-start gap-2"><ArrowDownLeft className="h-4 w-4" /> ACH transfer in</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><ArrowUpRight className="h-4 w-4" /> Wire instructions</Button>
-            <Button variant="outline" className="w-full justify-start gap-2"><Banknote className="h-4 w-4" /> Auto top-up rules</Button>
-          </CardContent>
-        </Card>
-      </div>
+            <div>
+              <p className="text-white/60">Funding IBAN</p>
+              <p className="mt-1 font-mono text-xs">{COMPANY_BANK.iban}</p>
+              <p className="text-xs text-white/50">Unique to your company</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="mt-6">
         <Tabs defaultValue="topups">
@@ -174,43 +170,55 @@ const Wallet = () => {
   );
 };
 
+function CopyField({ label, value, mono = true }: { label: string; value: string; mono?: boolean }) {
+  const copy = () => {
+    navigator.clipboard.writeText(value);
+    toast.success(`${label} copied`);
+  };
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-md border bg-card px-3 py-2">
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+        <p className={`mt-0.5 text-sm ${mono ? "font-mono" : ""} break-all`}>{value}</p>
+      </div>
+      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={copy}>
+        <Copy className="h-3.5 w-3.5" />
+      </Button>
+    </div>
+  );
+}
+
 function TopUpDialog() {
   const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [reference, setReference] = useState("");
-
-  const submit = () => {
-    if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount");
-    toast.success(`Top-up of ${Number(amount).toLocaleString("en-US", { style: "currency", currency: "USD" })} initiated`);
-    setOpen(false);
-    setAmount(""); setReference("");
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Top up wallet</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Top up wallet</DialogTitle>
+          <DialogTitle>Top up wallet — bank transfer details</DialogTitle>
           <DialogDescription>
-            Funds added here become available to allocate as spending limits to cards. Allocating a limit locks that amount in the wallet until you reallocate it.
+            Transfer funds to your company's unique IBAN below. Once received, the wallet balance updates automatically and funds become available to allocate to cards.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label>Amount (USD)</Label>
-            <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Reference (optional)</Label>
-            <Input placeholder="e.g. WIRE-NOV-001" value={reference} onChange={(e) => setReference(e.target.value)} />
+        <div className="space-y-2 py-2">
+          <CopyField label="Beneficiary" value={COMPANY_BANK.beneficiary} mono={false} />
+          <CopyField label="IBAN" value={COMPANY_BANK.iban} />
+          <CopyField label="BIC / SWIFT" value={COMPANY_BANK.bic} />
+          <CopyField label="Bank" value={COMPANY_BANK.bankName} mono={false} />
+          <CopyField label="Bank address" value={COMPANY_BANK.bankAddress} mono={false} />
+          <CopyField label="Payment reference (required)" value={COMPANY_BANK.reference} />
+          <div className="flex items-start gap-2 rounded-md bg-info/10 p-3 text-xs text-info">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <p>
+              Always include the payment reference so we can auto-match your transfer. Transfers usually settle in 1–2 business days.
+            </p>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={submit}>Initiate top-up</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
