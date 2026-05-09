@@ -13,6 +13,7 @@ import {
   FileText,
   ClipboardCheck,
   Sparkles,
+  PlusCircle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,8 +28,9 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useCurrentUser } from "@/lib/currentUser";
 
-const mainItems = [
+const adminMain = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Wallet", url: "/wallet", icon: Wallet },
   { title: "Cards", url: "/cards", icon: CreditCard },
@@ -36,15 +38,27 @@ const mainItems = [
   { title: "Transactions", url: "/transactions", icon: Receipt },
 ];
 
-const approvalItems = [
+const adminApprovals = [
   { title: "Approval Requests", url: "/approvals", icon: ClipboardCheck },
   { title: "Out-of-Pocket", url: "/reimbursements", icon: HandCoins },
   { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
-const accountingItems = [
+const adminAccounting = [
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
+];
+
+const memberMain = [
+  { title: "My Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "My Cards", url: "/me/cards", icon: CreditCard },
+  { title: "My Transactions", url: "/me/transactions", icon: Receipt },
+];
+
+const memberSubmit = [
+  { title: "Out-of-Pocket", url: "/me/reimbursements", icon: HandCoins },
+  { title: "Vendor Invoices", url: "/me/invoices", icon: FileText },
+  { title: "Card Requests", url: "/me/requests", icon: PlusCircle },
 ];
 
 const bottomItems = [
@@ -52,10 +66,18 @@ const bottomItems = [
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
+const roleLabel: Record<string, string> = {
+  admin: "Admin",
+  accountant: "Accountant",
+  external_auditor: "Auditor",
+  team_member: "Member",
+};
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { user, isMember } = useCurrentUser();
 
   const isActive = (url: string) =>
     url === "/" || url === "/statement" ? location.pathname === url : location.pathname.startsWith(url);
@@ -64,6 +86,26 @@ export function AppSidebar() {
     active
       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
       : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground";
+
+  const renderGroup = (label: string, items: typeof adminMain) => (
+    <SidebarGroup className="mt-4 first:mt-0">
+      {!collapsed && <SidebarGroupLabel className="text-sidebar-foreground/60">{label}</SidebarGroupLabel>}
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.url}>
+              <SidebarMenuButton asChild>
+                <NavLink to={item.url} end={item.url === "/"} className={linkCls(isActive(item.url))}>
+                  <item.icon className="h-4 w-4" />
+                  {!collapsed && <span>{item.title}</span>}
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -75,66 +117,27 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-sidebar-accent-foreground">Peko</span>
-              <span className="text-xs text-sidebar-foreground/70">Commercial Corporate Card</span>
+              <span className="text-xs text-sidebar-foreground/70">
+                {isMember ? "Member Portal" : "Commercial Corporate Card"}
+              </span>
             </div>
           )}
         </div>
       </SidebarHeader>
 
       <SidebarContent className="px-2 py-3">
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel className="text-sidebar-foreground/60">Main</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end={item.url === "/"} className={linkCls(isActive(item.url))}>
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup className="mt-4">
-          {!collapsed && <SidebarGroupLabel className="text-sidebar-foreground/60">Approvals</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {approvalItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={linkCls(isActive(item.url))}>
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup className="mt-4">
-          {!collapsed && <SidebarGroupLabel className="text-sidebar-foreground/60">Accounting</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {accountingItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={linkCls(isActive(item.url))}>
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {isMember ? (
+          <>
+            {renderGroup("Main", memberMain)}
+            {renderGroup("Submit", memberSubmit)}
+          </>
+        ) : (
+          <>
+            {renderGroup("Main", adminMain)}
+            {renderGroup("Approvals", adminApprovals)}
+            {renderGroup("Accounting", adminAccounting)}
+          </>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border px-2 py-3">
@@ -153,11 +156,11 @@ export function AppSidebar() {
         {!collapsed && (
           <div className="mt-3 flex items-center gap-2 rounded-md bg-sidebar-accent px-3 py-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground">
-              SC
+              {user.avatar}
             </div>
             <div className="flex flex-col text-xs">
-              <span className="font-medium text-sidebar-accent-foreground">Sarah Chen</span>
-              <span className="text-sidebar-foreground/70">Admin</span>
+              <span className="font-medium text-sidebar-accent-foreground">{user.name}</span>
+              <span className="text-sidebar-foreground/70">{roleLabel[user.role] ?? user.role}</span>
             </div>
           </div>
         )}

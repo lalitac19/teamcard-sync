@@ -4,6 +4,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { UserSwitcher } from "./UserSwitcher";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -28,6 +29,7 @@ export function AppLayout({ children, title, subtitle, actions }: AppLayoutProps
               />
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <UserSwitcher />
               <Button variant="ghost" size="icon" className="text-muted-foreground">
                 <Bell className="h-4 w-4" />
               </Button>
