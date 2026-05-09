@@ -247,16 +247,6 @@ const Cards = () => {
                     <TableCell>
                       <div className="flex justify-end gap-1">
                         <ManageCardDialog card={card} />
-                        {card.type === "virtual" && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            title="Request physical card"
-                            onClick={() => toast.success(`Physical card requested for ${member?.name ?? "cardholder"}`)}
-                          >
-                            <CreditCard className="h-4 w-4" />
-                          </Button>
-                        )}
                         <AuditTrailDialog card={card} />
                       </div>
                     </TableCell>
