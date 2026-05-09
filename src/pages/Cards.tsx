@@ -1019,7 +1019,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   <CreditCard className="h-4 w-4" /> Request physical card
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Order a physical companion card linked to this virtual card. It will be shipped to the cardholder.
+                  Order a physical card with the <strong>same card number, expiry, and CVV</strong> as this virtual card. It will be shipped to the cardholder. Use “Replace card” instead if you need a brand-new card number.
                 </p>
                 <Button
                   variant="outline"
