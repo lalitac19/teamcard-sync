@@ -41,6 +41,7 @@ export default function MyTransactions() {
   const { user } = useCurrentUser();
   const [q, setQ] = useState("");
   const [cardId, setCardId] = useState<string>("all");
+  const [selected, setSelected] = useState<Transaction | null>(null);
 
   const myCards = allCards.filter((c) => c.memberId === user.id);
 
