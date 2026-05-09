@@ -23,9 +23,11 @@ import {
   cards as allCards,
   formatCurrency,
   formatDate,
+  type Transaction,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
 import { Search } from "lucide-react";
+import { MemberTxnDetailDialog } from "@/components/MemberTxnDetailDialog";
 
 const statusBadge = (s: string) => {
   if (s === "posted")
@@ -39,6 +41,7 @@ export default function MyTransactions() {
   const { user } = useCurrentUser();
   const [q, setQ] = useState("");
   const [cardId, setCardId] = useState<string>("all");
+  const [selected, setSelected] = useState<Transaction | null>(null);
 
   const myCards = allCards.filter((c) => c.memberId === user.id);
 
@@ -102,7 +105,11 @@ export default function MyTransactions() {
               {rows.map((t) => {
                 const card = allCards.find((c) => c.id === t.cardId);
                 return (
-                  <TableRow key={t.id}>
+                  <TableRow
+                    key={t.id}
+                    className="cursor-pointer hover:bg-muted/40"
+                    onClick={() => setSelected(t)}
+                  >
                     <TableCell className="whitespace-nowrap">{formatDate(t.date)}</TableCell>
                     <TableCell className="font-medium">{t.merchant}</TableCell>
                     <TableCell className="text-muted-foreground">{t.category}</TableCell>
@@ -127,6 +134,12 @@ export default function MyTransactions() {
           </Table>
         </CardContent>
       </Card>
+
+      <MemberTxnDetailDialog
+        txn={selected}
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+      />
     </AppLayout>
   );
 }
