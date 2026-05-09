@@ -1013,6 +1013,24 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               </Button>
             </section>
 
+            {card.type === "virtual" && (
+              <section className="space-y-3 rounded-lg border p-4">
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" /> Request physical card
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Order a physical companion card linked to this virtual card. It will be shipped to the cardholder.
+                </p>
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => toast.success(`Physical card requested for ${member?.name ?? "cardholder"}`)}
+                >
+                  <CreditCard className="h-4 w-4" /> Request physical card
+                </Button>
+              </section>
+            )}
+
           </TabsContent>
         </Tabs>
       </DialogContent>
