@@ -105,7 +105,11 @@ export default function MyTransactions() {
               {rows.map((t) => {
                 const card = allCards.find((c) => c.id === t.cardId);
                 return (
-                  <TableRow key={t.id}>
+                  <TableRow
+                    key={t.id}
+                    className="cursor-pointer hover:bg-muted/40"
+                    onClick={() => setSelected(t)}
+                  >
                     <TableCell className="whitespace-nowrap">{formatDate(t.date)}</TableCell>
                     <TableCell className="font-medium">{t.merchant}</TableCell>
                     <TableCell className="text-muted-foreground">{t.category}</TableCell>
