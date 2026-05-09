@@ -134,6 +134,12 @@ export default function MyTransactions() {
           </Table>
         </CardContent>
       </Card>
+
+      <MemberTxnDetailDialog
+        txn={selected}
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+      />
     </AppLayout>
   );
 }
