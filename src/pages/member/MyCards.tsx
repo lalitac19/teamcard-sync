@@ -12,7 +12,7 @@ import {
   type Card as CardModel,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
-import { Snowflake, PlusCircle, Inbox } from "lucide-react";
+import { Snowflake, PlusCircle, Inbox, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 export default function MyCards() {
