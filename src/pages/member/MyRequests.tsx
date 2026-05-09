@@ -186,7 +186,6 @@ export default function MyRequests() {
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="virtual">Virtual</SelectItem>
-                        <SelectItem value="physical">Physical</SelectItem>
                         <SelectItem value="single-use">Single-use</SelectItem>
                       </SelectContent>
                     </Select>
