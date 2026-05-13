@@ -108,6 +108,16 @@ export default function MyCards() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
+                      disabled={c.status !== "active"}
+                      onClick={() => setRevealCard(c)}
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      Show details
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
                       disabled={c.status === "expired"}
                       onClick={() => toggleFreeze(c.id)}
                     >
@@ -117,6 +127,20 @@ export default function MyCards() {
                     <Button variant="outline" size="sm" className="flex-1" asChild>
                       <Link to="/me/requests">Top up</Link>
                     </Button>
+                    {c.type === "virtual" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() =>
+                          toast.success(`Physical card requested for ••••${c.last4}`)
+                        }
+                      >
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Request physical card
+                      </Button>
+                    )}
+                  </div>
                     {c.type === "virtual" && (
                       <Button
                         variant="outline"
