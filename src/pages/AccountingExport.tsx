@@ -381,7 +381,8 @@ function CardTxnsTab() {
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Debit account</TableHead>
+                <TableHead className="text-right">Fees</TableHead>
+                <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
@@ -400,6 +401,9 @@ function CardTxnsTab() {
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
                       <TableCell className="text-sm">{m?.name}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
+                      <TableCell className="text-right text-sm text-muted-foreground">
+                        {r.fee ? `−${formatCurrency(r.fee)}` : "—"}
+                      </TableCell>
                       <TableCell>
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
@@ -429,7 +433,7 @@ function CardTxnsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow key={r.id + "-split"}>
-                        <TableCell colSpan={9} className="bg-muted/20 p-3">
+                        <TableCell colSpan={10} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
