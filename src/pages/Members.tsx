@@ -418,7 +418,7 @@ function InviteMemberDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite a new member</DialogTitle>
+          <DialogTitle>Invite a new person</DialogTitle>
           <DialogDescription>
             They'll get an email to sign up, complete KYC, and download the mobile app.
           </DialogDescription>
