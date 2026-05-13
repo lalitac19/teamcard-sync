@@ -158,6 +158,10 @@ export interface Transaction {
   exported?: boolean;
   /** Fees charged on top of the merchant amount (FX, processing, etc.). */
   fee?: number;
+  /** Original transaction amount in the merchant's currency (if not AED). */
+  originalAmount?: number;
+  /** ISO 4217 code of the merchant currency (e.g. "USD", "EUR"). Omitted when AED. */
+  originalCurrency?: string;
 }
 
 export interface Reimbursement {
@@ -291,18 +295,18 @@ export const cards: Card[] = [
 ];
 
 export const transactions: Transaction[] = [
-  { id: "t1", date: "2024-10-22", merchant: "United Airlines", category: "Travel", amount: 1240.50, fee: 18.60, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "United Airlines Inc.", country: "United States" },
-  { id: "t2", date: "2024-10-22", merchant: "Figma Inc.", category: "Software", amount: 144.00, fee: 2.16, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Figma Inc.", country: "United States" },
-  { id: "t3", date: "2024-10-21", merchant: "WeWork", category: "Office", amount: 890.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "WeWork Companies", country: "United Kingdom" },
-  { id: "t4", date: "2024-10-21", merchant: "Google Ads", category: "Marketing", amount: 2400.00, fee: 36.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "Google LLC", country: "Ireland" },
+  { id: "t1", date: "2024-10-22", merchant: "United Airlines", category: "Travel", amount: 1240.50, fee: 18.60, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "United Airlines Inc.", country: "United States", originalAmount: 337.75, originalCurrency: "USD" },
+  { id: "t2", date: "2024-10-22", merchant: "Figma Inc.", category: "Software", amount: 144.00, fee: 2.16, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Figma Inc.", country: "United States", originalAmount: 39.20, originalCurrency: "USD" },
+  { id: "t3", date: "2024-10-21", merchant: "WeWork", category: "Office", amount: 890.00, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "WeWork Companies", country: "United Kingdom", originalAmount: 191.00, originalCurrency: "GBP" },
+  { id: "t4", date: "2024-10-21", merchant: "Google Ads", category: "Marketing", amount: 2400.00, fee: 36.00, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "Google LLC", country: "Ireland", originalAmount: 600.00, originalCurrency: "EUR" },
   { id: "t5", date: "2024-10-20", merchant: "Uber", category: "Travel", amount: 38.20, cardId: "c2", memberId: "m2", status: "posted", receipt: false, vendor: "Uber Technologies", country: "United States" },
   { id: "t6", date: "2024-10-20", merchant: "Sweetgreen", category: "Meals", amount: 64.80, cardId: "c2", memberId: "m2", status: "posted", receipt: true, vendor: "Sweetgreen Inc.", country: "United States" },
-  { id: "t7", date: "2024-10-19", merchant: "AWS", category: "Software", amount: 1820.00, fee: 27.30, cardId: "c5", memberId: "m4", status: "posted", receipt: true, vendor: "Amazon Web Services", country: "United States" },
-  { id: "t8", date: "2024-10-19", merchant: "LinkedIn Ads", category: "Marketing", amount: 760.00, fee: 11.40, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "LinkedIn Corp.", country: "United States" },
-  { id: "t9", date: "2024-10-18", merchant: "Hilton Hotels", category: "Travel", amount: 412.00, fee: 6.18, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Hilton Worldwide", country: "Germany" },
-  { id: "t10", date: "2024-10-18", merchant: "Notion Labs", category: "Software", amount: 96.00, fee: 1.44, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Notion Labs Inc.", country: "United States" },
+  { id: "t7", date: "2024-10-19", merchant: "AWS", category: "Software", amount: 1820.00, fee: 27.30, cardId: "c5", memberId: "m4", status: "posted", receipt: true, vendor: "Amazon Web Services", country: "United States", originalAmount: 495.50, originalCurrency: "USD" },
+  { id: "t8", date: "2024-10-19", merchant: "LinkedIn Ads", category: "Marketing", amount: 760.00, fee: 11.40, cardId: "c4", memberId: "m3", status: "posted", receipt: true, vendor: "LinkedIn Corp.", country: "United States", originalAmount: 207.00, originalCurrency: "USD" },
+  { id: "t9", date: "2024-10-18", merchant: "Hilton Hotels", category: "Travel", amount: 412.00, fee: 6.18, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Hilton Worldwide", country: "Germany", originalAmount: 103.00, originalCurrency: "EUR" },
+  { id: "t10", date: "2024-10-18", merchant: "Notion Labs", category: "Software", amount: 96.00, fee: 1.44, cardId: "c3", memberId: "m2", status: "posted", receipt: true, vendor: "Notion Labs Inc.", country: "United States", originalAmount: 26.00, originalCurrency: "USD" },
   { id: "t11", date: "2024-10-17", merchant: "Lyft", category: "Travel", amount: 24.50, cardId: "c2", memberId: "m2", status: "pending", receipt: false, vendor: "Lyft Inc.", country: "United States" },
-  { id: "t12", date: "2024-10-17", merchant: "Staples", category: "Office", amount: 156.30, fee: 2.34, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Staples Inc.", country: "Canada" },
+  { id: "t12", date: "2024-10-17", merchant: "Staples", category: "Office", amount: 156.30, fee: 2.34, cardId: "c1", memberId: "m1", status: "posted", receipt: true, vendor: "Staples Inc.", country: "Canada", originalAmount: 58.00, originalCurrency: "CAD" },
 ];
 
 export const reimbursements: Reimbursement[] = [
@@ -407,6 +411,15 @@ export const allCountries = (): string[] => {
 
 export const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-AE", { style: "currency", currency: "AED" }).format(n);
+
+/** Format an amount in any ISO currency code, prefixed with the code (e.g. "USD 39.20"). */
+export const formatMoney = (n: number, currency: string = "AED") => {
+  const formatted = new Intl.NumberFormat("en-AE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+  return `${currency} ${formatted}`;
+};
 
 export const formatDate = (s: string) =>
   new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
