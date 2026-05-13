@@ -92,7 +92,7 @@ export default function MyReimbursements() {
 
   return (
     <AppLayout
-      title="Out-of-pocket expenses"
+      title="Reimbursements"
       subtitle="Submit personal expenses for reimbursement."
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
@@ -103,7 +103,7 @@ export default function MyReimbursements() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Submit out-of-pocket expense</DialogTitle>
+              <DialogTitle>Submit reimbursement expense</DialogTitle>
               <DialogDescription>
                 Your manager will review and approve reimbursement.
               </DialogDescription>

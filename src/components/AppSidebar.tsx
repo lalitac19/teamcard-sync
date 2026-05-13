@@ -40,7 +40,7 @@ const adminMain = [
 
 const adminApprovals = [
   { title: "Approval Requests", url: "/approvals", icon: ClipboardCheck },
-  { title: "Out-of-Pocket", url: "/reimbursements", icon: HandCoins },
+  { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
   { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
@@ -56,7 +56,7 @@ const memberMain = [
 ];
 
 const memberSubmit = [
-  { title: "Out-of-Pocket", url: "/me/reimbursements", icon: HandCoins },
+  { title: "Reimbursements", url: "/me/reimbursements", icon: HandCoins },
   { title: "Vendor Invoices", url: "/me/invoices", icon: FileText },
   { title: "Card Requests", url: "/me/requests", icon: PlusCircle },
 ];

@@ -190,7 +190,7 @@ const Approvals = () => {
       <Tabs defaultValue="txn" className="w-full">
         <TabsList className="grid w-full grid-cols-5 md:max-w-3xl">
           <TabsTrigger value="txn">Transactions ({counts.txn})</TabsTrigger>
-          <TabsTrigger value="oop">Out-of-Pocket ({counts.oop})</TabsTrigger>
+          <TabsTrigger value="oop">Reimbursements ({counts.oop})</TabsTrigger>
           <TabsTrigger value="inv">Vendor Invoices ({counts.inv})</TabsTrigger>
           <TabsTrigger value="card">Card requests ({counts.card})</TabsTrigger>
           <TabsTrigger value="topup">Limit increases ({counts.topup})</TabsTrigger>
@@ -257,7 +257,7 @@ const Approvals = () => {
           )}
         </TabsContent>
 
-        {/* 2. Out-of-Pocket approvals */}
+        {/* 2. Reimbursements approvals */}
         <TabsContent value="oop" className="mt-4 space-y-3">
           <p className="text-xs text-muted-foreground">
             Approved claims will flow to Accounting Export for mapping.

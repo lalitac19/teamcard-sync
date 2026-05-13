@@ -111,7 +111,7 @@ export default function MemberDashboard() {
         />
         <KpiCard
           icon={HandCoins}
-          label="Pending out-of-pocket"
+          label="Pending reimbursement"
           value={formatCurrency(pendingReimbAmount)}
           hint={`${myReimb.filter((r) => r.status === "pending").length} awaiting approval`}
           tone="warning"
