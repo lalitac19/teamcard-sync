@@ -660,7 +660,7 @@ function MemberRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={openEdit}>
-            <Pencil className="mr-2 h-4 w-4" /> Edit member
+            <Pencil className="mr-2 h-4 w-4" /> Edit person
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
