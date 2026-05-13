@@ -667,7 +667,7 @@ function MemberRowActions({
             onClick={() => setRemoveOpen(true)}
             className="text-destructive focus:text-destructive"
           >
-            <Trash2 className="mr-2 h-4 w-4" /> Remove member
+            <Trash2 className="mr-2 h-4 w-4" /> Remove person
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
