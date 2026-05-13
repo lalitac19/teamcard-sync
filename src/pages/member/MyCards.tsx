@@ -148,11 +148,13 @@ export default function MyCards() {
         </div>
       )}
 
-      <CardDetailsRevealDialog
-        card={revealCard!}
-        open={!!revealCard}
-        onOpenChange={(o) => !o && setRevealCard(null)}
-      />
+      {revealCard && (
+        <CardDetailsRevealDialog
+          card={revealCard}
+          open={!!revealCard}
+          onOpenChange={(o) => !o && setRevealCard(null)}
+        />
+      )}
     </AppLayout>
   );
 }
