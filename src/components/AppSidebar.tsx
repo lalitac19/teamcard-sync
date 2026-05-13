@@ -83,6 +83,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { user, isMember } = useCurrentUser();
+  const adminHasCard = !isMember && allCards.some((c) => c.memberId === user.id && c.status !== "terminated");
 
   const isActive = (url: string) =>
     url === "/" || url === "/statement" ? location.pathname === url : location.pathname.startsWith(url);
