@@ -413,7 +413,7 @@ function InviteMemberDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
-          <UserPlus className="h-4 w-4" /> Invite member
+          <UserPlus className="h-4 w-4" /> Invite person
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
