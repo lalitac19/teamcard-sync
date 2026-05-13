@@ -49,6 +49,10 @@ const adminAccounting = [
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
 ];
 
+const adminPersonal = [
+  { title: "My Cards", url: "/me/cards", icon: CreditCard },
+];
+
 const memberMain = [
   { title: "My Dashboard", url: "/", icon: LayoutDashboard },
   { title: "My Cards", url: "/me/cards", icon: CreditCard },
