@@ -142,6 +142,7 @@ export function AppSidebar() {
             {renderGroup("Main", adminMain)}
             {renderGroup("Approvals", adminApprovals)}
             {renderGroup("Accounting", adminAccounting)}
+            {adminHasCard && renderGroup("Personal", adminPersonal)}
           </>
         )}
       </SidebarContent>
