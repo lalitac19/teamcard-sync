@@ -767,8 +767,16 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     toast.success(val ? "Card frozen" : "Card unfrozen");
   };
 
+  const replaceReasonLabels: Record<typeof replaceReason, string> = {
+    compromised: "Card details compromised",
+    suspected_fraud: "Suspected fraud",
+    merchant_breach: "Merchant data breach",
+    subscription_reset: "Recurring charges reset",
+    other: "Other",
+  };
+
   const handleReplace = () => {
-    toast.success(`Replacement ${replaceType} card requested (${replaceReason})`);
+    toast.success(`Replacement virtual card requested (${replaceReasonLabels[replaceReason]})`);
     setOpen(false);
   };
 
