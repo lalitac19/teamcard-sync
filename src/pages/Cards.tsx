@@ -730,7 +730,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const [allowAtm, setAllowAtm] = useState(false);
 
   // Replace card
-  const [replaceReason, setReplaceReason] = useState<"lost" | "stolen" | "damaged" | "other">("lost");
+  const [replaceReason, setReplaceReason] = useState<
+    "compromised" | "suspected_fraud" | "merchant_breach" | "subscription_reset" | "other"
+  >("compromised");
   const [replaceType, setReplaceType] = useState<"virtual">("virtual");
   const [replaceNotes, setReplaceNotes] = useState("");
 
