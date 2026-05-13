@@ -731,7 +731,14 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Replace card
   const [replaceReason, setReplaceReason] = useState<
-    "compromised" | "suspected_fraud" | "merchant_breach" | "subscription_reset" | "other"
+    | "compromised"
+    | "suspected_fraud"
+    | "merchant_breach"
+    | "subscription_reset"
+    | "lost"
+    | "stolen"
+    | "damaged"
+    | "other"
   >("compromised");
   const [replaceType, setReplaceType] = useState<"virtual">("virtual");
   const [replaceNotes, setReplaceNotes] = useState("");
@@ -772,6 +779,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     suspected_fraud: "Suspected fraud",
     merchant_breach: "Merchant data breach",
     subscription_reset: "Recurring charges reset",
+    lost: "Lost",
+    stolen: "Stolen",
+    damaged: "Damaged",
     other: "Other",
   };
 
@@ -995,6 +1005,13 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                       <SelectItem value="suspected_fraud">Suspected fraud</SelectItem>
                       <SelectItem value="merchant_breach">Merchant data breach</SelectItem>
                       <SelectItem value="subscription_reset">Recurring charges reset</SelectItem>
+                      {card.type === "physical" && (
+                        <>
+                          <SelectItem value="lost">Lost</SelectItem>
+                          <SelectItem value="stolen">Stolen</SelectItem>
+                          <SelectItem value="damaged">Damaged</SelectItem>
+                        </>
+                      )}
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
