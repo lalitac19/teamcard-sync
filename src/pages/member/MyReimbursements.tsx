@@ -124,7 +124,7 @@ export default function MyReimbursements() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Amount (USD)</Label>
+                  <Label>Amount (AED)</Label>
                   <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" />
                 </div>
               </div>

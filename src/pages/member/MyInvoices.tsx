@@ -105,7 +105,7 @@ export default function MyInvoices() {
                   <Input value={invoiceNumber} onChange={(e) => setInvoiceNumber(e.target.value)} placeholder="INV-1234" />
                 </div>
                 <div>
-                  <Label>Amount (USD)</Label>
+                  <Label>Amount (AED)</Label>
                   <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" />
                 </div>
               </div>

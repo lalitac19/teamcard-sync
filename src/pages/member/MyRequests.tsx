@@ -152,7 +152,7 @@ export default function MyRequests() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Amount (USD)</Label>
+                  <Label>Amount (AED)</Label>
                   <Input type="number" value={topUpAmount} onChange={(e) => setTopUpAmount(e.target.value)} placeholder="0.00" />
                 </div>
                 <div>
@@ -204,7 +204,7 @@ export default function MyRequests() {
                   </div>
                 </div>
                 <div>
-                  <Label>Spending limit (USD)</Label>
+                  <Label>Spending limit (AED)</Label>
                   <Input type="number" value={limit} onChange={(e) => setLimit(e.target.value)} placeholder="0.00" />
                 </div>
                 <div>

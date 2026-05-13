@@ -406,7 +406,7 @@ export const allCountries = (): string[] => {
 };
 
 export const formatCurrency = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  new Intl.NumberFormat("en-AE", { style: "currency", currency: "AED" }).format(n);
 
 export const formatDate = (s: string) =>
   new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
