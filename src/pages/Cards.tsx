@@ -645,7 +645,7 @@ function IssueCardDialog() {
           </p>
         </div>
         <div className="space-y-1.5">
-          <Label>Spending limit (USD)</Label>
+          <Label>Spending limit (AED)</Label>
           <Input
             type="number"
             placeholder="5000"
@@ -659,7 +659,7 @@ function IssueCardDialog() {
           </p>
         </div>
         <div className="space-y-1.5">
-          <Label>Per-transaction limit (USD, optional)</Label>
+          <Label>Per-transaction limit (AED, optional)</Label>
           <Input
             type="number"
             placeholder="e.g. 1000"
@@ -871,7 +871,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
             <div className="space-y-1.5">
-              <Label>Spending limit (USD)</Label>
+              <Label>Spending limit (AED)</Label>
               <Input
                 type="number"
                 value={spendLimit}
@@ -884,7 +884,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label>Per-transaction limit (USD)</Label>
+              <Label>Per-transaction limit (AED)</Label>
               <Input
                 type="number"
                 value={perTxnLimit}

@@ -44,7 +44,7 @@ const statusBadge = (s: string) => {
 
 const accountingSoftwares = ["QuickBooks", "Xero", "NetSuite", "Sage Intacct"];
 
-const FX_RATE = 1; // simple stub: assume USD
+const FX_RATE = 1; // simple stub: assume AED
 const INTL_FEE_PCT = 0.015;
 
 export function TransactionDetailDialog({
@@ -208,7 +208,7 @@ export function TransactionDetailDialog({
                 <div className="flex items-center gap-2 text-sm font-medium"><Globe className="h-4 w-4" /> Payment details</div>
                 <div className="text-sm grid grid-cols-2 gap-y-1">
                   <span className="text-muted-foreground">Type</span><span>Card purchase</span>
-                  <span className="text-muted-foreground">Currency</span><span>USD</span>
+                  <span className="text-muted-foreground">Currency</span><span>AED</span>
                   <span className="text-muted-foreground">Country</span><span>{txn.country ?? "—"}</span>
                   <span className="text-muted-foreground">International</span>
                   <span>{isInternational ? "Yes" : "No"}</span>
