@@ -380,7 +380,7 @@ function CardTxnsTab() {
                 <TableHead>Date</TableHead>
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
-                <TableHead className="text-right">Vendor amount</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
               <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>

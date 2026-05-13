@@ -23,6 +23,7 @@ import {
   Transaction,
   cardById,
   formatCurrency,
+  formatMoney,
   formatDate,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
@@ -121,7 +122,12 @@ export function MemberTxnDetailDialog({
               </DialogDescription>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-semibold">−{formatCurrency(txn.amount)}</p>
+              <p className="text-2xl font-semibold">
+                −{formatMoney(txn.originalAmount ?? txn.amount, txn.originalCurrency ?? "AED")}
+              </p>
+              {txn.originalCurrency && txn.originalCurrency !== "AED" && (
+                <p className="text-xs text-muted-foreground">≈ {formatCurrency(txn.amount)}</p>
+              )}
               <div className="mt-1">{statusBadge(txn.status)}</div>
             </div>
           </div>
@@ -175,8 +181,16 @@ export function MemberTxnDetailDialog({
                   <span>{txn.country ?? "—"}</span>
                   <span className="text-muted-foreground">Category</span>
                   <span>{txn.category}</span>
+                  <span className="text-muted-foreground">Currency</span>
+                  <span>{txn.originalCurrency ?? "AED"}</span>
                   <Separator className="col-span-2 my-1" />
-                  <span className="font-medium">Amount</span>
+                  {txn.originalCurrency && txn.originalCurrency !== "AED" && (
+                    <>
+                      <span className="text-muted-foreground">Merchant amount</span>
+                      <span className="text-right">{formatMoney(txn.originalAmount ?? txn.amount, txn.originalCurrency)}</span>
+                    </>
+                  )}
+                  <span className="font-medium">Amount (AED)</span>
                   <span className="text-right font-semibold">{formatCurrency(txn.amount)}</span>
                 </div>
               </section>

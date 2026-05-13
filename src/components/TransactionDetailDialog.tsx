@@ -16,7 +16,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Transaction, memberById, cardById, chartOfAccounts, vatRates, formatCurrency, formatDate,
+  Transaction, memberById, cardById, chartOfAccounts, vatRates, formatCurrency, formatMoney, formatDate,
 } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -157,7 +157,12 @@ export function TransactionDetailDialog({
               </DialogDescription>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-semibold">−{formatCurrency(txn.amount)}</p>
+              <p className="text-2xl font-semibold">
+                −{formatMoney(txn.originalAmount ?? txn.amount, txn.originalCurrency ?? "AED")}
+              </p>
+              {txn.originalCurrency && txn.originalCurrency !== "AED" && (
+                <p className="text-xs text-muted-foreground">≈ {formatCurrency(txn.amount)}</p>
+              )}
               <div className="mt-1">{statusBadge(txn.status)}</div>
             </div>
           </div>
@@ -208,7 +213,8 @@ export function TransactionDetailDialog({
                 <div className="flex items-center gap-2 text-sm font-medium"><Globe className="h-4 w-4" /> Payment details</div>
                 <div className="text-sm grid grid-cols-2 gap-y-1">
                   <span className="text-muted-foreground">Type</span><span>Card purchase</span>
-                  <span className="text-muted-foreground">Currency</span><span>AED</span>
+                  <span className="text-muted-foreground">Currency</span>
+                  <span>{txn.originalCurrency ?? "AED"}</span>
                   <span className="text-muted-foreground">Country</span><span>{txn.country ?? "—"}</span>
                   <span className="text-muted-foreground">International</span>
                   <span>{isInternational ? "Yes" : "No"}</span>
@@ -219,7 +225,13 @@ export function TransactionDetailDialog({
             <section className="rounded-lg border p-4 space-y-2">
               <p className="text-sm font-medium">Amounts</p>
               <div className="text-sm grid grid-cols-2 gap-y-1">
-                <span className="text-muted-foreground">Transaction amount</span>
+                {txn.originalCurrency && txn.originalCurrency !== "AED" && (
+                  <>
+                    <span className="text-muted-foreground">Merchant amount</span>
+                    <span className="text-right">{formatMoney(txn.originalAmount ?? txn.amount, txn.originalCurrency)}</span>
+                  </>
+                )}
+                <span className="text-muted-foreground">Transaction amount (AED)</span>
                 <span className="text-right">{formatCurrency(txn.amount)}</span>
                 <span className="text-muted-foreground">International fee {isInternational ? "(1.5%)" : ""}</span>
                 <span className="text-right">{formatCurrency(intlFee)}</span>
