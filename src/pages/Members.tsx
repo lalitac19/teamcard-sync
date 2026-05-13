@@ -537,7 +537,7 @@ function CreateTeamDialog({
         <DialogHeader>
           <DialogTitle>Create a team</DialogTitle>
           <DialogDescription>
-            Group existing members together and assign a team lead.
+            Group existing people together and assign a team lead.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
