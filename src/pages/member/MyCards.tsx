@@ -12,12 +12,14 @@ import {
   type Card as CardModel,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
-import { Snowflake, PlusCircle, Inbox, CreditCard } from "lucide-react";
+import { Snowflake, PlusCircle, Inbox, CreditCard, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { CardDetailsRevealDialog } from "@/components/CardDetailsRevealDialog";
 
 export default function MyCards() {
   const { user } = useCurrentUser();
   const [cards, setCards] = useState<CardModel[]>(seedCards);
+  const [revealCard, setRevealCard] = useState<CardModel | null>(null);
 
   const myCards = useMemo(
     () => cards.filter((c) => c.memberId === user.id && c.status !== "terminated"),
@@ -106,6 +108,16 @@ export default function MyCards() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
+                      disabled={c.status !== "active"}
+                      onClick={() => setRevealCard(c)}
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      Show details
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
                       disabled={c.status === "expired"}
                       onClick={() => toggleFreeze(c.id)}
                     >
@@ -135,6 +147,15 @@ export default function MyCards() {
           })}
         </div>
       )}
+
+      {revealCard && (
+        <CardDetailsRevealDialog
+          card={revealCard}
+          open={!!revealCard}
+          onOpenChange={(o) => !o && setRevealCard(null)}
+        />
+      )}
     </AppLayout>
   );
 }
+

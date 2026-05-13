@@ -29,6 +29,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useCurrentUser } from "@/lib/currentUser";
+import { cards as allCards } from "@/lib/mockData";
 
 const adminMain = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -47,6 +48,10 @@ const adminApprovals = [
 const adminAccounting = [
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
+];
+
+const adminPersonal = [
+  { title: "My Cards", url: "/me/cards", icon: CreditCard },
 ];
 
 const memberMain = [
@@ -78,6 +83,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { user, isMember } = useCurrentUser();
+  const adminHasCard = !isMember && allCards.some((c) => c.memberId === user.id && c.status !== "terminated");
 
   const isActive = (url: string) =>
     url === "/" || url === "/statement" ? location.pathname === url : location.pathname.startsWith(url);
@@ -136,6 +142,7 @@ export function AppSidebar() {
             {renderGroup("Main", adminMain)}
             {renderGroup("Approvals", adminApprovals)}
             {renderGroup("Accounting", adminAccounting)}
+            {adminHasCard && renderGroup("Personal", adminPersonal)}
           </>
         )}
       </SidebarContent>
