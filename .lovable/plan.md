@@ -1,25 +1,22 @@
-## Goal
-On the admin Wallet page, replace the "Quick actions" card and the existing "Top up wallet" dialog with a single flow that reveals the company's assigned IBAN / bank account details so the admin knows where to wire funds.
+## Replace card — reasons for virtual card replacement
 
-## Changes (src/pages/Wallet.tsx)
+Since the replacement is always a **virtual card** (issued with a fresh card number, expiry, and CVV), the existing reasons (Lost / Stolen / Damaged / Other) don't all fit. Lost/Stolen/Damaged describe physical events.
 
-1. **Remove the "Quick actions" card** (right column with ACH transfer in / Wire instructions / Auto top-up rules buttons).
-2. **Make the hero balance card span the full width** (`md:col-span-3` or remove the grid).
-3. **Replace `TopUpDialog`** — keep the same "Top up wallet" button in the page header, but clicking it now opens a dialog titled "Top up wallet — bank transfer details" that displays the company's unique IBAN and supporting bank fields, instead of an amount form.
+### New reason list
 
-## Bank details shown in the dialog
-Mock data, copy-to-clipboard on each field:
-- Beneficiary name: `Peko Technologies Inc.`
-- IBAN: `GB29 PEKO 0000 0012 3456 78` (unique per company)
-- BIC / SWIFT: `PEKOGB2LXXX`
-- Bank name: `Peko Banking Partner, London`
-- Bank address: `1 Finsbury Avenue, London EC2M 2PP`
-- Reference (must include): the company's account ID, e.g. `PEKO-CLIENT-00421` — note that admin must include this so the top-up is auto-matched.
+Replace the dropdown options in `src/pages/Cards.tsx` (Lifecycle tab → Replace card section) with reasons that make sense for re-issuing a virtual card:
 
-Plus a short note: "Transfers usually settle in 1–2 business days. The wallet balance will update automatically once funds are received."
+1. **Card details compromised** — number, CVV, or expiry was exposed (phishing, data breach, accidental sharing).
+2. **Suspected fraud** — unrecognized authorizations or fraud alert on the current card.
+3. **Merchant data breach** — vendor that stored the card disclosed a breach.
+4. **Recurring charges out of control** — too many subscriptions tied to the card; user wants a clean number.
+5. **Other** — free-text reason captured in the existing Notes field.
 
-## Technical notes
-- New small `<CopyField>` helper inside the file using `navigator.clipboard.writeText` + `toast.success("Copied")`, rendered as a row with label, monospaced value, and a `Copy` icon button (lucide-react).
-- Drop unused imports (`ArrowDownLeft`, `ArrowUpRight`, `Banknote`, the `Input`/`Label` previously used for amount entry if no longer needed).
-- No business-logic / data-model changes; mock IBAN values can live as constants at the top of `Wallet.tsx`.
-- Hero card layout: change wrapping grid from `md:grid-cols-3` to a single full-width card so it doesn't look unbalanced after removing Quick actions.
+### Behavior
+
+- The `replaceReason` state type updates from `"lost" | "stolen" | "damaged" | "other"` to the new union.
+- Default selection: `compromised`.
+- Toast on submit keeps the same shape: `Replacement virtual card requested (<reason label>)`.
+- Notes textarea remains for additional context (especially useful when "Other" is picked).
+
+No other parts of the dialog change. Files touched: `src/pages/Cards.tsx` only.

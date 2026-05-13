@@ -730,7 +730,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const [allowAtm, setAllowAtm] = useState(false);
 
   // Replace card
-  const [replaceReason, setReplaceReason] = useState<"lost" | "stolen" | "damaged" | "other">("lost");
+  const [replaceReason, setReplaceReason] = useState<
+    "compromised" | "suspected_fraud" | "merchant_breach" | "subscription_reset" | "other"
+  >("compromised");
   const [replaceType, setReplaceType] = useState<"virtual">("virtual");
   const [replaceNotes, setReplaceNotes] = useState("");
 
@@ -765,8 +767,16 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     toast.success(val ? "Card frozen" : "Card unfrozen");
   };
 
+  const replaceReasonLabels: Record<typeof replaceReason, string> = {
+    compromised: "Card details compromised",
+    suspected_fraud: "Suspected fraud",
+    merchant_breach: "Merchant data breach",
+    subscription_reset: "Recurring charges reset",
+    other: "Other",
+  };
+
   const handleReplace = () => {
-    toast.success(`Replacement ${replaceType} card requested (${replaceReason})`);
+    toast.success(`Replacement virtual card requested (${replaceReasonLabels[replaceReason]})`);
     setOpen(false);
   };
 
@@ -981,9 +991,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   <Select value={replaceReason} onValueChange={(v) => setReplaceReason(v as typeof replaceReason)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="lost">Lost</SelectItem>
-                      <SelectItem value="stolen">Stolen</SelectItem>
-                      <SelectItem value="damaged">Damaged</SelectItem>
+                      <SelectItem value="compromised">Card details compromised</SelectItem>
+                      <SelectItem value="suspected_fraud">Suspected fraud</SelectItem>
+                      <SelectItem value="merchant_breach">Merchant data breach</SelectItem>
+                      <SelectItem value="subscription_reset">Recurring charges reset</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
