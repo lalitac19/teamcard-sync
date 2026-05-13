@@ -677,7 +677,7 @@ function MemberRowActions({
           <DialogHeader>
             <DialogTitle>Edit {member.name}</DialogTitle>
             <DialogDescription>
-              Update this member's role, team, and department.
+              Update this person's role, team, and department.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
