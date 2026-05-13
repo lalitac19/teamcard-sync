@@ -154,9 +154,9 @@ const Members = () => {
       })),
     );
     if (linked.length > 0) {
-      toast.success(`Member removed. ${linked.length} card${linked.length === 1 ? "" : "s"} terminated.`);
+      toast.success(`Person removed. ${linked.length} card${linked.length === 1 ? "" : "s"} terminated.`);
     } else {
-      toast.success("Member removed");
+      toast.success("Person removed");
     }
   };
 
@@ -192,7 +192,7 @@ const Members = () => {
         return { ...t, memberIds, leadId };
       }),
     );
-    toast.success("Member updated");
+    toast.success("Person updated");
   };
 
   const handleCreateTeam = (t: Omit<Team, "id" | "createdAt">) => {
@@ -206,14 +206,14 @@ const Members = () => {
 
   return (
     <AppLayout
-      title="Members"
+      title="People"
       subtitle="Manage your team, roles, KYC status, and team structure."
     >
-      <Tabs defaultValue="members" className="space-y-4">
+      <Tabs defaultValue="people" className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <TabsList>
-            <TabsTrigger value="members" className="gap-2">
-              <UserPlus className="h-4 w-4" /> Members
+            <TabsTrigger value="people" className="gap-2">
+              <UserPlus className="h-4 w-4" /> People
             </TabsTrigger>
             <TabsTrigger value="teams" className="gap-2">
               <Users className="h-4 w-4" /> Teams
@@ -226,13 +226,13 @@ const Members = () => {
           </div>
         </div>
 
-        <TabsContent value="members" className="mt-0">
+        <TabsContent value="people" className="mt-0">
           <Card className="shadow-soft">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Member</TableHead>
+                    <TableHead>Person</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Team</TableHead>
                     <TableHead>Cards</TableHead>
@@ -413,12 +413,12 @@ function InviteMemberDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
-          <UserPlus className="h-4 w-4" /> Invite member
+          <UserPlus className="h-4 w-4" /> Invite person
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite a new member</DialogTitle>
+          <DialogTitle>Invite a new person</DialogTitle>
           <DialogDescription>
             They'll get an email to sign up, complete KYC, and download the mobile app.
           </DialogDescription>
@@ -537,7 +537,7 @@ function CreateTeamDialog({
         <DialogHeader>
           <DialogTitle>Create a team</DialogTitle>
           <DialogDescription>
-            Group existing members together and assign a team lead.
+            Group existing people together and assign a team lead.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
@@ -572,7 +572,7 @@ function CreateTeamDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Members</Label>
+            <Label>People</Label>
             <div className="max-h-56 space-y-1 overflow-y-auto rounded-md border border-border p-2">
               {members.map((m) => {
                 const checked = selected.has(m.id) || m.id === leadId;
@@ -660,14 +660,14 @@ function MemberRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={openEdit}>
-            <Pencil className="mr-2 h-4 w-4" /> Edit member
+            <Pencil className="mr-2 h-4 w-4" /> Edit person
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setRemoveOpen(true)}
             className="text-destructive focus:text-destructive"
           >
-            <Trash2 className="mr-2 h-4 w-4" /> Remove member
+            <Trash2 className="mr-2 h-4 w-4" /> Remove person
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -677,7 +677,7 @@ function MemberRowActions({
           <DialogHeader>
             <DialogTitle>Edit {member.name}</DialogTitle>
             <DialogDescription>
-              Update this member's role, team, and department.
+              Update this person's role, team, and department.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
