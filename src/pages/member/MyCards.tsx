@@ -12,12 +12,14 @@ import {
   type Card as CardModel,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
-import { Snowflake, PlusCircle, Inbox, CreditCard } from "lucide-react";
+import { Snowflake, PlusCircle, Inbox, CreditCard, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { CardDetailsRevealDialog } from "@/components/CardDetailsRevealDialog";
 
 export default function MyCards() {
   const { user } = useCurrentUser();
   const [cards, setCards] = useState<CardModel[]>(seedCards);
+  const [revealCard, setRevealCard] = useState<CardModel | null>(null);
 
   const myCards = useMemo(
     () => cards.filter((c) => c.memberId === user.id && c.status !== "terminated"),
