@@ -141,26 +141,19 @@ export default function MyCards() {
                       </Button>
                     )}
                   </div>
-                    {c.type === "virtual" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() =>
-                          toast.success(`Physical card requested for ••••${c.last4}`)
-                        }
-                      >
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Request physical card
-                      </Button>
-                    )}
-                  </div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
       )}
+
+      <CardDetailsRevealDialog
+        card={revealCard!}
+        open={!!revealCard}
+        onOpenChange={(o) => !o && setRevealCard(null)}
+      />
     </AppLayout>
   );
 }
+
