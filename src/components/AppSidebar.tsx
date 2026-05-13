@@ -29,6 +29,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useCurrentUser } from "@/lib/currentUser";
+import { cards as allCards } from "@/lib/mockData";
 
 const adminMain = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
