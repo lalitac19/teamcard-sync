@@ -991,9 +991,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   <Select value={replaceReason} onValueChange={(v) => setReplaceReason(v as typeof replaceReason)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="lost">Lost</SelectItem>
-                      <SelectItem value="stolen">Stolen</SelectItem>
-                      <SelectItem value="damaged">Damaged</SelectItem>
+                      <SelectItem value="compromised">Card details compromised</SelectItem>
+                      <SelectItem value="suspected_fraud">Suspected fraud</SelectItem>
+                      <SelectItem value="merchant_breach">Merchant data breach</SelectItem>
+                      <SelectItem value="subscription_reset">Recurring charges reset</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
