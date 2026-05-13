@@ -572,7 +572,7 @@ function CreateTeamDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Members</Label>
+            <Label>People</Label>
             <div className="max-h-56 space-y-1 overflow-y-auto rounded-md border border-border p-2">
               {members.map((m) => {
                 const checked = selected.has(m.id) || m.id === leadId;
