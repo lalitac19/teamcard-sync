@@ -42,7 +42,7 @@ export const permissionCatalog: { key: string; label: string; group: string }[] 
   { key: "freeze_cards", label: "Freeze / unfreeze cards", group: "Cards" },
   { key: "set_card_limits", label: "Set card spend limits", group: "Cards" },
   { key: "approve_transactions", label: "Approve card transactions", group: "Approvals" },
-  { key: "approve_oop", label: "Approve out-of-pocket expenses", group: "Approvals" },
+  { key: "approve_oop", label: "Approve reimbursement expenses", group: "Approvals" },
   { key: "approve_invoices", label: "Approve vendor invoices", group: "Approvals" },
   { key: "approve_card_requests", label: "Approve card issuance requests", group: "Approvals" },
   { key: "approve_topup_requests", label: "Approve card top-up requests", group: "Approvals" },

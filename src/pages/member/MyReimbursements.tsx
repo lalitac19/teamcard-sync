@@ -103,7 +103,7 @@ export default function MyReimbursements() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Submit out-of-pocket expense</DialogTitle>
+              <DialogTitle>Submit reimbursement expense</DialogTitle>
               <DialogDescription>
                 Your manager will review and approve reimbursement.
               </DialogDescription>

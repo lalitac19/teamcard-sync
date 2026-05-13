@@ -98,7 +98,7 @@ const Reimbursements = () => {
 
   return (
     <AppLayout
-      title="Out-of-Pocket Expenses"
+      title="Reimbursements"
       subtitle="Reimbursement claims uploaded by members. Approvals are handled in Approval Requests."
     >
       <div className="grid gap-4 md:grid-cols-3">
