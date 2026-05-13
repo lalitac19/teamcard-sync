@@ -35,7 +35,7 @@ const adminItems: NavItem[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Wallet", url: "/wallet", icon: Wallet },
   { title: "Cards", url: "/cards", icon: CreditCard },
-  { title: "Members", url: "/members", icon: Users },
+  { title: "People", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
   { title: "Approvals", url: "/approvals", icon: ClipboardCheck },
   { title: "Out-of-Pocket", url: "/reimbursements", icon: HandCoins },

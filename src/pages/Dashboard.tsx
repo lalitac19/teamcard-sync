@@ -148,7 +148,7 @@ const Dashboard = () => {
   const actionItems = [
     { count: txnApprovals.filter((t) => t.status === "pending").length, label: "transactions need approval", to: "/approvals", icon: ShieldCheck },
     { count: cardRequests.filter((c) => c.status === "pending").length, label: "card requests pending", to: "/approvals", icon: CardIcon },
-    { count: pendingKyc, label: "members pending KYC", to: "/members", icon: Users },
+    { count: pendingKyc, label: "people pending KYC", to: "/members", icon: Users },
     { count: pendingInvoices.length, label: "vendor invoices awaiting approval", to: "/invoices", icon: Receipt },
     { count: cardsNearLimit, label: "cards over 80% utilization", to: "/cards", icon: Flame },
   ].filter((a) => a.count > 0);
@@ -235,7 +235,7 @@ const Dashboard = () => {
           to="/cards"
         />
         <KpiCard
-          label="Verified members"
+          label="Verified people"
           value={`${verifiedMembers.length} / ${members.length}`}
           icon={<Users className="h-4 w-4" />}
           delta={pendingKyc > 0 ? `${pendingKyc} pending KYC` : "All verified"}

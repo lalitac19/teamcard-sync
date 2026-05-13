@@ -35,9 +35,9 @@ export interface RolePermissions {
 
 export const permissionCatalog: { key: string; label: string; group: string }[] = [
   { key: "view_dashboard", label: "View dashboard", group: "General" },
-  { key: "manage_members", label: "Invite & remove members", group: "Members" },
-  { key: "assign_roles", label: "Assign roles to members", group: "Members" },
-  { key: "manage_teams", label: "Create & edit teams", group: "Members" },
+  { key: "manage_members", label: "Invite & remove people", group: "People" },
+  { key: "assign_roles", label: "Assign roles to people", group: "People" },
+  { key: "manage_teams", label: "Create & edit teams", group: "People" },
   { key: "issue_cards", label: "Issue new cards", group: "Cards" },
   { key: "freeze_cards", label: "Freeze / unfreeze cards", group: "Cards" },
   { key: "set_card_limits", label: "Set card spend limits", group: "Cards" },

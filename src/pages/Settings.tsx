@@ -368,7 +368,7 @@ function RolesPermissions() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete role "{current.label}"?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Members assigned to this role will need to be reassigned.
+                        People assigned to this role will need to be reassigned.
                         This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
