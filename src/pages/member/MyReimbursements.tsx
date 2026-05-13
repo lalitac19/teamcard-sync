@@ -92,7 +92,7 @@ export default function MyReimbursements() {
 
   return (
     <AppLayout
-      title="Out-of-pocket expenses"
+      title="Reimbursements"
       subtitle="Submit personal expenses for reimbursement."
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
