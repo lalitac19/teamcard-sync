@@ -381,7 +381,8 @@ function CardTxnsTab() {
                 <TableHead>Merchant</TableHead>
                 <TableHead>Member</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Debit account</TableHead>
+                <TableHead className="text-right">Fees</TableHead>
+                <TableHead>Debit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
