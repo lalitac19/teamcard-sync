@@ -128,6 +128,13 @@ const Cards = () => {
         </div>
       }
     >
+      <div className="mb-3 flex items-start gap-2 rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <span>
+          For security, full card numbers, CVV, and expiry are never visible from the admin portal. Cardholders can reveal their own details via OTP from their member view.
+        </span>
+      </div>
+
       {/* Type quick filters */}
       <div className="mb-3 flex flex-wrap gap-2">
         {(["all", "virtual", "physical", "single-use"] as const).map((f) => (
