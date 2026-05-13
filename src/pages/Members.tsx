@@ -154,9 +154,9 @@ const Members = () => {
       })),
     );
     if (linked.length > 0) {
-      toast.success(`Member removed. ${linked.length} card${linked.length === 1 ? "" : "s"} terminated.`);
+      toast.success(`Person removed. ${linked.length} card${linked.length === 1 ? "" : "s"} terminated.`);
     } else {
-      toast.success("Member removed");
+      toast.success("Person removed");
     }
   };
 
@@ -192,7 +192,7 @@ const Members = () => {
         return { ...t, memberIds, leadId };
       }),
     );
-    toast.success("Member updated");
+    toast.success("Person updated");
   };
 
   const handleCreateTeam = (t: Omit<Team, "id" | "createdAt">) => {
@@ -206,14 +206,14 @@ const Members = () => {
 
   return (
     <AppLayout
-      title="Members"
+      title="People"
       subtitle="Manage your team, roles, KYC status, and team structure."
     >
-      <Tabs defaultValue="members" className="space-y-4">
+      <Tabs defaultValue="people" className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <TabsList>
-            <TabsTrigger value="members" className="gap-2">
-              <UserPlus className="h-4 w-4" /> Members
+            <TabsTrigger value="people" className="gap-2">
+              <UserPlus className="h-4 w-4" /> People
             </TabsTrigger>
             <TabsTrigger value="teams" className="gap-2">
               <Users className="h-4 w-4" /> Teams
@@ -226,13 +226,13 @@ const Members = () => {
           </div>
         </div>
 
-        <TabsContent value="members" className="mt-0">
+        <TabsContent value="people" className="mt-0">
           <Card className="shadow-soft">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Member</TableHead>
+                    <TableHead>Person</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Team</TableHead>
                     <TableHead>Cards</TableHead>
