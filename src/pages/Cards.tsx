@@ -731,7 +731,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Replace card
   const [replaceReason, setReplaceReason] = useState<"lost" | "stolen" | "damaged" | "other">("lost");
-  const [replaceType, setReplaceType] = useState<"physical" | "virtual">(card.type === "virtual" ? "virtual" : "physical");
+  const [replaceType, setReplaceType] = useState<"virtual">("virtual");
   const [replaceNotes, setReplaceNotes] = useState("");
 
   // Terminate
@@ -990,13 +990,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Replacement type</Label>
-                  <Select value={replaceType} onValueChange={(v) => setReplaceType(v as typeof replaceType)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="physical">Physical</SelectItem>
-                      <SelectItem value="virtual">Virtual</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex h-9 items-center rounded-md border border-input bg-secondary/40 px-3 text-sm">
+                    Virtual card
+                  </div>
                 </div>
               </div>
               <div className="space-y-1.5">
