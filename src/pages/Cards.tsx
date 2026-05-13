@@ -731,7 +731,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Replace card
   const [replaceReason, setReplaceReason] = useState<"lost" | "stolen" | "damaged" | "other">("lost");
-  const [replaceType, setReplaceType] = useState<"physical" | "virtual">(card.type === "virtual" ? "virtual" : "physical");
+  const [replaceType, setReplaceType] = useState<"virtual">("virtual");
   const [replaceNotes, setReplaceNotes] = useState("");
 
   // Terminate
