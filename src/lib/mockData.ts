@@ -328,9 +328,9 @@ export const walletTopUps: WalletTopUp[] = [
 ];
 
 export const txnApprovals: TxnApproval[] = [
-  { id: "ta1", txnId: "t4", date: "2024-10-21", memberId: "m3", cardId: "c4", merchant: "Google Ads", amount: 2400.00, policyReason: "Exceeds $2,000 single-txn policy", status: "pending" },
+  { id: "ta1", txnId: "t4", date: "2024-10-21", memberId: "m3", cardId: "c4", merchant: "Google Ads", amount: 2400.00, policyReason: "Exceeds AED 2,000 single-txn policy", status: "pending" },
   { id: "ta2", txnId: "t7", date: "2024-10-19", memberId: "m4", cardId: "c5", merchant: "AWS", amount: 1820.00, policyReason: "Cardholder requires manager review", status: "pending" },
-  { id: "ta3", txnId: "t1", date: "2024-10-22", memberId: "m1", cardId: "c1", merchant: "United Airlines", amount: 1240.50, policyReason: "Travel category > $1,000", status: "approved" },
+  { id: "ta3", txnId: "t1", date: "2024-10-22", memberId: "m1", cardId: "c1", merchant: "United Airlines", amount: 1240.50, policyReason: "Travel category > AED 1,000", status: "approved" },
   { id: "ta4", txnId: "t9", date: "2024-10-18", memberId: "m1", cardId: "c1", merchant: "Hilton Hotels", amount: 412.00, policyReason: "Lodging requires tag review", status: "rejected" },
 ];
 
