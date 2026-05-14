@@ -162,6 +162,15 @@ const PlaceOfSupplySelect = ({ value, onChange }: { value?: string; onChange: (v
   </Select>
 );
 
+const DescriptionInput = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => (
+  <Input
+    value={value ?? ""}
+    onChange={(e) => onChange(e.target.value)}
+    placeholder="Description"
+    className="h-8 w-[200px] text-xs"
+  />
+);
+
 const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v: string) => void; disabled?: boolean }) => (
   <Select value={value} onValueChange={onChange} disabled={disabled}>
     <SelectTrigger className="h-8 w-[110px] border-dashed text-xs">
