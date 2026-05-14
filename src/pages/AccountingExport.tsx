@@ -882,7 +882,7 @@ function InvoicesTab() {
                 return (
                   <Fragment key={r.id}>
                     <TableRow data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell><Checkbox checked={r.selected} disabled={r.exported} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
