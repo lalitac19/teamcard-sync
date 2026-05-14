@@ -48,13 +48,21 @@ const ExportStatusFilter = ({ value, onChange, counts }: {
   onChange: (v: ExportStatus) => void;
   counts: { all: number; unexported: number; exported: number };
 }) => (
-  <Tabs value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
-    <TabsList className="h-9">
-      <TabsTrigger value="unexported" className="text-xs">Unexported ({counts.unexported})</TabsTrigger>
-      <TabsTrigger value="exported" className="text-xs">Exported ({counts.exported})</TabsTrigger>
-      <TabsTrigger value="all" className="text-xs">All ({counts.all})</TabsTrigger>
-    </TabsList>
-  </Tabs>
+  <Card className="shadow-soft">
+    <CardContent className="flex items-end gap-3 p-4">
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-muted-foreground">Status</label>
+        <Select value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
+          <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unexported">Unexported ({counts.unexported})</SelectItem>
+            <SelectItem value="exported">Exported ({counts.exported})</SelectItem>
+            <SelectItem value="all">All ({counts.all})</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </CardContent>
+  </Card>
 );
 
 const matchesExportStatus = (exported: boolean, filter: ExportStatus) =>
@@ -482,16 +490,16 @@ function CardTxnsTab() {
         </div>
       )}
       <AccountingHeader count={selectedCount} onExport={handleExport} />
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-stretch gap-3">
         <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
-      </div>
-      <div className="mb-3">
-        <TableFilters
-          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
-          merchant={merchant} onMerchantChange={setMerchant}
-          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
-        />
+        <div className="flex-1 min-w-[300px]">
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+            merchant={merchant} onMerchantChange={setMerchant}
+            onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+          />
+        </div>
       </div>
       {totalFees > 0 && feesAccountInfo && (
         <div className="mb-3 flex items-start gap-2 rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
@@ -574,9 +582,7 @@ function CardTxnsTab() {
                       <TableCell>
                         {r.exported
                           ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
+                          : <Badge variant="secondary">Unexported</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
@@ -669,16 +675,16 @@ function ReimbursementsTab() {
         </div>
       )}
       <AccountingHeader count={selectedCount} onExport={handleExport} />
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-stretch gap-3">
         <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
-      </div>
-      <div className="mb-3">
-        <TableFilters
-          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
-          merchant={merchant} onMerchantChange={setMerchant}
-          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
-        />
+        <div className="flex-1 min-w-[300px]">
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+            merchant={merchant} onMerchantChange={setMerchant}
+            onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+          />
+        </div>
       </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
@@ -755,9 +761,7 @@ function ReimbursementsTab() {
                       <TableCell>
                         {r.exported
                           ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
+                          : <Badge variant="secondary">Unexported</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
@@ -843,17 +847,17 @@ function InvoicesTab() {
         </div>
       )}
       <AccountingHeader count={selectedCount} onExport={handleExport} />
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-stretch gap-3">
         <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
-      </div>
-      <div className="mb-3">
-        <TableFilters
-          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-          merchant={vendorSearch} onMerchantChange={setVendorSearch}
-          merchantLabel="Vendor / Invoice #"
-          merchantPlaceholder="Search vendor or invoice…"
-          onReset={() => { setFrom(undefined); setTo(undefined); setVendorSearch(""); }}
-        />
+        <div className="flex-1 min-w-[300px]">
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            merchant={vendorSearch} onMerchantChange={setVendorSearch}
+            merchantLabel="Vendor / Invoice #"
+            merchantPlaceholder="Search vendor or invoice…"
+            onReset={() => { setFrom(undefined); setTo(undefined); setVendorSearch(""); }}
+          />
+        </div>
       </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
@@ -925,9 +929,7 @@ function InvoicesTab() {
                       <TableCell>
                         {r.exported
                           ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
+                          : <Badge variant="secondary">Unexported</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
@@ -997,17 +999,17 @@ function TopUpsTab() {
   return (
     <>
       <AccountingHeader count={selectedCount} onExport={handleExport} />
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-stretch gap-3">
         <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
-      </div>
-      <div className="mb-3">
-        <TableFilters
-          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-          merchant={refSearch} onMerchantChange={setRefSearch}
-          merchantLabel="Reference / Source"
-          merchantPlaceholder="Search reference or source…"
-          onReset={() => { setFrom(undefined); setTo(undefined); setRefSearch(""); }}
-        />
+        <div className="flex-1 min-w-[300px]">
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            merchant={refSearch} onMerchantChange={setRefSearch}
+            merchantLabel="Reference / Source"
+            merchantPlaceholder="Search reference or source…"
+            onReset={() => { setFrom(undefined); setTo(undefined); setRefSearch(""); }}
+          />
+        </div>
       </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
@@ -1048,9 +1050,7 @@ function TopUpsTab() {
                         ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
                         : r.status === "processing"
                           ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
+                          : <Badge variant="secondary">Unexported</Badge>}
                     </TableCell>
                   </TableRow>
                 );
