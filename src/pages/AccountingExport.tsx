@@ -469,7 +469,7 @@ function CardTxnsTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const m = memberById(r.memberId);
                 const ready = rowReady(r, r.amount);
                 const isSplit = !!r.splitOpen;
