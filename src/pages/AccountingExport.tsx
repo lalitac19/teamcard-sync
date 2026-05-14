@@ -135,6 +135,33 @@ const VendorInput = ({ value, onChange, placeholder = "Vendor name" }: { value?:
   />
 );
 
+const EMIRATES = [
+  "Abu Dhabi", "Dubai", "Sharjah", "Ajman",
+  "Umm Al Quwain", "Ras Al Khaimah", "Fujairah",
+];
+
+const TrnInput = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => (
+  <Input
+    value={value ?? ""}
+    onChange={(e) => onChange(e.target.value)}
+    placeholder="TRN"
+    className="h-8 w-[140px] text-xs"
+  />
+);
+
+const PlaceOfSupplySelect = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => (
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="h-8 w-[160px] border-dashed text-xs">
+      <SelectValue placeholder="Place of supply" />
+    </SelectTrigger>
+    <SelectContent>
+      {EMIRATES.map((e) => (
+        <SelectItem key={e} value={e}>{e}</SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
 const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v: string) => void; disabled?: boolean }) => (
   <Select value={value} onValueChange={onChange} disabled={disabled}>
     <SelectTrigger className="h-8 w-[110px] border-dashed text-xs">
