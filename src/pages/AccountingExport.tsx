@@ -40,6 +40,26 @@ const inDateRange = (iso: string, from?: Date, to?: Date) => {
   return true;
 };
 
+/* ---------- Export status filter ---------- */
+type ExportStatus = "all" | "unexported" | "exported";
+
+const ExportStatusFilter = ({ value, onChange, counts }: {
+  value: ExportStatus;
+  onChange: (v: ExportStatus) => void;
+  counts: { all: number; unexported: number; exported: number };
+}) => (
+  <Tabs value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
+    <TabsList className="h-9">
+      <TabsTrigger value="unexported" className="text-xs">Unexported ({counts.unexported})</TabsTrigger>
+      <TabsTrigger value="exported" className="text-xs">Exported ({counts.exported})</TabsTrigger>
+      <TabsTrigger value="all" className="text-xs">All ({counts.all})</TabsTrigger>
+    </TabsList>
+  </Tabs>
+);
+
+const matchesExportStatus = (exported: boolean, filter: ExportStatus) =>
+  filter === "all" || (filter === "exported" ? exported : !exported);
+
 /* ---------- Shared types ---------- */
 interface SplitLine {
   id: string;
@@ -401,6 +421,7 @@ function CardTxnsTab() {
     postedTxns.map((t) => ({
       ...t,
       selected: false,
+      exported: false,
       account: t.debitAccount as string | undefined,
       vatRate: undefined as string | undefined,
       trn: "" as string,
@@ -410,8 +431,8 @@ function CardTxnsTab() {
       splits: [] as SplitLine[],
     })),
   );
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
+  const selectedCount = rows.filter((r) => r.selected && !r.exported).length;
+  const toggleAll = (v: boolean) => setRows(rows.map((r) => (r.exported ? r : { ...r, selected: v })));
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -423,6 +444,7 @@ function CardTxnsTab() {
   const [to, setTo] = useState<Date | undefined>();
   const [merchant, setMerchant] = useState("");
   const [memberFilter, setMemberFilter] = useState(ALL);
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("unexported");
 
   const cardholderOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -433,11 +455,24 @@ function CardTxnsTab() {
     return Array.from(map, ([value, label]) => ({ value, label }));
   }, [rows]);
 
+  const counts = {
+    all: rows.length,
+    exported: rows.filter((r) => r.exported).length,
+    unexported: rows.filter((r) => !r.exported).length,
+  };
+
   const filteredRows = rows.filter((r) =>
+    matchesExportStatus(r.exported, exportStatus) &&
     inDateRange(r.date, from, to) &&
     (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
     (memberFilter === ALL || r.memberId === memberFilter),
   );
+
+  const handleExport = () => {
+    if (selectedCount === 0) return;
+    setRows(rows.map((r) => (r.selected && !r.exported ? { ...r, exported: true, selected: false } : r)));
+    toast.success(`Exported ${selectedCount} transactions to QuickBooks`);
+  };
 
   return (
     <>
@@ -446,10 +481,10 @@ function CardTxnsTab() {
           <span className="font-medium">{pendingCount} card transaction{pendingCount > 1 ? "s" : ""}</span> pending settlement — they'll appear here once posted.
         </div>
       )}
-      <AccountingHeader
-        count={selectedCount}
-        onExport={() => toast.success(`Exported ${selectedCount} transactions to QuickBooks`)}
-      />
+      <AccountingHeader count={selectedCount} onExport={handleExport} />
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
+      </div>
       <div className="mb-3">
         <TableFilters
           from={from} to={to} onFromChange={setFrom} onToChange={setTo}
@@ -497,7 +532,7 @@ function CardTxnsTab() {
                 return (
                   <Fragment key={r.id}>
                     <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell><Checkbox checked={r.selected} disabled={r.exported} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.category}</p></TableCell>
                       <TableCell className="text-sm">{m?.name}</TableCell>
@@ -537,9 +572,11 @@ function CardTxnsTab() {
                         />
                       </TableCell>
                       <TableCell>
-                        {ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
+                        {r.exported
+                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
+                          : ready
+                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                            : <Badge variant="secondary">Needs mapping</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
@@ -571,6 +608,7 @@ function ReimbursementsTab() {
     approved.map((r) => ({
       ...r,
       selected: false,
+      exported: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
       creditAccount: undefined as string | undefined,
@@ -582,8 +620,8 @@ function ReimbursementsTab() {
       splits: [] as SplitLine[],
     })),
   );
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
+  const selectedCount = rows.filter((r) => r.selected && !r.exported).length;
+  const toggleAll = (v: boolean) => setRows(rows.map((r) => (r.exported ? r : { ...r, selected: v })));
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -593,6 +631,7 @@ function ReimbursementsTab() {
   const [to, setTo] = useState<Date | undefined>();
   const [merchant, setMerchant] = useState("");
   const [memberFilter, setMemberFilter] = useState(ALL);
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("unexported");
 
   const cardholderOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -603,11 +642,24 @@ function ReimbursementsTab() {
     return Array.from(map, ([value, label]) => ({ value, label }));
   }, [rows]);
 
+  const counts = {
+    all: rows.length,
+    exported: rows.filter((r) => r.exported).length,
+    unexported: rows.filter((r) => !r.exported).length,
+  };
+
   const filteredRows = rows.filter((r) =>
+    matchesExportStatus(r.exported, exportStatus) &&
     inDateRange(r.date, from, to) &&
     (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
     (memberFilter === ALL || r.memberId === memberFilter),
   );
+
+  const handleExport = () => {
+    if (selectedCount === 0) return;
+    setRows(rows.map((r) => (r.selected && !r.exported ? { ...r, exported: true, selected: false } : r)));
+    toast.success(`Exported ${selectedCount} reimbursements to QuickBooks`);
+  };
 
   return (
     <>
@@ -616,10 +668,10 @@ function ReimbursementsTab() {
           <span className="font-medium">{pendingCount} reimbursement{pendingCount > 1 ? "s" : ""}</span> awaiting your approval — they'll appear here once approved.
         </div>
       )}
-      <AccountingHeader
-        count={selectedCount}
-        onExport={() => toast.success(`Exported ${selectedCount} reimbursements to QuickBooks`)}
-      />
+      <AccountingHeader count={selectedCount} onExport={handleExport} />
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
+      </div>
       <div className="mb-3">
         <TableFilters
           from={from} to={to} onFromChange={setFrom} onToChange={setTo}
@@ -657,7 +709,7 @@ function ReimbursementsTab() {
                 return (
                   <Fragment key={r.id}>
                     <TableRow data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell><Checkbox checked={r.selected} disabled={r.exported} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{m?.name}</TableCell>
                       <TableCell><p className="text-sm font-medium">{r.merchant}</p><p className="text-xs text-muted-foreground">{r.description}</p></TableCell>
@@ -701,9 +753,11 @@ function ReimbursementsTab() {
                         />
                       </TableCell>
                       <TableCell>
-                        {ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
+                        {r.exported
+                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
+                          : ready
+                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                            : <Badge variant="secondary">Needs mapping</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
@@ -737,9 +791,10 @@ function InvoicesTab() {
     approved.map((i) => ({
       ...i,
       selected: false,
+      exported: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      
+
       vendorName: i.vendor as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
@@ -748,8 +803,8 @@ function InvoicesTab() {
       splits: [] as SplitLine[],
     })),
   );
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
+  const selectedCount = rows.filter((r) => r.selected && !r.exported).length;
+  const toggleAll = (v: boolean) => setRows(rows.map((r) => (r.exported ? r : { ...r, selected: v })));
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -758,13 +813,27 @@ function InvoicesTab() {
   const [from, setFrom] = useState<Date | undefined>();
   const [to, setTo] = useState<Date | undefined>();
   const [vendorSearch, setVendorSearch] = useState("");
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("unexported");
+
+  const counts = {
+    all: rows.length,
+    exported: rows.filter((r) => r.exported).length,
+    unexported: rows.filter((r) => !r.exported).length,
+  };
 
   const filteredRows = rows.filter((r) =>
+    matchesExportStatus(r.exported, exportStatus) &&
     inDateRange(r.date, from, to) &&
     (vendorSearch === "" ||
       r.vendorName.toLowerCase().includes(vendorSearch.toLowerCase()) ||
       r.invoiceNumber.toLowerCase().includes(vendorSearch.toLowerCase())),
   );
+
+  const handleExport = () => {
+    if (selectedCount === 0) return;
+    setRows(rows.map((r) => (r.selected && !r.exported ? { ...r, exported: true, selected: false } : r)));
+    toast.success(`Pushed ${selectedCount} bills to QuickBooks`);
+  };
 
   return (
     <>
@@ -773,10 +842,10 @@ function InvoicesTab() {
           <span className="font-medium">{pendingCount} invoice{pendingCount > 1 ? "s" : ""}</span> awaiting approval from admin.
         </div>
       )}
-      <AccountingHeader
-        count={selectedCount}
-        onExport={() => toast.success(`Pushed ${selectedCount} bills to QuickBooks`)}
-      />
+      <AccountingHeader count={selectedCount} onExport={handleExport} />
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
+      </div>
       <div className="mb-3">
         <TableFilters
           from={from} to={to} onFromChange={setFrom} onToChange={setTo}
@@ -813,7 +882,7 @@ function InvoicesTab() {
                 return (
                   <Fragment key={r.id}>
                     <TableRow data-state={r.selected ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
+                      <TableCell><Checkbox checked={r.selected} disabled={r.exported} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
@@ -854,9 +923,11 @@ function InvoicesTab() {
                         />
                       </TableCell>
                       <TableCell>
-                        {ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
+                        {r.exported
+                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
+                          : ready
+                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                            : <Badge variant="secondary">Needs mapping</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
@@ -887,33 +958,48 @@ function TopUpsTab() {
     walletTopUps.map((w) => ({
       ...w,
       selected: false,
+      exported: false,
       account: undefined as string | undefined,
       sourceAccount: undefined as string | undefined,
       vatRate: undefined as string | undefined,
     })),
   );
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
+  const selectedCount = rows.filter((r) => r.selected && !r.exported).length;
+  const toggleAll = (v: boolean) => setRows(rows.map((r) => (r.exported ? r : { ...r, selected: v })));
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
   const [from, setFrom] = useState<Date | undefined>();
   const [to, setTo] = useState<Date | undefined>();
   const [refSearch, setRefSearch] = useState("");
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("unexported");
+
+  const counts = {
+    all: rows.length,
+    exported: rows.filter((r) => r.exported).length,
+    unexported: rows.filter((r) => !r.exported).length,
+  };
 
   const filteredRows = rows.filter((r) =>
+    matchesExportStatus(r.exported, exportStatus) &&
     inDateRange(r.date, from, to) &&
     (refSearch === "" ||
       r.reference.toLowerCase().includes(refSearch.toLowerCase()) ||
       (r.source ?? "").toLowerCase().includes(refSearch.toLowerCase())),
   );
 
+  const handleExport = () => {
+    if (selectedCount === 0) return;
+    setRows(rows.map((r) => (r.selected && !r.exported ? { ...r, exported: true, selected: false } : r)));
+    toast.success(`Exported ${selectedCount} top-ups as bank transfers to QuickBooks`);
+  };
+
   return (
     <>
-      <AccountingHeader
-        count={selectedCount}
-        onExport={() => toast.success(`Exported ${selectedCount} top-ups as bank transfers to QuickBooks`)}
-      />
+      <AccountingHeader count={selectedCount} onExport={handleExport} />
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
+      </div>
       <div className="mb-3">
         <TableFilters
           from={from} to={to} onFromChange={setFrom} onToChange={setTo}
@@ -942,7 +1028,7 @@ function TopUpsTab() {
                 const ready = !!r.account && !!r.sourceAccount;
                 return (
                   <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
+                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed" || r.exported} /></TableCell>
                     <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                     <TableCell className="font-mono text-xs">{r.reference}</TableCell>
                     <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
@@ -958,11 +1044,13 @@ function TopUpsTab() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {r.status === "processing"
-                        ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
-                        : ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
+                      {r.exported
+                        ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
+                        : r.status === "processing"
+                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
+                          : ready
+                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                            : <Badge variant="secondary">Needs mapping</Badge>}
                     </TableCell>
                   </TableRow>
                 );
