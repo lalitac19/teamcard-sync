@@ -851,17 +851,17 @@ function InvoicesTab() {
         </div>
       )}
       <AccountingHeader count={selectedCount} onExport={handleExport} />
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-stretch gap-3">
         <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
-      </div>
-      <div className="mb-3">
-        <TableFilters
-          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-          merchant={vendorSearch} onMerchantChange={setVendorSearch}
-          merchantLabel="Vendor / Invoice #"
-          merchantPlaceholder="Search vendor or invoice…"
-          onReset={() => { setFrom(undefined); setTo(undefined); setVendorSearch(""); }}
-        />
+        <div className="flex-1 min-w-[300px]">
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            merchant={vendorSearch} onMerchantChange={setVendorSearch}
+            merchantLabel="Vendor / Invoice #"
+            merchantPlaceholder="Search vendor or invoice…"
+            onReset={() => { setFrom(undefined); setTo(undefined); setVendorSearch(""); }}
+          />
+        </div>
       </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
