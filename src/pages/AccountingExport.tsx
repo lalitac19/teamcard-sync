@@ -732,7 +732,7 @@ function InvoicesTab() {
                         <PlaceOfSupplySelect value={r.placeOfSupply} onChange={(v) => update(r.id, { placeOfSupply: v })} />
                       </TableCell>
                       <TableCell>
-                        <DescriptionInput value={r.description} onChange={(v) => update(r.id, { description: v })} />
+                        <DescriptionInput value={r.lineDescription} onChange={(v) => update(r.id, { lineDescription: v })} />
                       </TableCell>
                       <TableCell>
                         <SplitToggle
