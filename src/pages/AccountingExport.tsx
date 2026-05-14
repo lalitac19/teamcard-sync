@@ -568,6 +568,26 @@ function ReimbursementsTab() {
 
   const pendingCount = reimbursements.filter((r) => r.status === "pending").length;
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [merchant, setMerchant] = useState("");
+  const [memberFilter, setMemberFilter] = useState(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    rows.forEach((r) => {
+      const m = memberById(r.memberId);
+      if (m) map.set(m.id, m.name);
+    });
+    return Array.from(map, ([value, label]) => ({ value, label }));
+  }, [rows]);
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
+    (memberFilter === ALL || r.memberId === memberFilter),
+  );
+
   return (
     <>
       {pendingCount > 0 && (
@@ -579,6 +599,14 @@ function ReimbursementsTab() {
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} reimbursements to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+          merchant={merchant} onMerchantChange={setMerchant}
+          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+        />
+      </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
