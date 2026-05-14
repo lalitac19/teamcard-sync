@@ -40,6 +40,26 @@ const inDateRange = (iso: string, from?: Date, to?: Date) => {
   return true;
 };
 
+/* ---------- Export status filter ---------- */
+type ExportStatus = "all" | "unexported" | "exported";
+
+const ExportStatusFilter = ({ value, onChange, counts }: {
+  value: ExportStatus;
+  onChange: (v: ExportStatus) => void;
+  counts: { all: number; unexported: number; exported: number };
+}) => (
+  <Tabs value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
+    <TabsList className="h-9">
+      <TabsTrigger value="unexported" className="text-xs">Unexported ({counts.unexported})</TabsTrigger>
+      <TabsTrigger value="exported" className="text-xs">Exported ({counts.exported})</TabsTrigger>
+      <TabsTrigger value="all" className="text-xs">All ({counts.all})</TabsTrigger>
+    </TabsList>
+  </Tabs>
+);
+
+const matchesExportStatus = (exported: boolean, filter: ExportStatus) =>
+  filter === "all" || (filter === "exported" ? exported : !exported);
+
 /* ---------- Shared types ---------- */
 interface SplitLine {
   id: string;
