@@ -649,7 +649,7 @@ function InvoicesTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      creditAccount: "2010" as string | undefined,
+      
       vendorName: i.vendor as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
