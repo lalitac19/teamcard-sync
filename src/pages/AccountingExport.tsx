@@ -649,7 +649,7 @@ function InvoicesTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      creditAccount: "2010" as string | undefined,
+      
       vendorName: i.vendor as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
@@ -688,7 +688,6 @@ function InvoicesTab() {
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
-                <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
@@ -699,7 +698,7 @@ function InvoicesTab() {
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = rowReady(r, r.amount);
+                const ready = rowReady(r, r.amount) && !!r.vendorName.trim();
                 const isSplit = !!r.splitOpen;
                 return (
                   <Fragment key={r.id}>
@@ -708,6 +707,7 @@ function InvoicesTab() {
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
                       <TableCell>
                         <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
+                        {!r.vendorName.trim() && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
@@ -716,9 +716,7 @@ function InvoicesTab() {
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
-                      </TableCell>
-                      <TableCell>
-                        <CreditAccountSelect value={r.creditAccount} onChange={(v) => update(r.id, { creditAccount: v })} />
+                        {!isSplit && !r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -740,7 +738,7 @@ function InvoicesTab() {
                           onClick={() => update(r.id, {
                             splitOpen: !isSplit,
                             splits: !isSplit
-                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate, r.creditAccount)])
+                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
                               : r.splits,
                           })}
                         />
@@ -753,13 +751,11 @@ function InvoicesTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={14} className="bg-muted/20 p-3">
+                        <TableCell colSpan={13} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
                             onChange={(lines) => update(r.id, { splits: lines })}
-                            showCredit
-                            defaultCreditAccount={r.creditAccount}
                           />
                         </TableCell>
                       </TableRow>
