@@ -686,11 +686,11 @@ function InvoicesTab() {
               <TableRow>
                 <TableHead className="w-10"><Checkbox onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
                 <TableHead>Invoice #</TableHead>
-                <TableHead>Vendor</TableHead>
                 <TableHead>Issued</TableHead>
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Vendor</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
