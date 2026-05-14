@@ -450,6 +450,7 @@ function CardTxnsTab() {
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                        {!isSplit && !r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         {isSplit
