@@ -31,6 +31,15 @@ const getDefaultFeesAccount = () => {
   return localStorage.getItem(FEES_ACCOUNT_KEY) || "5090";
 };
 
+/* ---------- Date range helper ---------- */
+const inDateRange = (iso: string, from?: Date, to?: Date) => {
+  if (!from && !to) return true;
+  const d = new Date(iso);
+  if (from && d < new Date(from.getFullYear(), from.getMonth(), from.getDate())) return false;
+  if (to && d > new Date(to.getFullYear(), to.getMonth(), to.getDate(), 23, 59, 59)) return false;
+  return true;
+};
+
 /* ---------- Shared types ---------- */
 interface SplitLine {
   id: string;
