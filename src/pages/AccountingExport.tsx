@@ -552,8 +552,8 @@ function ReimbursementsTab() {
                 <TableHead>Merchant / Description</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Vendor</TableHead>
-                <TableHead>Debit account</TableHead>
-                <TableHead>Credit account</TableHead>
+                <TableHead>Debit account <span className="text-destructive">*</span></TableHead>
+                <TableHead>Credit account <span className="text-destructive">*</span></TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
