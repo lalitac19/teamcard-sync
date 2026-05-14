@@ -629,7 +629,7 @@ function ReimbursementsTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const m = memberById(r.memberId);
                 const ready = rowReady(r, r.amount) && !!r.creditAccount && (r.splitOpen ? splitsReady(r.splits ?? [], true) : true);
                 const isSplit = !!r.splitOpen;
