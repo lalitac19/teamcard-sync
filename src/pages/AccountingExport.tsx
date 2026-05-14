@@ -398,6 +398,26 @@ function CardTxnsTab() {
   const feesAccountInfo = chartOfAccounts.find((a) => a.code === feesAccount);
   const totalFees = rows.reduce((s, r) => s + (r.fee || 0), 0);
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [merchant, setMerchant] = useState("");
+  const [memberFilter, setMemberFilter] = useState(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    rows.forEach((r) => {
+      const m = memberById(r.memberId);
+      if (m) map.set(m.id, m.name);
+    });
+    return Array.from(map, ([value, label]) => ({ value, label }));
+  }, [rows]);
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
+    (memberFilter === ALL || r.memberId === memberFilter),
+  );
+
   return (
     <>
       {pendingCount > 0 && (
@@ -409,6 +429,14 @@ function CardTxnsTab() {
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} transactions to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+          merchant={merchant} onMerchantChange={setMerchant}
+          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+        />
+      </div>
       {totalFees > 0 && feesAccountInfo && (
         <div className="mb-3 flex items-start gap-2 rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
