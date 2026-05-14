@@ -421,7 +421,7 @@ function CardTxnsTab() {
                 <TableHead>Member</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead className="text-right">Fees</TableHead>
-                <TableHead>Debit account</TableHead>
+                <TableHead>Debit account <span className="text-destructive">*</span></TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
@@ -805,8 +805,8 @@ function TopUpsTab() {
                 <TableHead>Date</TableHead>
                 <TableHead>Reference</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Debit account</TableHead>
-                <TableHead>Source</TableHead>
+                <TableHead>Debit account <span className="text-destructive">*</span></TableHead>
+                <TableHead>Source <span className="text-destructive">*</span></TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
