@@ -470,7 +470,7 @@ function CardTxnsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow key={r.id + "-split"}>
-                        <TableCell colSpan={10} className="bg-muted/20 p-3">
+                        <TableCell colSpan={12} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
