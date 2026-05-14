@@ -539,6 +539,8 @@ function ReimbursementsTab() {
                 <TableHead>Debit account</TableHead>
                 <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
+                <TableHead>TRN</TableHead>
+                <TableHead>Place of supply</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
