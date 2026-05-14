@@ -514,7 +514,7 @@ function ReimbursementsTab() {
       selected: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      creditAccount: "2020" as string | undefined,
+      creditAccount: undefined as string | undefined,
       vendorName: "" as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
@@ -552,8 +552,8 @@ function ReimbursementsTab() {
                 <TableHead>Merchant / Description</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Vendor</TableHead>
-                <TableHead>Debit account</TableHead>
-                <TableHead>Credit account</TableHead>
+                <TableHead>Debit account <span className="text-destructive">*</span></TableHead>
+                <TableHead>Credit account <span className="text-destructive">*</span></TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
@@ -689,8 +689,8 @@ function InvoicesTab() {
                 <TableHead>Issued</TableHead>
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Debit account</TableHead>
-                <TableHead>Vendor</TableHead>
+                <TableHead>Debit account <span className="text-destructive">*</span></TableHead>
+                <TableHead>Vendor <span className="text-destructive">*</span></TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
