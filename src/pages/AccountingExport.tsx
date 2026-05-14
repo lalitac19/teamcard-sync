@@ -707,6 +707,7 @@ function InvoicesTab() {
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
                       <TableCell>
                         <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
+                        {!r.vendorName.trim() && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
