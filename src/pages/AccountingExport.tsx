@@ -786,7 +786,7 @@ function InvoicesTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const ready = rowReady(r, r.amount) && !!r.vendorName.trim();
                 const isSplit = !!r.splitOpen;
                 return (
