@@ -729,7 +729,7 @@ function InvoicesTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={11} className="bg-muted/20 p-3">
+                        <TableCell colSpan={13} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
