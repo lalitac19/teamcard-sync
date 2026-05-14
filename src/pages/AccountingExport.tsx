@@ -48,17 +48,21 @@ const ExportStatusFilter = ({ value, onChange, counts }: {
   onChange: (v: ExportStatus) => void;
   counts: { all: number; unexported: number; exported: number };
 }) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-xs text-muted-foreground">Status</label>
-    <Select value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
-      <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
-      <SelectContent>
-        <SelectItem value="unexported">Unexported ({counts.unexported})</SelectItem>
-        <SelectItem value="exported">Exported ({counts.exported})</SelectItem>
-        <SelectItem value="all">All ({counts.all})</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+  <Card className="shadow-soft">
+    <CardContent className="flex items-end gap-3 p-4">
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-muted-foreground">Status</label>
+        <Select value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
+          <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unexported">Unexported ({counts.unexported})</SelectItem>
+            <SelectItem value="exported">Exported ({counts.exported})</SelectItem>
+            <SelectItem value="all">All ({counts.all})</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </CardContent>
+  </Card>
 );
 
 const matchesExportStatus = (exported: boolean, filter: ExportStatus) =>
