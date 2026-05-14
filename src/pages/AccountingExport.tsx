@@ -450,6 +450,7 @@ function CardTxnsTab() {
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                        {!isSplit && !r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -564,7 +565,7 @@ function ReimbursementsTab() {
             <TableBody>
               {rows.map((r) => {
                 const m = memberById(r.memberId);
-                const ready = rowReady(r, r.amount);
+                const ready = rowReady(r, r.amount) && !!r.creditAccount && (r.splitOpen ? splitsReady(r.splits ?? [], true) : true);
                 const isSplit = !!r.splitOpen;
                 return (
                   <Fragment key={r.id}>
@@ -581,9 +582,11 @@ function ReimbursementsTab() {
                         {isSplit
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
+                        {!isSplit && !r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         <CreditAccountSelect value={r.creditAccount} onChange={(v) => update(r.id, { creditAccount: v })} />
+                        {!r.creditAccount && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -683,11 +686,11 @@ function InvoicesTab() {
               <TableRow>
                 <TableHead className="w-10"><Checkbox onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
                 <TableHead>Invoice #</TableHead>
-                <TableHead>Vendor</TableHead>
                 <TableHead>Issued</TableHead>
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Vendor</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
@@ -705,10 +708,6 @@ function InvoicesTab() {
                     <TableRow data-state={r.selected ? "selected" : undefined}>
                       <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
-                      <TableCell>
-                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
-                        {!r.vendorName.trim() && <p className="mt-1 text-[10px] text-destructive">Required</p>}
-                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
@@ -717,6 +716,10 @@ function InvoicesTab() {
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
                         {!isSplit && !r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
+                      </TableCell>
+                      <TableCell>
+                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
+                        {!r.vendorName.trim() && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         {isSplit
@@ -801,9 +804,9 @@ function TopUpsTab() {
                 <TableHead className="w-10"><Checkbox onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Reference</TableHead>
-                <TableHead>Source</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -815,15 +818,17 @@ function TopUpsTab() {
                     <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
                     <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                     <TableCell className="font-mono text-xs">{r.reference}</TableCell>
+                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
+                    <TableCell>
+                      <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
+                      {!r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
                         <span className="text-xs text-muted-foreground">{r.source}</span>
                         <BankAccountSelect value={r.sourceAccount} onChange={(v) => update(r.id, { sourceAccount: v })} />
+                        {!r.sourceAccount && <p className="text-[10px] text-destructive">Required</p>}
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
-                    <TableCell>
-                      <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
                     </TableCell>
                     <TableCell>
                       {r.status === "processing"
