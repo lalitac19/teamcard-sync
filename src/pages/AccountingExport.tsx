@@ -48,13 +48,17 @@ const ExportStatusFilter = ({ value, onChange, counts }: {
   onChange: (v: ExportStatus) => void;
   counts: { all: number; unexported: number; exported: number };
 }) => (
-  <Tabs value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
-    <TabsList className="h-9">
-      <TabsTrigger value="unexported" className="text-xs">Unexported ({counts.unexported})</TabsTrigger>
-      <TabsTrigger value="exported" className="text-xs">Exported ({counts.exported})</TabsTrigger>
-      <TabsTrigger value="all" className="text-xs">All ({counts.all})</TabsTrigger>
-    </TabsList>
-  </Tabs>
+  <div className="flex flex-col gap-1.5">
+    <label className="text-xs text-muted-foreground">Status</label>
+    <Select value={value} onValueChange={(v) => onChange(v as ExportStatus)}>
+      <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="unexported">Unexported ({counts.unexported})</SelectItem>
+        <SelectItem value="exported">Exported ({counts.exported})</SelectItem>
+        <SelectItem value="all">All ({counts.all})</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
 );
 
 const matchesExportStatus = (exported: boolean, filter: ExportStatus) =>
