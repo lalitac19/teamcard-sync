@@ -421,6 +421,7 @@ function CardTxnsTab() {
     postedTxns.map((t) => ({
       ...t,
       selected: false,
+      exported: false,
       account: t.debitAccount as string | undefined,
       vatRate: undefined as string | undefined,
       trn: "" as string,
@@ -430,8 +431,8 @@ function CardTxnsTab() {
       splits: [] as SplitLine[],
     })),
   );
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
+  const selectedCount = rows.filter((r) => r.selected && !r.exported).length;
+  const toggleAll = (v: boolean) => setRows(rows.map((r) => (r.exported ? r : { ...r, selected: v })));
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -443,6 +444,7 @@ function CardTxnsTab() {
   const [to, setTo] = useState<Date | undefined>();
   const [merchant, setMerchant] = useState("");
   const [memberFilter, setMemberFilter] = useState(ALL);
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("unexported");
 
   const cardholderOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -453,11 +455,24 @@ function CardTxnsTab() {
     return Array.from(map, ([value, label]) => ({ value, label }));
   }, [rows]);
 
+  const counts = {
+    all: rows.length,
+    exported: rows.filter((r) => r.exported).length,
+    unexported: rows.filter((r) => !r.exported).length,
+  };
+
   const filteredRows = rows.filter((r) =>
+    matchesExportStatus(r.exported, exportStatus) &&
     inDateRange(r.date, from, to) &&
     (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
     (memberFilter === ALL || r.memberId === memberFilter),
   );
+
+  const handleExport = () => {
+    if (selectedCount === 0) return;
+    setRows(rows.map((r) => (r.selected && !r.exported ? { ...r, exported: true, selected: false } : r)));
+    toast.success(`Exported ${selectedCount} transactions to QuickBooks`);
+  };
 
   return (
     <>
@@ -466,10 +481,10 @@ function CardTxnsTab() {
           <span className="font-medium">{pendingCount} card transaction{pendingCount > 1 ? "s" : ""}</span> pending settlement — they'll appear here once posted.
         </div>
       )}
-      <AccountingHeader
-        count={selectedCount}
-        onExport={() => toast.success(`Exported ${selectedCount} transactions to QuickBooks`)}
-      />
+      <AccountingHeader count={selectedCount} onExport={handleExport} />
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
+      </div>
       <div className="mb-3">
         <TableFilters
           from={from} to={to} onFromChange={setFrom} onToChange={setTo}
