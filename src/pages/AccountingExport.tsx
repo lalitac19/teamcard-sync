@@ -71,25 +71,46 @@ const splitsReady = (lines: SplitLine[], requireCredit = false) =>
   lines.length > 0 && lines.every((l) => !!l.debitAccount && (!!l.vatRate || l.nonBusiness) && (!requireCredit || !!l.creditAccount));
 
 /* ---------- Reusable selects ---------- */
-const AccountingHeader = ({ count, onExport }: { count: number; onExport: () => void }) => (
-  <div className="mb-4 flex items-center justify-between rounded-lg border border-border bg-secondary/40 p-3">
-    <div className="flex items-center gap-3">
-      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
-        <CheckCircle2 className="h-4 w-4" />
+const AccountingHeader = ({ count, onExport }: { count: number; onExport: () => void }) => {
+  const [syncing, setSyncing] = useState(false);
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+
+  const handleSync = () => {
+    setSyncing(true);
+    const t = toast.loading("Syncing chart of accounts from QuickBooks…");
+    setTimeout(() => {
+      setSyncing(false);
+      setLastSynced(new Date());
+      toast.success(`Chart synced • ${chartOfAccounts.length} accounts`, { id: t });
+    }, 1200);
+  };
+
+  return (
+    <div className="mb-4 flex items-center justify-between rounded-lg border border-border bg-secondary/40 p-3">
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <CheckCircle2 className="h-4 w-4" />
+        </div>
+        <div className="text-sm">
+          <p className="font-medium">QuickBooks Online connected</p>
+          <p className="text-xs text-muted-foreground">
+            Chart of accounts synced • {chartOfAccounts.length} accounts
+            {lastSynced && ` • Last synced ${lastSynced.toLocaleTimeString()}`}
+          </p>
+        </div>
       </div>
-      <div className="text-sm">
-        <p className="font-medium">QuickBooks Online connected</p>
-        <p className="text-xs text-muted-foreground">Chart of accounts synced • {chartOfAccounts.length} accounts</p>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={handleSync} disabled={syncing}>
+          <RefreshCw className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
+          {syncing ? "Syncing…" : "Sync chart"}
+        </Button>
+        <Button size="sm" className="gap-2" onClick={onExport}>
+          <Upload className="h-4 w-4" /> Export selected ({count})
+        </Button>
       </div>
     </div>
-    <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" className="gap-2"><RefreshCw className="h-3.5 w-3.5" /> Sync chart</Button>
-      <Button size="sm" className="gap-2" onClick={onExport}>
-        <Upload className="h-4 w-4" /> Export selected ({count})
-      </Button>
-    </div>
-  </div>
-);
+  );
+};
 
 const AccountSelect = ({ value, onChange, size = "sm" }: { value?: string; onChange: (v: string) => void; size?: "sm" | "xs" }) => (
   <Select value={value} onValueChange={onChange}>
