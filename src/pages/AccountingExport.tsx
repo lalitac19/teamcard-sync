@@ -791,9 +791,10 @@ function InvoicesTab() {
     approved.map((i) => ({
       ...i,
       selected: false,
+      exported: false,
       account: undefined as string | undefined,
       vatRate: undefined as string | undefined,
-      
+
       vendorName: i.vendor as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
@@ -802,8 +803,8 @@ function InvoicesTab() {
       splits: [] as SplitLine[],
     })),
   );
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const toggleAll = (v: boolean) => setRows(rows.map((r) => ({ ...r, selected: v })));
+  const selectedCount = rows.filter((r) => r.selected && !r.exported).length;
+  const toggleAll = (v: boolean) => setRows(rows.map((r) => (r.exported ? r : { ...r, selected: v })));
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -812,13 +813,27 @@ function InvoicesTab() {
   const [from, setFrom] = useState<Date | undefined>();
   const [to, setTo] = useState<Date | undefined>();
   const [vendorSearch, setVendorSearch] = useState("");
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("unexported");
+
+  const counts = {
+    all: rows.length,
+    exported: rows.filter((r) => r.exported).length,
+    unexported: rows.filter((r) => !r.exported).length,
+  };
 
   const filteredRows = rows.filter((r) =>
+    matchesExportStatus(r.exported, exportStatus) &&
     inDateRange(r.date, from, to) &&
     (vendorSearch === "" ||
       r.vendorName.toLowerCase().includes(vendorSearch.toLowerCase()) ||
       r.invoiceNumber.toLowerCase().includes(vendorSearch.toLowerCase())),
   );
+
+  const handleExport = () => {
+    if (selectedCount === 0) return;
+    setRows(rows.map((r) => (r.selected && !r.exported ? { ...r, exported: true, selected: false } : r)));
+    toast.success(`Pushed ${selectedCount} bills to QuickBooks`);
+  };
 
   return (
     <>
@@ -827,10 +842,10 @@ function InvoicesTab() {
           <span className="font-medium">{pendingCount} invoice{pendingCount > 1 ? "s" : ""}</span> awaiting approval from admin.
         </div>
       )}
-      <AccountingHeader
-        count={selectedCount}
-        onExport={() => toast.success(`Pushed ${selectedCount} bills to QuickBooks`)}
-      />
+      <AccountingHeader count={selectedCount} onExport={handleExport} />
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
+      </div>
       <div className="mb-3">
         <TableFilters
           from={from} to={to} onFromChange={setFrom} onToChange={setTo}
