@@ -705,6 +705,12 @@ function InvoicesTab() {
                           : <VatSelect value={r.vatRate} onChange={(v) => update(r.id, { vatRate: v })} />}
                       </TableCell>
                       <TableCell>
+                        <TrnInput value={r.trn} onChange={(v) => update(r.id, { trn: v })} />
+                      </TableCell>
+                      <TableCell>
+                        <PlaceOfSupplySelect value={r.placeOfSupply} onChange={(v) => update(r.id, { placeOfSupply: v })} />
+                      </TableCell>
+                      <TableCell>
                         <SplitToggle
                           open={isSplit}
                           onClick={() => update(r.id, {
