@@ -490,16 +490,16 @@ function CardTxnsTab() {
         </div>
       )}
       <AccountingHeader count={selectedCount} onExport={handleExport} />
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-stretch gap-3">
         <ExportStatusFilter value={exportStatus} onChange={setExportStatus} counts={counts} />
-      </div>
-      <div className="mb-3">
-        <TableFilters
-          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
-          merchant={merchant} onMerchantChange={setMerchant}
-          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
-        />
+        <div className="flex-1 min-w-[300px]">
+          <TableFilters
+            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+            cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+            merchant={merchant} onMerchantChange={setMerchant}
+            onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+          />
+        </div>
       </div>
       {totalFees > 0 && feesAccountInfo && (
         <div className="mb-3 flex items-start gap-2 rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
