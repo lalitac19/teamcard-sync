@@ -734,6 +734,17 @@ function InvoicesTab() {
 
   const pendingCount = invoices.filter((i) => i.status === "pending").length;
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [vendorSearch, setVendorSearch] = useState("");
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (vendorSearch === "" ||
+      r.vendorName.toLowerCase().includes(vendorSearch.toLowerCase()) ||
+      r.invoiceNumber.toLowerCase().includes(vendorSearch.toLowerCase())),
+  );
+
   return (
     <>
       {pendingCount > 0 && (
@@ -745,6 +756,15 @@ function InvoicesTab() {
         count={selectedCount}
         onExport={() => toast.success(`Pushed ${selectedCount} bills to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          merchant={vendorSearch} onMerchantChange={setVendorSearch}
+          merchantLabel="Vendor / Invoice #"
+          merchantPlaceholder="Search vendor or invoice…"
+          onReset={() => { setFrom(undefined); setTo(undefined); setVendorSearch(""); }}
+        />
+      </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
