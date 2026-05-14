@@ -572,9 +572,11 @@ function CardTxnsTab() {
                         />
                       </TableCell>
                       <TableCell>
-                        {ready
-                          ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                          : <Badge variant="secondary">Needs mapping</Badge>}
+                        {r.exported
+                          ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
+                          : ready
+                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
+                            : <Badge variant="secondary">Needs mapping</Badge>}
                       </TableCell>
                     </TableRow>
                     {isSplit && (
