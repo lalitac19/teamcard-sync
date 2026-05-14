@@ -1,4 +1,5 @@
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
+import { TableFilters, ALL } from "@/components/TableFilters";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,15 @@ const FEES_ACCOUNT_KEY = "accounting:feesAccount";
 const getDefaultFeesAccount = () => {
   if (typeof window === "undefined") return "5090";
   return localStorage.getItem(FEES_ACCOUNT_KEY) || "5090";
+};
+
+/* ---------- Date range helper ---------- */
+const inDateRange = (iso: string, from?: Date, to?: Date) => {
+  if (!from && !to) return true;
+  const d = new Date(iso);
+  if (from && d < new Date(from.getFullYear(), from.getMonth(), from.getDate())) return false;
+  if (to && d > new Date(to.getFullYear(), to.getMonth(), to.getDate(), 23, 59, 59)) return false;
+  return true;
 };
 
 /* ---------- Shared types ---------- */
@@ -388,6 +398,26 @@ function CardTxnsTab() {
   const feesAccountInfo = chartOfAccounts.find((a) => a.code === feesAccount);
   const totalFees = rows.reduce((s, r) => s + (r.fee || 0), 0);
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [merchant, setMerchant] = useState("");
+  const [memberFilter, setMemberFilter] = useState(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    rows.forEach((r) => {
+      const m = memberById(r.memberId);
+      if (m) map.set(m.id, m.name);
+    });
+    return Array.from(map, ([value, label]) => ({ value, label }));
+  }, [rows]);
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
+    (memberFilter === ALL || r.memberId === memberFilter),
+  );
+
   return (
     <>
       {pendingCount > 0 && (
@@ -399,6 +429,14 @@ function CardTxnsTab() {
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} transactions to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+          merchant={merchant} onMerchantChange={setMerchant}
+          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+        />
+      </div>
       {totalFees > 0 && feesAccountInfo && (
         <div className="mb-3 flex items-start gap-2 rounded-md border border-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
@@ -431,7 +469,7 @@ function CardTxnsTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const m = memberById(r.memberId);
                 const ready = rowReady(r, r.amount);
                 const isSplit = !!r.splitOpen;
@@ -530,6 +568,26 @@ function ReimbursementsTab() {
 
   const pendingCount = reimbursements.filter((r) => r.status === "pending").length;
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [merchant, setMerchant] = useState("");
+  const [memberFilter, setMemberFilter] = useState(ALL);
+
+  const cardholderOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    rows.forEach((r) => {
+      const m = memberById(r.memberId);
+      if (m) map.set(m.id, m.name);
+    });
+    return Array.from(map, ([value, label]) => ({ value, label }));
+  }, [rows]);
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (merchant === "" || r.merchant.toLowerCase().includes(merchant.toLowerCase())) &&
+    (memberFilter === ALL || r.memberId === memberFilter),
+  );
+
   return (
     <>
       {pendingCount > 0 && (
@@ -541,6 +599,14 @@ function ReimbursementsTab() {
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} reimbursements to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          cardholders={cardholderOptions} cardholderId={memberFilter} onCardholderChange={setMemberFilter}
+          merchant={merchant} onMerchantChange={setMerchant}
+          onReset={() => { setFrom(undefined); setTo(undefined); setMerchant(""); setMemberFilter(ALL); }}
+        />
+      </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
@@ -563,7 +629,7 @@ function ReimbursementsTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const m = memberById(r.memberId);
                 const ready = rowReady(r, r.amount) && !!r.creditAccount && (r.splitOpen ? splitsReady(r.splits ?? [], true) : true);
                 const isSplit = !!r.splitOpen;
@@ -668,6 +734,17 @@ function InvoicesTab() {
 
   const pendingCount = invoices.filter((i) => i.status === "pending").length;
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [vendorSearch, setVendorSearch] = useState("");
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (vendorSearch === "" ||
+      r.vendorName.toLowerCase().includes(vendorSearch.toLowerCase()) ||
+      r.invoiceNumber.toLowerCase().includes(vendorSearch.toLowerCase())),
+  );
+
   return (
     <>
       {pendingCount > 0 && (
@@ -679,6 +756,15 @@ function InvoicesTab() {
         count={selectedCount}
         onExport={() => toast.success(`Pushed ${selectedCount} bills to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          merchant={vendorSearch} onMerchantChange={setVendorSearch}
+          merchantLabel="Vendor / Invoice #"
+          merchantPlaceholder="Search vendor or invoice…"
+          onReset={() => { setFrom(undefined); setTo(undefined); setVendorSearch(""); }}
+        />
+      </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
@@ -700,7 +786,7 @@ function InvoicesTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const ready = rowReady(r, r.amount) && !!r.vendorName.trim();
                 const isSplit = !!r.splitOpen;
                 return (
@@ -790,12 +876,32 @@ function TopUpsTab() {
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [refSearch, setRefSearch] = useState("");
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (refSearch === "" ||
+      r.reference.toLowerCase().includes(refSearch.toLowerCase()) ||
+      (r.source ?? "").toLowerCase().includes(refSearch.toLowerCase())),
+  );
+
   return (
     <>
       <AccountingHeader
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} top-ups as bank transfers to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          merchant={refSearch} onMerchantChange={setRefSearch}
+          merchantLabel="Reference / Source"
+          merchantPlaceholder="Search reference or source…"
+          onReset={() => { setFrom(undefined); setTo(undefined); setRefSearch(""); }}
+        />
+      </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
@@ -811,7 +917,7 @@ function TopUpsTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const ready = !!r.account && !!r.sourceAccount;
                 return (
                   <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
