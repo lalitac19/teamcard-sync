@@ -1028,7 +1028,7 @@ function TopUpsTab() {
                 const ready = !!r.account && !!r.sourceAccount;
                 return (
                   <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
-                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
+                    <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed" || r.exported} /></TableCell>
                     <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                     <TableCell className="font-mono text-xs">{r.reference}</TableCell>
                     <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
