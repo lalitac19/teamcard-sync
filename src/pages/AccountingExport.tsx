@@ -162,6 +162,15 @@ const PlaceOfSupplySelect = ({ value, onChange }: { value?: string; onChange: (v
   </Select>
 );
 
+const DescriptionInput = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => (
+  <Input
+    value={value ?? ""}
+    onChange={(e) => onChange(e.target.value)}
+    placeholder="Description"
+    className="h-8 w-[200px] text-xs"
+  />
+);
+
 const VatSelect = ({ value, onChange, disabled }: { value?: string; onChange: (v: string) => void; disabled?: boolean }) => (
   <Select value={value} onValueChange={onChange} disabled={disabled}>
     <SelectTrigger className="h-8 w-[110px] border-dashed text-xs">
@@ -365,6 +374,7 @@ function CardTxnsTab() {
       vatRate: undefined as string | undefined,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
+      lineDescription: "" as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
@@ -415,6 +425,7 @@ function CardTxnsTab() {
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -452,6 +463,9 @@ function CardTxnsTab() {
                         <PlaceOfSupplySelect value={r.placeOfSupply} onChange={(v) => update(r.id, { placeOfSupply: v })} />
                       </TableCell>
                       <TableCell>
+                        <DescriptionInput value={r.lineDescription} onChange={(v) => update(r.id, { lineDescription: v })} />
+                      </TableCell>
+                      <TableCell>
                         <SplitToggle
                           open={isSplit}
                           onClick={() => update(r.id, {
@@ -470,7 +484,7 @@ function CardTxnsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow key={r.id + "-split"}>
-                        <TableCell colSpan={12} className="bg-muted/20 p-3">
+                        <TableCell colSpan={13} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
@@ -503,6 +517,7 @@ function ReimbursementsTab() {
       vendorName: "" as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
+      lineDescription: "" as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
@@ -541,6 +556,7 @@ function ReimbursementsTab() {
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -581,6 +597,9 @@ function ReimbursementsTab() {
                         <PlaceOfSupplySelect value={r.placeOfSupply} onChange={(v) => update(r.id, { placeOfSupply: v })} />
                       </TableCell>
                       <TableCell>
+                        <DescriptionInput value={r.lineDescription} onChange={(v) => update(r.id, { lineDescription: v })} />
+                      </TableCell>
+                      <TableCell>
                         <SplitToggle
                           open={isSplit}
                           onClick={() => update(r.id, {
@@ -599,7 +618,7 @@ function ReimbursementsTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={13} className="bg-muted/20 p-3">
+                        <TableCell colSpan={14} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
@@ -634,6 +653,7 @@ function InvoicesTab() {
       vendorName: i.vendor as string,
       trn: "" as string,
       placeOfSupply: undefined as string | undefined,
+      description: "" as string,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
@@ -672,6 +692,7 @@ function InvoicesTab() {
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead className="w-24">Split</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -711,6 +732,9 @@ function InvoicesTab() {
                         <PlaceOfSupplySelect value={r.placeOfSupply} onChange={(v) => update(r.id, { placeOfSupply: v })} />
                       </TableCell>
                       <TableCell>
+                        <DescriptionInput value={r.description} onChange={(v) => update(r.id, { description: v })} />
+                      </TableCell>
+                      <TableCell>
                         <SplitToggle
                           open={isSplit}
                           onClick={() => update(r.id, {
@@ -729,7 +753,7 @@ function InvoicesTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={13} className="bg-muted/20 p-3">
+                        <TableCell colSpan={14} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
