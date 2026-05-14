@@ -688,7 +688,6 @@ function InvoicesTab() {
                 <TableHead>Due</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
-                <TableHead>Credit account</TableHead>
                 <TableHead>VAT</TableHead>
                 <TableHead>TRN</TableHead>
                 <TableHead>Place of supply</TableHead>
@@ -699,7 +698,7 @@ function InvoicesTab() {
             </TableHeader>
             <TableBody>
               {rows.map((r) => {
-                const ready = rowReady(r, r.amount);
+                const ready = rowReady(r, r.amount) && !!r.vendorName.trim();
                 const isSplit = !!r.splitOpen;
                 return (
                   <Fragment key={r.id}>
