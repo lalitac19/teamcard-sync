@@ -804,9 +804,9 @@ function TopUpsTab() {
                 <TableHead className="w-10"><Checkbox onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Reference</TableHead>
-                <TableHead>Source</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Debit account</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -818,15 +818,17 @@ function TopUpsTab() {
                     <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} disabled={r.status !== "completed"} /></TableCell>
                     <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                     <TableCell className="font-mono text-xs">{r.reference}</TableCell>
+                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
+                    <TableCell>
+                      <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
+                      {!r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
                         <span className="text-xs text-muted-foreground">{r.source}</span>
                         <BankAccountSelect value={r.sourceAccount} onChange={(v) => update(r.id, { sourceAccount: v })} />
+                        {!r.sourceAccount && <p className="text-[10px] text-destructive">Required</p>}
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right text-sm font-semibold text-success">+{formatCurrency(r.amount)}</TableCell>
-                    <TableCell>
-                      <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />
                     </TableCell>
                     <TableCell>
                       {r.status === "processing"
