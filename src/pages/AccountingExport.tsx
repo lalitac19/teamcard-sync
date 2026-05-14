@@ -1050,9 +1050,7 @@ function TopUpsTab() {
                         ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Exported</Badge>
                         : r.status === "processing"
                           ? <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Processing</Badge>
-                          : ready
-                            ? <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Ready</Badge>
-                            : <Badge variant="secondary">Needs mapping</Badge>}
+                          : <Badge variant="secondary">Unexported</Badge>}
                     </TableCell>
                   </TableRow>
                 );
