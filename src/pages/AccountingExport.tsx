@@ -917,7 +917,7 @@ function TopUpsTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => {
+              {filteredRows.map((r) => {
                 const ready = !!r.account && !!r.sourceAccount;
                 return (
                   <TableRow key={r.id} data-state={r.selected ? "selected" : undefined}>
