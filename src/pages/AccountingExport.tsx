@@ -708,10 +708,6 @@ function InvoicesTab() {
                     <TableRow data-state={r.selected ? "selected" : undefined}>
                       <TableCell><Checkbox checked={r.selected} onCheckedChange={(v) => update(r.id, { selected: !!v })} /></TableCell>
                       <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
-                      <TableCell>
-                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
-                        {!r.vendorName.trim() && <p className="mt-1 text-[10px] text-destructive">Required</p>}
-                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
                       <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
@@ -720,6 +716,10 @@ function InvoicesTab() {
                           ? <span className="text-xs text-muted-foreground italic">Per line below</span>
                           : <AccountSelect value={r.account} onChange={(v) => update(r.id, { account: v })} />}
                         {!isSplit && !r.account && <p className="mt-1 text-[10px] text-destructive">Required</p>}
+                      </TableCell>
+                      <TableCell>
+                        <VendorInput value={r.vendorName} onChange={(v) => update(r.id, { vendorName: v })} placeholder={r.vendor} />
+                        {!r.vendorName.trim() && <p className="mt-1 text-[10px] text-destructive">Required</p>}
                       </TableCell>
                       <TableCell>
                         {isSplit
