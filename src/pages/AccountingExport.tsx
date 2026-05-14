@@ -876,12 +876,32 @@ function TopUpsTab() {
   const update = (id: string, patch: Partial<typeof rows[number]>) =>
     setRows(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
+  const [from, setFrom] = useState<Date | undefined>();
+  const [to, setTo] = useState<Date | undefined>();
+  const [refSearch, setRefSearch] = useState("");
+
+  const filteredRows = rows.filter((r) =>
+    inDateRange(r.date, from, to) &&
+    (refSearch === "" ||
+      r.reference.toLowerCase().includes(refSearch.toLowerCase()) ||
+      (r.source ?? "").toLowerCase().includes(refSearch.toLowerCase())),
+  );
+
   return (
     <>
       <AccountingHeader
         count={selectedCount}
         onExport={() => toast.success(`Exported ${selectedCount} top-ups as bank transfers to QuickBooks`)}
       />
+      <div className="mb-3">
+        <TableFilters
+          from={from} to={to} onFromChange={setFrom} onToChange={setTo}
+          merchant={refSearch} onMerchantChange={setRefSearch}
+          merchantLabel="Reference / Source"
+          merchantPlaceholder="Search reference or source…"
+          onReset={() => { setFrom(undefined); setTo(undefined); setRefSearch(""); }}
+        />
+      </div>
       <Card className="shadow-soft">
         <CardContent className="p-0">
           <Table>
