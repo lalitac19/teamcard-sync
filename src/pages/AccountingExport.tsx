@@ -738,7 +738,7 @@ function InvoicesTab() {
                           onClick={() => update(r.id, {
                             splitOpen: !isSplit,
                             splits: !isSplit
-                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate, r.creditAccount)])
+                             ? (r.splits && r.splits.length > 0 ? r.splits : [newLine(r.amount, r.account, r.vatRate)])
                               : r.splits,
                           })}
                         />
@@ -751,13 +751,11 @@ function InvoicesTab() {
                     </TableRow>
                     {isSplit && (
                       <TableRow>
-                        <TableCell colSpan={14} className="bg-muted/20 p-3">
+                        <TableCell colSpan={13} className="bg-muted/20 p-3">
                           <SplitEditor
                             total={r.amount}
                             lines={r.splits ?? []}
                             onChange={(lines) => update(r.id, { splits: lines })}
-                            showCredit
-                            defaultCreditAccount={r.creditAccount}
                           />
                         </TableCell>
                       </TableRow>
