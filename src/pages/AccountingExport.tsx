@@ -501,6 +501,8 @@ function ReimbursementsTab() {
       vatRate: undefined as string | undefined,
       creditAccount: "2020" as string | undefined,
       vendorName: "" as string,
+      trn: "" as string,
+      placeOfSupply: undefined as string | undefined,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
