@@ -363,6 +363,8 @@ function CardTxnsTab() {
       selected: false,
       account: t.debitAccount as string | undefined,
       vatRate: undefined as string | undefined,
+      trn: "" as string,
+      placeOfSupply: undefined as string | undefined,
       splitOpen: false,
       splits: [] as SplitLine[],
     })),
