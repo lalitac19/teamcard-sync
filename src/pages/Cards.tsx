@@ -842,7 +842,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   // Geography controls
   const [geoMode, setGeoMode] = useState<"allow" | "block">("allow");
-  const [regions, setRegions] = useState<string[]>(["US", "GB"]);
+  const [regions, setRegions] = useState<string[]>([]);
   
 
   // Replace card
@@ -1091,19 +1091,19 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <div>
                   <p className="text-sm font-medium">Geography</p>
                   <p className="text-xs text-muted-foreground">
-                    Mark countries to restrict on this card.
+                    Mark regions to restrict on this card.
                   </p>
                 </div>
                 <span className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground">Restrict</span>
               </div>
-              <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto rounded-lg border p-3">
-                {COUNTRIES.map((c) => {
-                  const active = regions.includes(c.code);
+              <div className="grid grid-cols-2 gap-2 rounded-lg border p-3">
+                {(["Domestic", "International"] as const).map((label) => {
+                  const active = regions.includes(label);
                   return (
                     <button
-                      key={c.code}
+                      key={label}
                       type="button"
-                      onClick={() => toggleItem(regions, setRegions, c.code)}
+                      onClick={() => toggleItem(regions, setRegions, label)}
                       className="flex items-center gap-2 text-left text-sm"
                     >
                       <span
@@ -1113,7 +1113,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                       >
                         {active && <X className="h-3 w-3" strokeWidth={3} />}
                       </span>
-                      {c.name} ({c.code})
+                      {label}
                     </button>
                   );
                 })}
