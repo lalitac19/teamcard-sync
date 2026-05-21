@@ -994,7 +994,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <Select value={merchantMode} onValueChange={(v) => setMerchantMode(v as "allow" | "block")}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="allow">Allow only selected</SelectItem>
+                    <SelectItem value="allow">Restrict to selected</SelectItem>
                     <SelectItem value="block">Block selected</SelectItem>
                   </SelectContent>
                 </Select>
