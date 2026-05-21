@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import {
   walletTopUps, cards as allCards, walletBalance, walletAvailable,
-  totalAllocatedLimits, memberById,
+  totalSpentAcrossCards, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import { Plus, Wallet as WalletIcon, Lock, Copy, Info } from "lucide-react";
