@@ -835,6 +835,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">(
     card.limitPeriod === "per-transaction" ? "monthly" : (card.limitPeriod as "daily" | "weekly" | "monthly"),
   );
+  const [atmEnabled, setAtmEnabled] = useState(!!card.atmDailyLimit);
   const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
   // Wallet pool is shared — caps are not reservations. Show available for info only.
   const walletPoolAvailable = walletAvailable();
