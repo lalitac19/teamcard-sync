@@ -63,18 +63,18 @@ const Wallet = () => {
           </div>
           <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
           <p className="mt-1 text-xs text-white/60">
-            The wallet is a pool of funds — not a card. Money is spent only after it is allocated to a card as a limit.
+            Shared pool — every active card draws from this same balance. Spend caps on cards are limits, not reservations.
           </p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
             <div>
-              <p className="text-white/60 flex items-center gap-1"><Lock className="h-3 w-3" /> Locked to cards</p>
-              <p className="mt-1 font-semibold">{formatCurrency(allocated)}</p>
-              <p className="text-xs text-white/50">{activeCards.length} cards</p>
+              <p className="text-white/60">Spent from wallet</p>
+              <p className="mt-1 font-semibold">{formatCurrency(spent)}</p>
+              <p className="text-xs text-white/50">{activeCards.length} active cards</p>
             </div>
             <div>
-              <p className="text-white/60">Available to allocate</p>
+              <p className="text-white/60">Available to spend</p>
               <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
-              <p className="text-xs text-white/50">Issue cards or raise limits</p>
+              <p className="text-xs text-white/50">First spend wins</p>
             </div>
             <div>
               <p className="text-white/60">Funding IBAN</p>
