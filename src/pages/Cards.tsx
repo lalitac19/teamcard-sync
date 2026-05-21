@@ -1035,22 +1035,35 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending cap."}
               </p>
             </div>
-            <div className="space-y-1.5">
-              <Label>Daily ATM withdrawal limit (AED)</Label>
-              <p className="text-xs text-muted-foreground">
-                The daily cash withdrawal limit is 20% of the assigned spending limit (max {newSpendLimit ? formatCurrency(atmDailyCap) : "—"}/day).
-              </p>
-              <Input
-                type="number"
-                value={atmLimit}
-                onChange={(e) => setAtmLimit(e.target.value)}
-                placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "Leave blank to disable"}
-              />
-              <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
-                {atmExceedsCap
-                  ? `Daily ATM limit cannot exceed 20% of the assigned spending limit (${formatCurrency(atmDailyCap)}).`
-                  : `Leave blank to disable ATM withdrawals.`}
-              </p>
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm">ATM cash withdrawal</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Allow cash withdrawals on this card.
+                  </p>
+                </div>
+                <Switch checked={atmEnabled} onCheckedChange={setAtmEnabled} />
+              </div>
+              {atmEnabled && (
+                <div className="space-y-1.5 pt-1">
+                  <Label className="text-xs">Daily ATM withdrawal limit (AED)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    The daily cash withdrawal limit is 20% of the assigned spending limit (max {newSpendLimit ? formatCurrency(atmDailyCap) : "—"}/day).
+                  </p>
+                  <Input
+                    type="number"
+                    value={atmLimit}
+                    onChange={(e) => setAtmLimit(e.target.value)}
+                    placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
+                  />
+                  {atmExceedsCap && (
+                    <p className="text-xs text-destructive">
+                      Daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
