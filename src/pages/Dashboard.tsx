@@ -186,7 +186,7 @@ const Dashboard = () => {
               <p className="text-xs uppercase tracking-widest text-white/60">Wallet balance</p>
               <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
-                <span>Locked to cards: {formatCurrency(allocatedToCards)}</span>
+                <span>Spent: {formatCurrency(walletBalance - available)}</span>
                 <span>Available: {formatCurrency(available)}</span>
               </div>
             </div>
