@@ -720,7 +720,7 @@ function IssueCardDialog() {
             onChange={(e) => setAllocatedLimit(e.target.value)}
           />
           <p className="text-xs text-muted-foreground">
-            Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(available)} available) on a first-come, first-served basis.
+            Maximum this card can spend in the period. Funds are drawn from the shared wallet on a first-come, first-served basis.
           </p>
         </div>
         <div className="space-y-1.5">
