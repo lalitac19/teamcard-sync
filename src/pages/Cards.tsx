@@ -756,7 +756,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={!requested || perTxnExceedsSpend}>Issue card</Button>
+        <Button onClick={submit} disabled={!firstTopUpDone || !requested || perTxnExceedsSpend}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
