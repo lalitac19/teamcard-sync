@@ -647,6 +647,7 @@ function IssueCardDialog() {
   const [allocatedLimit, setAllocatedLimit] = useState("");
   const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [perTxnLimit, setPerTxnLimit] = useState("");
+  const [atmEnabled, setAtmEnabled] = useState(false);
   const [atmLimit, setAtmLimit] = useState("");
   const [cardName, setCardName] = useState("");
 
