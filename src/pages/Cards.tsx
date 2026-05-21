@@ -958,14 +958,14 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-2 rounded-lg border p-3">
-                {REGIONS.map((r) => (
-                  <label key={r} className="flex items-center gap-2 text-sm">
+              <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto rounded-lg border p-3">
+                {COUNTRIES.map((c) => (
+                  <label key={c.code} className="flex items-center gap-2 text-sm">
                     <Checkbox
-                      checked={regions.includes(r)}
-                      onCheckedChange={() => toggleItem(regions, setRegions, r)}
+                      checked={regions.includes(c.code)}
+                      onCheckedChange={() => toggleItem(regions, setRegions, c.code)}
                     />
-                    {r}
+                    {c.name} ({c.code})
                   </label>
                 ))}
               </div>
