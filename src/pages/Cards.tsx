@@ -657,10 +657,8 @@ function IssueCardDialog() {
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
 
-  // ATM withdrawal is capped at 20% of the equivalent daily portion of the overall spending cap.
-  const dailyEquivalent =
-    limitFrequency === "daily" ? requested : limitFrequency === "weekly" ? requested / 7 : requested / 30;
-  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  // ATM withdrawal is capped at 20% of the assigned spending limit.
+  const atmDailyCap = Math.floor(requested * 0.2 * 100) / 100;
   const atm = atmEnabled ? Number(atmLimit) || 0 : 0;
   const atmExceedsCap = atmEnabled && atm > 0 && requested > 0 && atm > atmDailyCap;
 
@@ -852,9 +850,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
-  const dailyEquivalent =
-    limitFrequency === "daily" ? newSpendLimit : limitFrequency === "weekly" ? newSpendLimit / 7 : newSpendLimit / 30;
-  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  const atmDailyCap = Math.floor(newSpendLimit * 0.2 * 100) / 100;
   const newAtm = atmEnabled ? Number(atmLimit) || 0 : 0;
   const atmExceedsCap = atmEnabled && newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
 
