@@ -219,6 +219,13 @@ export default function MyRequests() {
                   <Input type="number" value={limit} onChange={(e) => setLimit(e.target.value)} placeholder="0.00" />
                 </div>
                 <div>
+                  <Label>Daily ATM withdrawal limit (AED, optional)</Label>
+                  <Input type="number" value={atmLimit} onChange={(e) => setAtmLimit(e.target.value)} placeholder="Leave blank to disable" />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Capped at 20% of the daily spending cap.
+                  </p>
+                </div>
+                <div>
                   <Label>Reason</Label>
                   <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="What will this card be used for?" />
                 </div>
