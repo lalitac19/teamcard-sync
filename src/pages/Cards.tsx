@@ -648,13 +648,14 @@ function IssueCardDialog() {
   const [perTxnLimit, setPerTxnLimit] = useState("");
   const [cardName, setCardName] = useState("");
 
-  const available = walletAvailable();
+  const firstTopUpDone = hasCompletedFirstTopUp();
   const requested = Number(allocatedLimit) || 0;
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
 
   const submit = () => {
+    if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
     if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
@@ -667,19 +668,16 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Sets a spending cap for this card. The wallet is a shared pool — caps are limits, not reservations. Any active card can spend until the wallet is empty.
+          Sets a spending cap for this card. Card issuance is unlimited once the wallet has been funded — caps are limits, not reservations, and cards spend from the shared wallet on a first-come, first-served basis.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
-        <div className="rounded-md border bg-secondary/40 p-3 text-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Wallet available (shared)</span>
-            <span className="font-semibold">{formatCurrency(available)}</span>
+        {!firstTopUpDone && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+            You must complete your first wallet top-up before any card can be issued.
           </div>
-          <p className="mt-1 text-muted-foreground">
-            Caps across cards may exceed the wallet balance — funds are spent on a first-come, first-served basis.
-          </p>
-        </div>
+        )}
+
 
         <div className="space-y-1.5">
           <Label>Card type</Label>
