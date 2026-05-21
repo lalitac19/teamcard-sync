@@ -80,11 +80,9 @@ export default function MyRequests() {
       return;
     }
     const atm = parseFloat(atmLimit) || 0;
-    const dailyEq =
-      period === "daily" ? lim : period === "weekly" ? lim / 7 : period === "monthly" ? lim / 30 : lim;
-    const atmCap = Math.floor(dailyEq * 0.2 * 100) / 100;
+    const atmCap = Math.floor(lim * 0.2 * 100) / 100;
     if (atm > atmCap) {
-      toast.error(`Daily ATM limit cannot exceed 20% of the daily spending cap (AED ${atmCap.toFixed(2)})`);
+      toast.error(`Daily ATM limit cannot exceed 20% of the assigned spending limit (AED ${atmCap.toFixed(2)})`);
       return;
     }
     const req: CardRequest = {
