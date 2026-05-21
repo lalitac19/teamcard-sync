@@ -1041,11 +1041,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   </label>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <span className="text-sm">Online / e-commerce</span>
-                  <Switch checked={allowOnline} onCheckedChange={setAllowOnline} />
-                </div>
+              <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center justify-between rounded-lg border p-3">
                   <span className="text-sm">ATM withdrawals</span>
                   <Switch checked={allowAtm} onCheckedChange={setAllowAtm} />
