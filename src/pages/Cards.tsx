@@ -771,11 +771,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   //   txnLimit   = max amount per single transaction
   const [spendLimit, setSpendLimit] = useState(String(card.spendLimit));
   const [perTxnLimit, setPerTxnLimit] = useState(card.txnLimit ? String(card.txnLimit) : "");
-  // Headroom available to raise this card's allocation: wallet available EXCLUDING this card's current allocation.
-  const otherCardsAllocated = walletAvailable(card.id);
+  // Wallet pool is shared — caps are not reservations. Show available for info only.
+  const walletPoolAvailable = walletAvailable();
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
-  const exceedsAllocation = newSpendLimit > otherCardsAllocated;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
 
   // Merchant controls
