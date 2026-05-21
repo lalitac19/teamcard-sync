@@ -54,16 +54,7 @@ const MERCHANT_CATEGORIES = [
   "Financial Services",
 ];
 
-const REGIONS = [
-  "North America",
-  "Europe (EEA)",
-  "United Kingdom",
-  "Latin America",
-  "Middle East",
-  "Africa",
-  "Asia Pacific",
-  "Oceania",
-];
+// Geography options use the full COUNTRIES list (defined below).
 
 const statusBadge = (status: string) => {
   if (status === "active") return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Active</Badge>;
