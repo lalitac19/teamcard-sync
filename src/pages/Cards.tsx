@@ -841,7 +841,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const [geoMode, setGeoMode] = useState<"allow" | "block">("allow");
   const [regions, setRegions] = useState<string[]>(["US", "GB"]);
   
-  const [allowAtm, setAllowAtm] = useState(false);
 
   // Replace card
   const [replaceReason, setReplaceReason] = useState<
