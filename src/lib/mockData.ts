@@ -119,6 +119,8 @@ export interface Card {
   spendLimit: number;
   /** Maximum amount allowed for a single transaction on this card. */
   txnLimit?: number;
+  /** Optional daily ATM withdrawal limit. Capped at 20% of the daily-equivalent spending cap. */
+  atmDailyLimit?: number;
   spent: number;
   /** Cards do not hold a balance — they spend against their allocated wallet limit. */
   balance: number;
@@ -214,6 +216,8 @@ export interface CardRequest {
   type: CardType;
   requestedLimit: number;
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
+  /** Optional daily ATM withdrawal limit requested by the member. */
+  atmDailyLimit?: number;
   reason: string;
   status: "pending" | "approved" | "rejected";
 }

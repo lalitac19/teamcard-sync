@@ -409,6 +409,9 @@ const Approvals = () => {
                           <TableCell className="text-sm">
                             {formatCurrency(r.requestedLimit)}
                             <span className="text-xs text-muted-foreground"> / {r.limitPeriod}</span>
+                            {r.atmDailyLimit ? (
+                              <div className="text-xs text-muted-foreground">ATM {formatCurrency(r.atmDailyLimit)}/day</div>
+                            ) : null}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">{r.reason}</TableCell>
                           <TableCell>{statusBadge(r.status)}</TableCell>

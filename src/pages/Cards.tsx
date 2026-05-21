@@ -815,11 +815,20 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   //   txnLimit   = max amount per single transaction
   const [spendLimit, setSpendLimit] = useState(String(card.spendLimit));
   const [perTxnLimit, setPerTxnLimit] = useState(card.txnLimit ? String(card.txnLimit) : "");
+  const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">(
+    card.limitPeriod === "per-transaction" ? "monthly" : (card.limitPeriod as "daily" | "weekly" | "monthly"),
+  );
+  const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
   // Wallet pool is shared — caps are not reservations. Show available for info only.
   const walletPoolAvailable = walletAvailable();
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
+  const dailyEquivalent =
+    limitFrequency === "daily" ? newSpendLimit : limitFrequency === "weekly" ? newSpendLimit / 7 : newSpendLimit / 30;
+  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  const newAtm = Number(atmLimit) || 0;
+  const atmExceedsCap = newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
@@ -832,7 +841,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const [geoMode, setGeoMode] = useState<"allow" | "block">("allow");
   const [regions, setRegions] = useState<string[]>(["US", "GB"]);
   
-  const [allowAtm, setAllowAtm] = useState(false);
 
   // Replace card
   const [replaceReason, setReplaceReason] = useState<
@@ -864,6 +872,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     if (newSpendLimit <= 0) return toast.error("Spending cap must be greater than zero");
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
+    }
+    if (atmExceedsCap) {
+      return toast.error(`Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)})`);
     }
     toast.success("Card limits updated");
     setOpen(false);
@@ -972,13 +983,24 @@ function ManageCardDialog({ card }: { card: CardModel }) {
           <TabsContent value="limits" className="space-y-4 pt-4">
             <div className="space-y-1.5">
               <Label>Spending cap (AED)</Label>
-              <Input
-                type="number"
-                value={spendLimit}
-                onChange={(e) => setSpendLimit(e.target.value)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  value={spendLimit}
+                  onChange={(e) => setSpendLimit(e.target.value)}
+                  className="flex-1"
+                />
+                <Select value={limitFrequency} onValueChange={(v) => setLimitFrequency(v as typeof limitFrequency)}>
+                  <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Per day</SelectItem>
+                    <SelectItem value="weekly">Per week</SelectItem>
+                    <SelectItem value="monthly">Per month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <p className="text-xs text-muted-foreground">
-                Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
+                Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -995,11 +1017,25 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending cap."}
               </p>
             </div>
+            <div className="space-y-1.5">
+              <Label>Daily ATM withdrawal limit (AED)</Label>
+              <Input
+                type="number"
+                value={atmLimit}
+                onChange={(e) => setAtmLimit(e.target.value)}
+                placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "Leave blank to disable"}
+              />
+              <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
+                {atmExceedsCap
+                  ? `Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)}).`
+                  : `Capped at 20% of the daily spending cap${newSpendLimit ? ` — max ${formatCurrency(atmDailyCap)}/day` : ""}. Leave blank to disable ATM withdrawals.`}
+              </p>
+            </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={perTxnExceedsSpend}
+                disabled={perTxnExceedsSpend || atmExceedsCap}
               >
                 Save limits
               </Button>
@@ -1076,12 +1112,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   );
                 })}
               </div>
-              <div className="grid grid-cols-1 gap-3">
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <span className="text-sm">ATM withdrawals</span>
-                  <Switch checked={allowAtm} onCheckedChange={setAllowAtm} />
-                </div>
-              </div>
+              <p className="text-xs text-muted-foreground">
+                ATM withdrawals are configured on the Limits tab — set a daily cap (max 20% of the daily spending cap) or leave blank to disable.
+              </p>
             </section>
 
             <DialogFooter>
