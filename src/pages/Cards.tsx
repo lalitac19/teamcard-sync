@@ -709,17 +709,15 @@ function IssueCardDialog() {
           </p>
         </div>
         <div className="space-y-1.5">
-          <Label>Spending limit (AED)</Label>
+          <Label>Spending cap (AED)</Label>
           <Input
             type="number"
             placeholder="5000"
             value={allocatedLimit}
             onChange={(e) => setAllocatedLimit(e.target.value)}
           />
-          <p className={`text-xs ${exceeds ? "text-destructive" : "text-muted-foreground"}`}>
-            {exceeds
-              ? `Exceeds wallet available balance (${formatCurrency(available)}). Top up the wallet or reduce another card's limit.`
-              : `Total amount this card can spend in the period. Locked from wallet. Max ${formatCurrency(available)} available.`}
+          <p className="text-xs text-muted-foreground">
+            Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(available)} available) on a first-come, first-served basis.
           </p>
         </div>
         <div className="space-y-1.5">
