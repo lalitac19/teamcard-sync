@@ -645,7 +645,9 @@ function IssueCardDialog() {
   const [categories, setCategories] = useState<string[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [allocatedLimit, setAllocatedLimit] = useState("");
+  const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [perTxnLimit, setPerTxnLimit] = useState("");
+  const [atmLimit, setAtmLimit] = useState("");
   const [cardName, setCardName] = useState("");
 
   const firstTopUpDone = hasCompletedFirstTopUp();
@@ -654,13 +656,27 @@ function IssueCardDialog() {
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
 
+  // ATM withdrawal is capped at 20% of the equivalent daily portion of the overall spending cap.
+  const dailyEquivalent =
+    limitFrequency === "daily" ? requested : limitFrequency === "weekly" ? requested / 7 : requested / 30;
+  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  const atm = Number(atmLimit) || 0;
+  const atmExceedsCap = atm > 0 && requested > 0 && atm > atmDailyCap;
+
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
     if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
-    toast.success(`Card issued · ${formatCurrency(requested)} spending cap${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
+    if (atmExceedsCap) {
+      return toast.error(`Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)})`);
+    }
+    toast.success(
+      `Card issued · ${formatCurrency(requested)} ${limitFrequency} cap` +
+        (perTxn ? `, ${formatCurrency(perTxn)} per-txn` : "") +
+        (atm ? `, ${formatCurrency(atm)} ATM/day` : ""),
+    );
   };
 
   return (
@@ -713,14 +729,25 @@ function IssueCardDialog() {
         </div>
         <div className="space-y-1.5">
           <Label>Spending cap (AED)</Label>
-          <Input
-            type="number"
-            placeholder="5000"
-            value={allocatedLimit}
-            onChange={(e) => setAllocatedLimit(e.target.value)}
-          />
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              placeholder="5000"
+              value={allocatedLimit}
+              onChange={(e) => setAllocatedLimit(e.target.value)}
+              className="flex-1"
+            />
+            <Select value={limitFrequency} onValueChange={(v) => setLimitFrequency(v as typeof limitFrequency)}>
+              <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Per day</SelectItem>
+                <SelectItem value="weekly">Per week</SelectItem>
+                <SelectItem value="monthly">Per month</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <p className="text-xs text-muted-foreground">
-            Maximum this card can spend in the period. Funds are drawn from the shared wallet on a first-come, first-served basis.
+            Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet on a first-come, first-served basis.
           </p>
         </div>
         <div className="space-y-1.5">
@@ -735,6 +762,20 @@ function IssueCardDialog() {
             {perTxnExceedsSpend
               ? "Per-transaction limit cannot exceed the spending limit."
               : "Caps the size of any single transaction. Leave blank for no per-transaction cap."}
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Daily ATM withdrawal limit (AED, optional)</Label>
+          <Input
+            type="number"
+            placeholder={requested ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
+            value={atmLimit}
+            onChange={(e) => setAtmLimit(e.target.value)}
+          />
+          <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
+            {atmExceedsCap
+              ? `Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)}).`
+              : `Capped at 20% of the daily spending cap${requested ? ` — max ${formatCurrency(atmDailyCap)}/day` : ""}. Leave blank to disable ATM withdrawals.`}
           </p>
         </div>
         <MultiSelectChips
@@ -756,7 +797,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={!firstTopUpDone || !requested || perTxnExceedsSpend}>Issue card</Button>
+        <Button onClick={submit} disabled={!firstTopUpDone || !requested || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
