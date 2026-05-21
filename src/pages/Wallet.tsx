@@ -204,7 +204,7 @@ function TopUpDialog() {
         <DialogHeader>
           <DialogTitle>Top up wallet — bank transfer details</DialogTitle>
           <DialogDescription>
-            Transfer funds to your company's unique IBAN below. Once received, the wallet balance updates automatically and funds become available to allocate to cards.
+            Transfer funds to your company's unique IBAN below. Once received, the wallet balance updates automatically and becomes immediately spendable by any active card.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2 py-2">
