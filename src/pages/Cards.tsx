@@ -647,6 +647,7 @@ function IssueCardDialog() {
   const [allocatedLimit, setAllocatedLimit] = useState("");
   const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [perTxnLimit, setPerTxnLimit] = useState("");
+  const [atmEnabled, setAtmEnabled] = useState(false);
   const [atmLimit, setAtmLimit] = useState("");
   const [cardName, setCardName] = useState("");
 
@@ -660,8 +661,8 @@ function IssueCardDialog() {
   const dailyEquivalent =
     limitFrequency === "daily" ? requested : limitFrequency === "weekly" ? requested / 7 : requested / 30;
   const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
-  const atm = Number(atmLimit) || 0;
-  const atmExceedsCap = atm > 0 && requested > 0 && atm > atmDailyCap;
+  const atm = atmEnabled ? Number(atmLimit) || 0 : 0;
+  const atmExceedsCap = atmEnabled && atm > 0 && requested > 0 && atm > atmDailyCap;
 
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
@@ -764,22 +765,35 @@ function IssueCardDialog() {
               : "Caps the size of any single transaction. Leave blank for no per-transaction cap."}
           </p>
         </div>
-        <div className="space-y-1.5">
-          <Label>Daily ATM withdrawal limit (AED, optional)</Label>
-          <p className="text-xs text-muted-foreground">
-            The daily cash withdrawal limit is 20% of the assigned spending limit (max {requested ? formatCurrency(atmDailyCap) : "—"}/day).
-          </p>
-          <Input
-            type="number"
-            placeholder={requested ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
-            value={atmLimit}
-            onChange={(e) => setAtmLimit(e.target.value)}
-          />
-          <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
-            {atmExceedsCap
-              ? `Daily ATM limit cannot exceed 20% of the assigned spending limit (${formatCurrency(atmDailyCap)}).`
-              : `Leave blank to disable ATM withdrawals.`}
-          </p>
+        <div className="space-y-2 rounded-lg border p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm">ATM cash withdrawal</Label>
+              <p className="text-xs text-muted-foreground">
+                Allow cash withdrawals on this card.
+              </p>
+            </div>
+            <Switch checked={atmEnabled} onCheckedChange={setAtmEnabled} />
+          </div>
+          {atmEnabled && (
+            <div className="space-y-1.5 pt-1">
+              <Label className="text-xs">Daily ATM withdrawal limit (AED)</Label>
+              <p className="text-xs text-muted-foreground">
+                The daily cash withdrawal limit is 20% of the assigned spending limit (max {requested ? formatCurrency(atmDailyCap) : "—"}/day).
+              </p>
+              <Input
+                type="number"
+                placeholder={requested ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
+                value={atmLimit}
+                onChange={(e) => setAtmLimit(e.target.value)}
+              />
+              {atmExceedsCap && (
+                <p className="text-xs text-destructive">
+                  Daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
+                </p>
+              )}
+            </div>
+          )}
         </div>
         <MultiSelectChips
           label="Allowed merchant categories"
@@ -821,6 +835,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">(
     card.limitPeriod === "per-transaction" ? "monthly" : (card.limitPeriod as "daily" | "weekly" | "monthly"),
   );
+  const [atmEnabled, setAtmEnabled] = useState(!!card.atmDailyLimit);
   const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
   // Wallet pool is shared — caps are not reservations. Show available for info only.
   const walletPoolAvailable = walletAvailable();
@@ -830,8 +845,8 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const dailyEquivalent =
     limitFrequency === "daily" ? newSpendLimit : limitFrequency === "weekly" ? newSpendLimit / 7 : newSpendLimit / 30;
   const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
-  const newAtm = Number(atmLimit) || 0;
-  const atmExceedsCap = newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
+  const newAtm = atmEnabled ? Number(atmLimit) || 0 : 0;
+  const atmExceedsCap = atmEnabled && newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
@@ -1020,22 +1035,35 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending cap."}
               </p>
             </div>
-            <div className="space-y-1.5">
-              <Label>Daily ATM withdrawal limit (AED)</Label>
-              <p className="text-xs text-muted-foreground">
-                The daily cash withdrawal limit is 20% of the assigned spending limit (max {newSpendLimit ? formatCurrency(atmDailyCap) : "—"}/day).
-              </p>
-              <Input
-                type="number"
-                value={atmLimit}
-                onChange={(e) => setAtmLimit(e.target.value)}
-                placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "Leave blank to disable"}
-              />
-              <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
-                {atmExceedsCap
-                  ? `Daily ATM limit cannot exceed 20% of the assigned spending limit (${formatCurrency(atmDailyCap)}).`
-                  : `Leave blank to disable ATM withdrawals.`}
-              </p>
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm">ATM cash withdrawal</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Allow cash withdrawals on this card.
+                  </p>
+                </div>
+                <Switch checked={atmEnabled} onCheckedChange={setAtmEnabled} />
+              </div>
+              {atmEnabled && (
+                <div className="space-y-1.5 pt-1">
+                  <Label className="text-xs">Daily ATM withdrawal limit (AED)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    The daily cash withdrawal limit is 20% of the assigned spending limit (max {newSpendLimit ? formatCurrency(atmDailyCap) : "—"}/day).
+                  </p>
+                  <Input
+                    type="number"
+                    value={atmLimit}
+                    onChange={(e) => setAtmLimit(e.target.value)}
+                    placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
+                  />
+                  {atmExceedsCap && (
+                    <p className="text-xs text-destructive">
+                      Daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
