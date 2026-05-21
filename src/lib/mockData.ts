@@ -216,6 +216,8 @@ export interface CardRequest {
   type: CardType;
   requestedLimit: number;
   limitPeriod: "daily" | "weekly" | "monthly" | "per-transaction";
+  /** Optional daily ATM withdrawal limit requested by the member. */
+  atmDailyLimit?: number;
   reason: string;
   status: "pending" | "approved" | "rejected";
 }
