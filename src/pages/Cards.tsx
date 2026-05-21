@@ -113,7 +113,12 @@ const Cards = () => {
           <UnfreezeAllDialog />
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
+              <Button
+                size="sm"
+                className="gap-2"
+                disabled={!hasCompletedFirstTopUp()}
+                title={!hasCompletedFirstTopUp() ? "Complete your first wallet top-up to issue cards" : undefined}
+              >
                 <Plus className="h-4 w-4" /> Issue card
               </Button>
             </DialogTrigger>
