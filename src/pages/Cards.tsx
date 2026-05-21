@@ -1113,12 +1113,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   );
                 })}
               </div>
-              <div className="grid grid-cols-1 gap-3">
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <span className="text-sm">ATM withdrawals</span>
-                  <Switch checked={allowAtm} onCheckedChange={setAllowAtm} />
-                </div>
-              </div>
+              <p className="text-xs text-muted-foreground">
+                ATM withdrawals are configured on the Limits tab — set a daily cap (max 20% of the daily spending cap) or leave blank to disable.
+              </p>
             </section>
 
             <DialogFooter>
