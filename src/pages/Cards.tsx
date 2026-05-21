@@ -815,11 +815,20 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   //   txnLimit   = max amount per single transaction
   const [spendLimit, setSpendLimit] = useState(String(card.spendLimit));
   const [perTxnLimit, setPerTxnLimit] = useState(card.txnLimit ? String(card.txnLimit) : "");
+  const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">(
+    card.limitPeriod === "per-transaction" ? "monthly" : (card.limitPeriod as "daily" | "weekly" | "monthly"),
+  );
+  const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
   // Wallet pool is shared — caps are not reservations. Show available for info only.
   const walletPoolAvailable = walletAvailable();
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
+  const dailyEquivalent =
+    limitFrequency === "daily" ? newSpendLimit : limitFrequency === "weekly" ? newSpendLimit / 7 : newSpendLimit / 30;
+  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  const newAtm = Number(atmLimit) || 0;
+  const atmExceedsCap = newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
 
   // Merchant controls
   const initialAllowed = card.merchantCategories?.length
