@@ -766,6 +766,9 @@ function IssueCardDialog() {
         </div>
         <div className="space-y-1.5">
           <Label>Daily ATM withdrawal limit (AED, optional)</Label>
+          <p className="text-xs text-muted-foreground">
+            The daily cash withdrawal limit is 20% of the assigned spending limit (max {requested ? formatCurrency(atmDailyCap) : "—"}/day).
+          </p>
           <Input
             type="number"
             placeholder={requested ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
@@ -774,8 +777,8 @@ function IssueCardDialog() {
           />
           <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
             {atmExceedsCap
-              ? `Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)}).`
-              : `Capped at 20% of the daily spending cap${requested ? ` — max ${formatCurrency(atmDailyCap)}/day` : ""}. Leave blank to disable ATM withdrawals.`}
+              ? `Daily ATM limit cannot exceed 20% of the assigned spending limit (${formatCurrency(atmDailyCap)}).`
+              : `Leave blank to disable ATM withdrawals.`}
           </p>
         </div>
         <MultiSelectChips
@@ -1019,6 +1022,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
             </div>
             <div className="space-y-1.5">
               <Label>Daily ATM withdrawal limit (AED)</Label>
+              <p className="text-xs text-muted-foreground">
+                The daily cash withdrawal limit is 20% of the assigned spending limit (max {newSpendLimit ? formatCurrency(atmDailyCap) : "—"}/day).
+              </p>
               <Input
                 type="number"
                 value={atmLimit}
@@ -1027,8 +1033,8 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               />
               <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
                 {atmExceedsCap
-                  ? `Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)}).`
-                  : `Capped at 20% of the daily spending cap${newSpendLimit ? ` — max ${formatCurrency(atmDailyCap)}/day` : ""}. Leave blank to disable ATM withdrawals.`}
+                  ? `Daily ATM limit cannot exceed 20% of the assigned spending limit (${formatCurrency(atmDailyCap)}).`
+                  : `Leave blank to disable ATM withdrawals.`}
               </p>
             </div>
             <DialogFooter>
