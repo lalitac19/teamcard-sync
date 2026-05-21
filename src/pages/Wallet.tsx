@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import {
   walletTopUps, cards as allCards, walletBalance, walletAvailable,
-  totalAllocatedLimits, memberById,
+  totalSpentAcrossCards, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
 import { Plus, Wallet as WalletIcon, Lock, Copy, Info } from "lucide-react";
@@ -32,17 +32,21 @@ const COMPANY_BANK = {
 };
 
 const Wallet = () => {
-  const allocated = useMemo(() => totalAllocatedLimits(), []);
+  const spent = useMemo(() => totalSpentAcrossCards(), []);
   const available = useMemo(() => walletAvailable(), []);
   const activeCards = useMemo(
     () => allCards.filter((c) => c.status !== "terminated"),
     [],
   );
+  const totalCaps = useMemo(
+    () => activeCards.reduce((s, c) => s + c.spendLimit, 0),
+    [activeCards],
+  );
 
   return (
     <AppLayout
       title="Wallet"
-      subtitle="Top up the wallet, then allocate limits to cards. Allocated funds are locked to that card until you reallocate."
+      subtitle="A single pool of funds shared by all cards. Card spend caps are not reserved — any card can spend until the wallet is empty (first spend wins)."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
@@ -59,18 +63,18 @@ const Wallet = () => {
           </div>
           <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
           <p className="mt-1 text-xs text-white/60">
-            The wallet is a pool of funds — not a card. Money is spent only after it is allocated to a card as a limit.
+            Shared pool — every active card draws from this same balance. Spend caps on cards are limits, not reservations.
           </p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
             <div>
-              <p className="text-white/60 flex items-center gap-1"><Lock className="h-3 w-3" /> Locked to cards</p>
-              <p className="mt-1 font-semibold">{formatCurrency(allocated)}</p>
-              <p className="text-xs text-white/50">{activeCards.length} cards</p>
+              <p className="text-white/60">Spent from wallet</p>
+              <p className="mt-1 font-semibold">{formatCurrency(spent)}</p>
+              <p className="text-xs text-white/50">{activeCards.length} active cards</p>
             </div>
             <div>
-              <p className="text-white/60">Available to allocate</p>
+              <p className="text-white/60">Available to spend</p>
               <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
-              <p className="text-xs text-white/50">Issue cards or raise limits</p>
+              <p className="text-xs text-white/50">First spend wins</p>
             </div>
             <div>
               <p className="text-white/60">Funding IBAN</p>
@@ -85,7 +89,7 @@ const Wallet = () => {
         <Tabs defaultValue="topups">
           <TabsList>
             <TabsTrigger value="topups">Top-up history</TabsTrigger>
-            <TabsTrigger value="allocations">Locked allocations</TabsTrigger>
+            <TabsTrigger value="allocations">Card spend caps</TabsTrigger>
           </TabsList>
 
           <TabsContent value="topups" className="mt-4">
@@ -132,9 +136,9 @@ const Wallet = () => {
                       <TableHead>Cardholder</TableHead>
                       <TableHead>Card</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Locked limit</TableHead>
+                      <TableHead className="text-right">Spend cap</TableHead>
                       <TableHead className="text-right">Spent</TableHead>
-                      <TableHead className="text-right">Remaining</TableHead>
+                      <TableHead className="text-right">Cap remaining</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -153,10 +157,10 @@ const Wallet = () => {
                       );
                     })}
                     <TableRow className="bg-muted/30">
-                      <TableCell colSpan={3} className="text-sm font-medium">Total locked</TableCell>
-                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(allocated)}</TableCell>
+                      <TableCell colSpan={3} className="text-sm font-medium">Sum of caps</TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(totalCaps)}</TableCell>
                       <TableCell colSpan={2} className="text-right text-xs text-muted-foreground">
-                        Available: {formatCurrency(available)} of {formatCurrency(walletBalance)}
+                        Wallet available: {formatCurrency(available)} of {formatCurrency(walletBalance)}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -200,7 +204,7 @@ function TopUpDialog() {
         <DialogHeader>
           <DialogTitle>Top up wallet — bank transfer details</DialogTitle>
           <DialogDescription>
-            Transfer funds to your company's unique IBAN below. Once received, the wallet balance updates automatically and funds become available to allocate to cards.
+            Transfer funds to your company's unique IBAN below. Once received, the wallet balance updates automatically and becomes immediately spendable by any active card.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2 py-2">

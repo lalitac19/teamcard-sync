@@ -106,7 +106,7 @@ const Cards = () => {
   return (
     <AppLayout
       title="Cards"
-      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in wallet to allocate.`}
+      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in the shared wallet pool.`}
       actions={
         <div className="flex gap-2">
           <FreezeAllDialog />
@@ -645,22 +645,16 @@ function IssueCardDialog() {
 
   const available = walletAvailable();
   const requested = Number(allocatedLimit) || 0;
-  const exceeds = requested > available;
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
 
   const submit = () => {
-    if (!requested || requested <= 0) return toast.error("Enter the spending limit to allocate to this card");
-    if (exceeds) {
-      return toast.error(
-        `Spending limit exceeds wallet's available balance (${formatCurrency(available)}). Top up the wallet or reduce another card's limit.`,
-      );
-    }
+    if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
     if (perTxnExceedsSpend) {
-      return toast.error("Per-transaction limit cannot exceed the spending limit");
+      return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
-    toast.success(`Card issued · ${formatCurrency(requested)} locked from wallet${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
+    toast.success(`Card issued · ${formatCurrency(requested)} spending cap${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
   };
 
   return (
@@ -668,21 +662,18 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Allocates a spending limit from the wallet's available balance. The amount is locked in the wallet and reserved for this card until reallocated.
+          Sets a spending cap for this card. The wallet is a shared pool — caps are limits, not reservations. Any active card can spend until the wallet is empty.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
         <div className="rounded-md border bg-secondary/40 p-3 text-xs">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Wallet available</span>
+            <span className="text-muted-foreground">Wallet available (shared)</span>
             <span className="font-semibold">{formatCurrency(available)}</span>
           </div>
-          <div className="mt-1 flex items-center justify-between">
-            <span className="text-muted-foreground">After this allocation</span>
-            <span className={exceeds ? "font-semibold text-destructive" : "font-semibold"}>
-              {formatCurrency(Math.max(0, available - requested))}
-            </span>
-          </div>
+          <p className="mt-1 text-muted-foreground">
+            Caps across cards may exceed the wallet balance — funds are spent on a first-come, first-served basis.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -718,17 +709,15 @@ function IssueCardDialog() {
           </p>
         </div>
         <div className="space-y-1.5">
-          <Label>Spending limit (AED)</Label>
+          <Label>Spending cap (AED)</Label>
           <Input
             type="number"
             placeholder="5000"
             value={allocatedLimit}
             onChange={(e) => setAllocatedLimit(e.target.value)}
           />
-          <p className={`text-xs ${exceeds ? "text-destructive" : "text-muted-foreground"}`}>
-            {exceeds
-              ? `Exceeds wallet available balance (${formatCurrency(available)}). Top up the wallet or reduce another card's limit.`
-              : `Total amount this card can spend in the period. Locked from wallet. Max ${formatCurrency(available)} available.`}
+          <p className="text-xs text-muted-foreground">
+            Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(available)} available) on a first-come, first-served basis.
           </p>
         </div>
         <div className="space-y-1.5">
@@ -764,7 +753,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={exceeds || !requested || perTxnExceedsSpend}>Issue card</Button>
+        <Button onClick={submit} disabled={!requested || perTxnExceedsSpend}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
@@ -782,11 +771,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   //   txnLimit   = max amount per single transaction
   const [spendLimit, setSpendLimit] = useState(String(card.spendLimit));
   const [perTxnLimit, setPerTxnLimit] = useState(card.txnLimit ? String(card.txnLimit) : "");
-  // Headroom available to raise this card's allocation: wallet available EXCLUDING this card's current allocation.
-  const otherCardsAllocated = walletAvailable(card.id);
+  // Wallet pool is shared — caps are not reservations. Show available for info only.
+  const walletPoolAvailable = walletAvailable();
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
-  const exceedsAllocation = newSpendLimit > otherCardsAllocated;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
 
   // Merchant controls
@@ -829,14 +817,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   };
 
   const saveLimits = () => {
-    if (newSpendLimit <= 0) return toast.error("Spending limit must be greater than zero");
-    if (exceedsAllocation) {
-      return toast.error(
-        `Spending limit exceeds wallet's available balance (${formatCurrency(otherCardsAllocated)}).`,
-      );
-    }
+    if (newSpendLimit <= 0) return toast.error("Spending cap must be greater than zero");
     if (perTxnExceedsSpend) {
-      return toast.error("Per-transaction limit cannot exceed the spending limit");
+      return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
     toast.success("Card limits updated");
     setOpen(false);
@@ -944,16 +927,14 @@ function ManageCardDialog({ card }: { card: CardModel }) {
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
             <div className="space-y-1.5">
-              <Label>Spending limit (AED)</Label>
+              <Label>Spending cap (AED)</Label>
               <Input
                 type="number"
                 value={spendLimit}
                 onChange={(e) => setSpendLimit(e.target.value)}
               />
-              <p className={`text-xs ${exceedsAllocation ? "text-destructive" : "text-muted-foreground"}`}>
-                {exceedsAllocation
-                  ? `Exceeds wallet's available balance (${formatCurrency(otherCardsAllocated)}). Reduce another card's limit or top up the wallet.`
-                  : `Total amount this card can spend in the period. Locked from wallet. Increase up to ${formatCurrency(otherCardsAllocated)} (wallet available, excluding this card) or decrease at any time.`}
+              <p className="text-xs text-muted-foreground">
+                Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -966,15 +947,15 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               />
               <p className={`text-xs ${perTxnExceedsSpend ? "text-destructive" : "text-muted-foreground"}`}>
                 {perTxnExceedsSpend
-                  ? "Per-transaction limit cannot exceed the spending limit."
-                  : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending limit."}
+                  ? "Per-transaction limit cannot exceed the spending cap."
+                  : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending cap."}
               </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={exceedsAllocation || perTxnExceedsSpend}
+                disabled={perTxnExceedsSpend}
               >
                 Save limits
               </Button>
