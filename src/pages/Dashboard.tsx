@@ -188,12 +188,6 @@ const Dashboard = () => {
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
                 <span>Locked to cards: {formatCurrency(allocatedToCards)}</span>
                 <span>Available: {formatCurrency(available)}</span>
-                {processingTopUps > 0 && (
-                  <span className="text-accent">+ {formatCurrency(processingTopUps)} processing</span>
-                )}
-                {runwayMonths !== null && (
-                  <span>≈ {runwayMonths.toFixed(1)} months runway</span>
-                )}
               </div>
             </div>
             <div className="flex gap-2">
