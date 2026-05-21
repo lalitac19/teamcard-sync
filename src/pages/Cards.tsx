@@ -799,7 +799,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   // Geography controls
   const [geoMode, setGeoMode] = useState<"allow" | "block">("allow");
   const [regions, setRegions] = useState<string[]>(["US", "GB"]);
-  const [allowOnline, setAllowOnline] = useState(true);
+  
   const [allowAtm, setAllowAtm] = useState(false);
 
   // Replace card
@@ -994,7 +994,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <Select value={merchantMode} onValueChange={(v) => setMerchantMode(v as "allow" | "block")}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="allow">Allow only selected</SelectItem>
+                    <SelectItem value="allow">Restrict to selected</SelectItem>
                     <SelectItem value="block">Block selected</SelectItem>
                   </SelectContent>
                 </Select>
@@ -1025,7 +1025,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <Select value={geoMode} onValueChange={(v) => setGeoMode(v as "allow" | "block")}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="allow">Allow only selected</SelectItem>
+                    <SelectItem value="allow">Restrict to selected</SelectItem>
                     <SelectItem value="block">Block selected</SelectItem>
                   </SelectContent>
                 </Select>
@@ -1041,11 +1041,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   </label>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <span className="text-sm">Online / e-commerce</span>
-                  <Switch checked={allowOnline} onCheckedChange={setAllowOnline} />
-                </div>
+              <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center justify-between rounded-lg border p-3">
                   <span className="text-sm">ATM withdrawals</span>
                   <Switch checked={allowAtm} onCheckedChange={setAllowAtm} />
