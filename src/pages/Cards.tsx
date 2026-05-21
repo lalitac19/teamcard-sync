@@ -804,10 +804,13 @@ function IssueCardDialog() {
           onChange={setCategories}
         />
         <MultiSelectChips
-          label="Allowed countries"
-          placeholder="all countries allowed"
+          label="Allowed geography"
+          placeholder="all regions allowed"
           allLabel="No restrictions"
-          options={COUNTRIES.map((c) => ({ value: c.code, label: `${c.name} (${c.code})` }))}
+          options={[
+            { value: "Domestic", label: "Domestic" },
+            { value: "International", label: "International" },
+          ]}
           selected={countries}
           onChange={setCountries}
         />
