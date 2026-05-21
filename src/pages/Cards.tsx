@@ -785,11 +785,18 @@ function IssueCardDialog() {
                 type="number"
                 placeholder={requested ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
                 value={atmLimit}
-                onChange={(e) => setAtmLimit(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setAtmLimit(v);
+                  const n = Number(v) || 0;
+                  if (requested > 0 && n > atmDailyCap) {
+                    toast.error(`Please reduce — the daily ATM limit cannot exceed 20% of the assigned spending limit (max ${formatCurrency(atmDailyCap)}/day).`);
+                  }
+                }}
               />
               {atmExceedsCap && (
                 <p className="text-xs text-destructive">
-                  Daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
+                  Please reduce — the daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
                 </p>
               )}
             </div>
@@ -1057,12 +1064,19 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   <Input
                     type="number"
                     value={atmLimit}
-                    onChange={(e) => setAtmLimit(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setAtmLimit(v);
+                      const n = Number(v) || 0;
+                      if (newSpendLimit > 0 && n > atmDailyCap) {
+                        toast.error(`Please reduce — the daily ATM limit cannot exceed 20% of the assigned spending limit (max ${formatCurrency(atmDailyCap)}/day).`);
+                      }
+                    }}
                     placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "e.g. 200"}
                   />
                   {atmExceedsCap && (
                     <p className="text-xs text-destructive">
-                      Daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
+                      Please reduce — the daily ATM limit cannot exceed 20% of the assigned spending limit ({formatCurrency(atmDailyCap)}).
                     </p>
                   )}
                 </div>
