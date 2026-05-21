@@ -927,16 +927,14 @@ function ManageCardDialog({ card }: { card: CardModel }) {
           {/* Limits */}
           <TabsContent value="limits" className="space-y-4 pt-4">
             <div className="space-y-1.5">
-              <Label>Spending limit (AED)</Label>
+              <Label>Spending cap (AED)</Label>
               <Input
                 type="number"
                 value={spendLimit}
                 onChange={(e) => setSpendLimit(e.target.value)}
               />
-              <p className={`text-xs ${exceedsAllocation ? "text-destructive" : "text-muted-foreground"}`}>
-                {exceedsAllocation
-                  ? `Exceeds wallet's available balance (${formatCurrency(otherCardsAllocated)}). Reduce another card's limit or top up the wallet.`
-                  : `Total amount this card can spend in the period. Locked from wallet. Increase up to ${formatCurrency(otherCardsAllocated)} (wallet available, excluding this card) or decrease at any time.`}
+              <p className="text-xs text-muted-foreground">
+                Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -949,15 +947,15 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               />
               <p className={`text-xs ${perTxnExceedsSpend ? "text-destructive" : "text-muted-foreground"}`}>
                 {perTxnExceedsSpend
-                  ? "Per-transaction limit cannot exceed the spending limit."
-                  : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending limit."}
+                  ? "Per-transaction limit cannot exceed the spending cap."
+                  : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending cap."}
               </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={exceedsAllocation || perTxnExceedsSpend}
+                disabled={perTxnExceedsSpend}
               >
                 Save limits
               </Button>
