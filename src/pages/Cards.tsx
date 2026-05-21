@@ -817,14 +817,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   };
 
   const saveLimits = () => {
-    if (newSpendLimit <= 0) return toast.error("Spending limit must be greater than zero");
-    if (exceedsAllocation) {
-      return toast.error(
-        `Spending limit exceeds wallet's available balance (${formatCurrency(otherCardsAllocated)}).`,
-      );
-    }
+    if (newSpendLimit <= 0) return toast.error("Spending cap must be greater than zero");
     if (perTxnExceedsSpend) {
-      return toast.error("Per-transaction limit cannot exceed the spending limit");
+      return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
     toast.success("Card limits updated");
     setOpen(false);
