@@ -385,20 +385,27 @@ export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
 
 /**
- * Sum of spending limits allocated to all cards. These funds are LOCKED in
- * the wallet and reserved for those cards until an admin reallocates them.
+ * Sum of spending caps across all active cards. Caps are NOT reserved against
+ * the wallet — multiple cards can share the same pool of funds on a
+ * first-come, first-served basis. This figure is informational only.
  */
 export const totalAllocatedLimits = (excludeId?: string): number =>
   cards
     .filter((c) => c.id !== excludeId && c.status !== "terminated")
     .reduce((s, c) => s + c.spendLimit, 0);
 
+/** Total spent across all active cards. */
+export const totalSpentAcrossCards = (excludeId?: string): number =>
+  cards
+    .filter((c) => c.id !== excludeId && c.status !== "terminated")
+    .reduce((s, c) => s + c.spent, 0);
+
 /**
- * Funds in the wallet that are NOT locked to any card.
- * Available to issue new cards or raise existing limits.
+ * Funds remaining in the shared wallet pool after card spend.
+ * All active cards draw from this same pool — first spend wins.
  */
 export const walletAvailable = (excludeId?: string): number =>
-  Math.max(0, walletBalance - totalAllocatedLimits(excludeId));
+  Math.max(0, walletBalance - totalSpentAcrossCards(excludeId));
 
 /** Distinct countries appearing across transactions, reimbursements, and invoices. */
 export const allCountries = (): string[] => {
