@@ -984,13 +984,24 @@ function ManageCardDialog({ card }: { card: CardModel }) {
           <TabsContent value="limits" className="space-y-4 pt-4">
             <div className="space-y-1.5">
               <Label>Spending cap (AED)</Label>
-              <Input
-                type="number"
-                value={spendLimit}
-                onChange={(e) => setSpendLimit(e.target.value)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  value={spendLimit}
+                  onChange={(e) => setSpendLimit(e.target.value)}
+                  className="flex-1"
+                />
+                <Select value={limitFrequency} onValueChange={(v) => setLimitFrequency(v as typeof limitFrequency)}>
+                  <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Per day</SelectItem>
+                    <SelectItem value="weekly">Per week</SelectItem>
+                    <SelectItem value="monthly">Per month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <p className="text-xs text-muted-foreground">
-                Maximum this card can spend in the period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
+                Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -1007,11 +1018,25 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   : "Maximum amount allowed for a single transaction on this card. Increase or decrease independently of the spending cap."}
               </p>
             </div>
+            <div className="space-y-1.5">
+              <Label>Daily ATM withdrawal limit (AED)</Label>
+              <Input
+                type="number"
+                value={atmLimit}
+                onChange={(e) => setAtmLimit(e.target.value)}
+                placeholder={newSpendLimit ? `up to ${formatCurrency(atmDailyCap)}` : "Leave blank to disable"}
+              />
+              <p className={`text-xs ${atmExceedsCap ? "text-destructive" : "text-muted-foreground"}`}>
+                {atmExceedsCap
+                  ? `Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)}).`
+                  : `Capped at 20% of the daily spending cap${newSpendLimit ? ` — max ${formatCurrency(atmDailyCap)}/day` : ""}. Leave blank to disable ATM withdrawals.`}
+              </p>
+            </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={perTxnExceedsSpend}
+                disabled={perTxnExceedsSpend || atmExceedsCap}
               >
                 Save limits
               </Button>
