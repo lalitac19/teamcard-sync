@@ -661,8 +661,8 @@ function IssueCardDialog() {
   const dailyEquivalent =
     limitFrequency === "daily" ? requested : limitFrequency === "weekly" ? requested / 7 : requested / 30;
   const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
-  const atm = Number(atmLimit) || 0;
-  const atmExceedsCap = atm > 0 && requested > 0 && atm > atmDailyCap;
+  const atm = atmEnabled ? Number(atmLimit) || 0 : 0;
+  const atmExceedsCap = atmEnabled && atm > 0 && requested > 0 && atm > atmDailyCap;
 
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
