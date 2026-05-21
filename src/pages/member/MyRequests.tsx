@@ -60,6 +60,7 @@ export default function MyRequests() {
   const [type, setType] = useState<CardType>("virtual");
   const [limit, setLimit] = useState("");
   const [period, setPeriod] = useState<CardRequest["limitPeriod"]>("monthly");
+  const [atmLimit, setAtmLimit] = useState("");
   const [reason, setReason] = useState("");
 
   // Top-up dialog
