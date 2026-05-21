@@ -645,22 +645,16 @@ function IssueCardDialog() {
 
   const available = walletAvailable();
   const requested = Number(allocatedLimit) || 0;
-  const exceeds = requested > available;
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
 
   const submit = () => {
-    if (!requested || requested <= 0) return toast.error("Enter the spending limit to allocate to this card");
-    if (exceeds) {
-      return toast.error(
-        `Spending limit exceeds wallet's available balance (${formatCurrency(available)}). Top up the wallet or reduce another card's limit.`,
-      );
-    }
+    if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
     if (perTxnExceedsSpend) {
-      return toast.error("Per-transaction limit cannot exceed the spending limit");
+      return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
-    toast.success(`Card issued · ${formatCurrency(requested)} locked from wallet${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
+    toast.success(`Card issued · ${formatCurrency(requested)} spending cap${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
   };
 
   return (
@@ -668,21 +662,18 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Allocates a spending limit from the wallet's available balance. The amount is locked in the wallet and reserved for this card until reallocated.
+          Sets a spending cap for this card. The wallet is a shared pool — caps are limits, not reservations. Any active card can spend until the wallet is empty.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
         <div className="rounded-md border bg-secondary/40 p-3 text-xs">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Wallet available</span>
+            <span className="text-muted-foreground">Wallet available (shared)</span>
             <span className="font-semibold">{formatCurrency(available)}</span>
           </div>
-          <div className="mt-1 flex items-center justify-between">
-            <span className="text-muted-foreground">After this allocation</span>
-            <span className={exceeds ? "font-semibold text-destructive" : "font-semibold"}>
-              {formatCurrency(Math.max(0, available - requested))}
-            </span>
-          </div>
+          <p className="mt-1 text-muted-foreground">
+            Caps across cards may exceed the wallet balance — funds are spent on a first-come, first-served basis.
+          </p>
         </div>
 
         <div className="space-y-1.5">
