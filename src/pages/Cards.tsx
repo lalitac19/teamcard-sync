@@ -645,7 +645,9 @@ function IssueCardDialog() {
   const [categories, setCategories] = useState<string[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [allocatedLimit, setAllocatedLimit] = useState("");
+  const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [perTxnLimit, setPerTxnLimit] = useState("");
+  const [atmLimit, setAtmLimit] = useState("");
   const [cardName, setCardName] = useState("");
 
   const firstTopUpDone = hasCompletedFirstTopUp();
@@ -654,13 +656,27 @@ function IssueCardDialog() {
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
 
+  // ATM withdrawal is capped at 20% of the equivalent daily portion of the overall spending cap.
+  const dailyEquivalent =
+    limitFrequency === "daily" ? requested : limitFrequency === "weekly" ? requested / 7 : requested / 30;
+  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  const atm = Number(atmLimit) || 0;
+  const atmExceedsCap = atm > 0 && requested > 0 && atm > atmDailyCap;
+
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
     if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
-    toast.success(`Card issued · ${formatCurrency(requested)} spending cap${perTxn ? `, ${formatCurrency(perTxn)} per-txn cap` : ""}`);
+    if (atmExceedsCap) {
+      return toast.error(`Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)})`);
+    }
+    toast.success(
+      `Card issued · ${formatCurrency(requested)} ${limitFrequency} cap` +
+        (perTxn ? `, ${formatCurrency(perTxn)} per-txn` : "") +
+        (atm ? `, ${formatCurrency(atm)} ATM/day` : ""),
+    );
   };
 
   return (
