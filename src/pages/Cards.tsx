@@ -106,7 +106,7 @@ const Cards = () => {
   return (
     <AppLayout
       title="Cards"
-      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in wallet to allocate.`}
+      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in the shared wallet pool.`}
       actions={
         <div className="flex gap-2">
           <FreezeAllDialog />
