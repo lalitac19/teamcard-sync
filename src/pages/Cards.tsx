@@ -850,9 +850,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
-  const dailyEquivalent =
-    limitFrequency === "daily" ? newSpendLimit : limitFrequency === "weekly" ? newSpendLimit / 7 : newSpendLimit / 30;
-  const atmDailyCap = Math.floor(dailyEquivalent * 0.2 * 100) / 100;
+  const atmDailyCap = Math.floor(newSpendLimit * 0.2 * 100) / 100;
   const newAtm = atmEnabled ? Number(atmLimit) || 0 : 0;
   const atmExceedsCap = atmEnabled && newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
 
