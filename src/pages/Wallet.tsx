@@ -89,7 +89,7 @@ const Wallet = () => {
         <Tabs defaultValue="topups">
           <TabsList>
             <TabsTrigger value="topups">Top-up history</TabsTrigger>
-            <TabsTrigger value="allocations">Locked allocations</TabsTrigger>
+            <TabsTrigger value="allocations">Card spend caps</TabsTrigger>
           </TabsList>
 
           <TabsContent value="topups" className="mt-4">
