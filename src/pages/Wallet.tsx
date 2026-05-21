@@ -32,17 +32,21 @@ const COMPANY_BANK = {
 };
 
 const Wallet = () => {
-  const allocated = useMemo(() => totalAllocatedLimits(), []);
+  const spent = useMemo(() => totalSpentAcrossCards(), []);
   const available = useMemo(() => walletAvailable(), []);
   const activeCards = useMemo(
     () => allCards.filter((c) => c.status !== "terminated"),
     [],
   );
+  const totalCaps = useMemo(
+    () => activeCards.reduce((s, c) => s + c.spendLimit, 0),
+    [activeCards],
+  );
 
   return (
     <AppLayout
       title="Wallet"
-      subtitle="Top up the wallet, then allocate limits to cards. Allocated funds are locked to that card until you reallocate."
+      subtitle="A single pool of funds shared by all cards. Card spend caps are not reserved — any card can spend until the wallet is empty (first spend wins)."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
