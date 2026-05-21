@@ -136,9 +136,9 @@ const Wallet = () => {
                       <TableHead>Cardholder</TableHead>
                       <TableHead>Card</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Locked limit</TableHead>
+                      <TableHead className="text-right">Spend cap</TableHead>
                       <TableHead className="text-right">Spent</TableHead>
-                      <TableHead className="text-right">Remaining</TableHead>
+                      <TableHead className="text-right">Cap remaining</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -157,10 +157,10 @@ const Wallet = () => {
                       );
                     })}
                     <TableRow className="bg-muted/30">
-                      <TableCell colSpan={3} className="text-sm font-medium">Total locked</TableCell>
-                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(allocated)}</TableCell>
+                      <TableCell colSpan={3} className="text-sm font-medium">Sum of caps</TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(totalCaps)}</TableCell>
                       <TableCell colSpan={2} className="text-right text-xs text-muted-foreground">
-                        Available: {formatCurrency(available)} of {formatCurrency(walletBalance)}
+                        Wallet available: {formatCurrency(available)} of {formatCurrency(walletBalance)}
                       </TableCell>
                     </TableRow>
                   </TableBody>
