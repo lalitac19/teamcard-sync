@@ -222,7 +222,7 @@ export default function MyRequests() {
                   <Label>Daily ATM withdrawal limit (AED, optional)</Label>
                   <Input type="number" value={atmLimit} onChange={(e) => setAtmLimit(e.target.value)} placeholder="Leave blank to disable" />
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Capped at 20% of the daily spending cap.
+                    The daily cash withdrawal limit is 20% of the assigned spending limit.
                   </p>
                 </div>
                 <div>
