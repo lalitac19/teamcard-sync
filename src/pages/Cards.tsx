@@ -874,6 +874,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
+    if (atmExceedsCap) {
+      return toast.error(`Daily ATM limit cannot exceed 20% of the daily spending cap (${formatCurrency(atmDailyCap)})`);
+    }
     toast.success("Card limits updated");
     setOpen(false);
   };
