@@ -988,27 +988,32 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <div>
                   <p className="text-sm font-medium">Merchant categories</p>
                   <p className="text-xs text-muted-foreground">
-                    Restrict or allow specific merchant categories.
+                    Mark categories to restrict on this card.
                   </p>
                 </div>
-                <Select value={merchantMode} onValueChange={(v) => setMerchantMode(v as "allow" | "block")}>
-                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="allow">Restrict to selected</SelectItem>
-                    <SelectItem value="block">Block selected</SelectItem>
-                  </SelectContent>
-                </Select>
+                <span className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground">Restrict</span>
               </div>
               <div className="grid grid-cols-2 gap-2 rounded-lg border p-3">
-                {MERCHANT_CATEGORIES.map((m) => (
-                  <label key={m} className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={merchants.includes(m)}
-                      onCheckedChange={() => toggleItem(merchants, setMerchants, m)}
-                    />
-                    {m}
-                  </label>
-                ))}
+                {MERCHANT_CATEGORIES.map((m) => {
+                  const active = merchants.includes(m);
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => toggleItem(merchants, setMerchants, m)}
+                      className="flex items-center gap-2 text-left text-sm"
+                    >
+                      <span
+                        className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
+                          active ? "border-destructive bg-destructive text-destructive-foreground" : "border-input"
+                        }`}
+                      >
+                        {active && <X className="h-3 w-3" strokeWidth={3} />}
+                      </span>
+                      {m}
+                    </button>
+                  );
+                })}
               </div>
             </section>
 
@@ -1019,27 +1024,32 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <div>
                   <p className="text-sm font-medium">Geography</p>
                   <p className="text-xs text-muted-foreground">
-                    Restrict where this card can be used.
+                    Mark countries to restrict on this card.
                   </p>
                 </div>
-                <Select value={geoMode} onValueChange={(v) => setGeoMode(v as "allow" | "block")}>
-                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="allow">Restrict to selected</SelectItem>
-                    <SelectItem value="block">Block selected</SelectItem>
-                  </SelectContent>
-                </Select>
+                <span className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground">Restrict</span>
               </div>
               <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto rounded-lg border p-3">
-                {COUNTRIES.map((c) => (
-                  <label key={c.code} className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={regions.includes(c.code)}
-                      onCheckedChange={() => toggleItem(regions, setRegions, c.code)}
-                    />
-                    {c.name} ({c.code})
-                  </label>
-                ))}
+                {COUNTRIES.map((c) => {
+                  const active = regions.includes(c.code);
+                  return (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => toggleItem(regions, setRegions, c.code)}
+                      className="flex items-center gap-2 text-left text-sm"
+                    >
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
+                          active ? "border-destructive bg-destructive text-destructive-foreground" : "border-input"
+                        }`}
+                      >
+                        {active && <X className="h-3 w-3" strokeWidth={3} />}
+                      </span>
+                      {c.name} ({c.code})
+                    </button>
+                  );
+                })}
               </div>
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center justify-between rounded-lg border p-3">
