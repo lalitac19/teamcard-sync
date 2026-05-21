@@ -799,7 +799,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   // Geography controls
   const [geoMode, setGeoMode] = useState<"allow" | "block">("allow");
   const [regions, setRegions] = useState<string[]>(["US", "GB"]);
-  const [allowOnline, setAllowOnline] = useState(true);
+  
   const [allowAtm, setAllowAtm] = useState(false);
 
   // Replace card
