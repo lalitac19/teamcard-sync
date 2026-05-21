@@ -79,6 +79,14 @@ export default function MyRequests() {
       toast.error("Please enter a limit and reason.");
       return;
     }
+    const atm = parseFloat(atmLimit) || 0;
+    const dailyEq =
+      period === "daily" ? lim : period === "weekly" ? lim / 7 : period === "monthly" ? lim / 30 : lim;
+    const atmCap = Math.floor(dailyEq * 0.2 * 100) / 100;
+    if (atm > atmCap) {
+      toast.error(`Daily ATM limit cannot exceed 20% of the daily spending cap (AED ${atmCap.toFixed(2)})`);
+      return;
+    }
     const req: CardRequest = {
       id: `cr${Date.now()}`,
       date: new Date().toISOString().slice(0, 10),
@@ -86,12 +94,14 @@ export default function MyRequests() {
       type,
       requestedLimit: lim,
       limitPeriod: period,
+      atmDailyLimit: atm > 0 ? atm : undefined,
       reason,
       status: "pending",
     };
     setCardReqs((prev) => [req, ...prev]);
     setCardOpen(false);
     setLimit("");
+    setAtmLimit("");
     setReason("");
     toast.success("Card request submitted");
   };
