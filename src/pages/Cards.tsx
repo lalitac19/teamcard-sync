@@ -39,16 +39,19 @@ import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, 
 import { toast } from "sonner";
 
 const MERCHANT_CATEGORIES = [
-  "Software & SaaS",
-  "Travel & Transportation",
-  "Lodging & Hotels",
-  "Restaurants & Food",
-  "Office Supplies",
-  "Marketing & Advertising",
-  "Professional Services",
-  "Utilities & Telecom",
+  "Food",
+  "Bars & Nightlife",
+  "Retail",
+  "Travel",
+  "Utilities",
   "Entertainment",
-  "ATM & Cash",
+  "Healthcare",
+  "Education",
+  "Legal & Accounting",
+  "Professional Services",
+  "Charities & Memberships",
+  "Government Services",
+  "Financial Services",
 ];
 
 const REGIONS = [
