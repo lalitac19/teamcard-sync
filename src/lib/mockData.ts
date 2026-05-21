@@ -407,6 +407,14 @@ export const totalSpentAcrossCards = (excludeId?: string): number =>
 export const walletAvailable = (excludeId?: string): number =>
   Math.max(0, walletBalance - totalSpentAcrossCards(excludeId));
 
+/**
+ * Whether the wallet has ever been funded. Card issuance is gated on this:
+ * the first top-up must be completed before any card can be issued. After
+ * that, cards can be issued freely regardless of current wallet balance.
+ */
+export const hasCompletedFirstTopUp = (): boolean =>
+  walletTopUps.some((t) => t.status === "completed");
+
 /** Distinct countries appearing across transactions, reimbursements, and invoices. */
 export const allCountries = (): string[] => {
   const set = new Set<string>();
