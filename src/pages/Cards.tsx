@@ -903,6 +903,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   const saveLimits = () => {
     if (newSpendLimit <= 0) return toast.error("Spending cap must be greater than zero");
+    if (exceedsUnallocated) {
+      return toast.error(`Only ${formatCurrency(unallocatedExcludingThis)} unallocated in the wallet. Top up or reduce another card's limit to free up funds.`);
+    }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
