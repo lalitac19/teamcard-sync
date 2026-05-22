@@ -642,8 +642,11 @@ function MultiSelectChips({
 }
 
 function IssueCardDialog() {
-  const [categories, setCategories] = useState<string[]>([]);
-  const [countries, setCountries] = useState<string[]>([]);
+  const [blockedCategories, setBlockedCategories] = useState<string[]>([]);
+  const [blockedRegions, setBlockedRegions] = useState<string[]>([]);
+  const toggleBlocked = (list: string[], setList: (v: string[]) => void, item: string) => {
+    setList(list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
+  };
   const [allocatedLimit, setAllocatedLimit] = useState("");
   const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [perTxnLimit, setPerTxnLimit] = useState("");
