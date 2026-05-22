@@ -686,7 +686,7 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Sets a spending cap for this card. The cap is reserved against the wallet — the sum of all card limits cannot exceed the wallet balance.
+          Sets a spending cap for this card. Cards draw from the shared wallet balance — funds are consumed on a first-come basis as cards transact.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
