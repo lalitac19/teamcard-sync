@@ -656,11 +656,9 @@ function IssueCardDialog() {
 
   const firstTopUpDone = hasCompletedFirstTopUp();
   const requested = Number(allocatedLimit) || 0;
-  const unallocated = walletUnallocated();
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
-  const exceedsUnallocated = requested > 0 && requested > unallocated;
 
   // ATM withdrawal is capped at 20% of the assigned spending limit.
   const atmDailyCap = Math.floor(requested * 0.2 * 100) / 100;
