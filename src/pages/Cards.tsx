@@ -892,13 +892,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   );
   const [atmEnabled, setAtmEnabled] = useState(!!card.atmDailyLimit);
   const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
-  // Wallet allocation — caps ARE reserved. Compute unallocated excluding this card.
-  const walletPoolAvailable = walletAvailable();
-  const unallocatedExcludingThis = walletUnallocated(card.id);
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
-  const exceedsUnallocated = newSpendLimit > 0 && newSpendLimit > unallocatedExcludingThis;
   const atmDailyCap = Math.floor(newSpendLimit * 0.2 * 100) / 100;
   const newAtm = atmEnabled ? Number(atmLimit) || 0 : 0;
   const atmExceedsCap = atmEnabled && newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
