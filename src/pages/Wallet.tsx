@@ -46,7 +46,7 @@ const Wallet = () => {
   return (
     <AppLayout
       title="Wallet"
-      subtitle="A single pool of funds shared by all cards. Card spend caps are not reserved — any card can spend until the wallet is empty (first spend wins)."
+      subtitle="A single wallet funds all cards. Each card reserves its spending cap from the wallet — to issue a new card, the wallet must have enough unallocated funds, otherwise top up or reduce an existing card's limit."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
@@ -63,18 +63,18 @@ const Wallet = () => {
           </div>
           <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
           <p className="mt-1 text-xs text-white/60">
-            Shared pool — every active card draws from this same balance. Spend caps on cards are limits, not reservations.
+            Each active card reserves its spending cap from this balance. Unallocated funds remain available for new cards or top-ups.
           </p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
             <div>
-              <p className="text-white/60">Spent from wallet</p>
-              <p className="mt-1 font-semibold">{formatCurrency(spent)}</p>
+              <p className="text-white/60">Allocated to cards</p>
+              <p className="mt-1 font-semibold">{formatCurrency(totalCaps)}</p>
               <p className="text-xs text-white/50">{activeCards.length} active cards</p>
             </div>
             <div>
-              <p className="text-white/60">Available to spend</p>
+              <p className="text-white/60">Unallocated (available for new cards)</p>
               <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
-              <p className="text-xs text-white/50">First spend wins</p>
+              <p className="text-xs text-white/50">Spent so far: {formatCurrency(spent)}</p>
             </div>
             <div>
               <p className="text-white/60">Funding IBAN</p>
