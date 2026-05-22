@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { cards, formatCurrency, hasCompletedFirstTopUp, memberById, members, walletAvailable, type Card as CardModel } from "@/lib/mockData";
+import { cards, formatCurrency, hasCompletedFirstTopUp, memberById, members, walletAvailable, walletUnallocated, type Card as CardModel } from "@/lib/mockData";
 import { Plus, Snowflake, ArrowLeftRight, CreditCard, Settings2, AlertTriangle, RefreshCcw, Ban, ShieldCheck, History, Plus as PlusIcon, Pencil, ShieldAlert, Store, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -653,9 +653,11 @@ function IssueCardDialog() {
 
   const firstTopUpDone = hasCompletedFirstTopUp();
   const requested = Number(allocatedLimit) || 0;
+  const unallocated = walletUnallocated();
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
+  const exceedsUnallocated = requested > 0 && requested > unallocated;
 
   // ATM withdrawal is capped at 20% of the assigned spending limit.
   const atmDailyCap = Math.floor(requested * 0.2 * 100) / 100;
@@ -665,6 +667,9 @@ function IssueCardDialog() {
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
     if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
+    if (exceedsUnallocated) {
+      return toast.error(`Only ${formatCurrency(unallocated)} unallocated in the wallet. Top up or reduce an existing card's limit to free up funds.`);
+    }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
@@ -683,7 +688,7 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Sets a spending cap for this card. Card issuance is unlimited once the wallet has been funded — caps are limits, not reservations, and cards spend from the shared wallet on a first-come, first-served basis.
+          Sets a spending cap for this card. The cap is reserved against the wallet — the sum of all card limits cannot exceed the wallet balance.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
@@ -745,8 +750,10 @@ function IssueCardDialog() {
               </SelectContent>
             </Select>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet on a first-come, first-served basis.
+          <p className={`text-xs ${exceedsUnallocated ? "text-destructive" : "text-muted-foreground"}`}>
+            {exceedsUnallocated
+              ? `Only ${formatCurrency(unallocated)} unallocated in the wallet. Top up or reduce another card's limit to free up funds.`
+              : `Reserved against the wallet. ${formatCurrency(unallocated)} unallocated and available to assign.`}
           </p>
         </div>
         <div className="space-y-1.5">
@@ -822,7 +829,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={!firstTopUpDone || !requested || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
+        <Button onClick={submit} disabled={!firstTopUpDone || !requested || exceedsUnallocated || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
@@ -845,11 +852,13 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   );
   const [atmEnabled, setAtmEnabled] = useState(!!card.atmDailyLimit);
   const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
-  // Wallet pool is shared — caps are not reservations. Show available for info only.
+  // Wallet allocation — caps ARE reserved. Compute unallocated excluding this card.
   const walletPoolAvailable = walletAvailable();
+  const unallocatedExcludingThis = walletUnallocated(card.id);
   const newSpendLimit = Number(spendLimit) || 0;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
+  const exceedsUnallocated = newSpendLimit > 0 && newSpendLimit > unallocatedExcludingThis;
   const atmDailyCap = Math.floor(newSpendLimit * 0.2 * 100) / 100;
   const newAtm = atmEnabled ? Number(atmLimit) || 0 : 0;
   const atmExceedsCap = atmEnabled && newAtm > 0 && newSpendLimit > 0 && newAtm > atmDailyCap;
@@ -894,6 +903,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   const saveLimits = () => {
     if (newSpendLimit <= 0) return toast.error("Spending cap must be greater than zero");
+    if (exceedsUnallocated) {
+      return toast.error(`Only ${formatCurrency(unallocatedExcludingThis)} unallocated in the wallet. Top up or reduce another card's limit to free up funds.`);
+    }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
@@ -1023,8 +1035,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   </SelectContent>
                 </Select>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
+              <p className={`text-xs ${exceedsUnallocated ? "text-destructive" : "text-muted-foreground"}`}>
+                {exceedsUnallocated
+                  ? `Only ${formatCurrency(unallocatedExcludingThis)} unallocated in the wallet. Top up or reduce another card's limit to free up funds.`
+                  : `Reserved against the wallet. ${formatCurrency(unallocatedExcludingThis)} unallocated and available to assign to this card.`}
               </p>
             </div>
             <div className="space-y-1.5">
@@ -1082,7 +1096,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={perTxnExceedsSpend || atmExceedsCap}
+                disabled={exceedsUnallocated || perTxnExceedsSpend || atmExceedsCap}
               >
                 Save limits
               </Button>

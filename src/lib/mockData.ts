@@ -389,9 +389,8 @@ export const memberById = (id: string) => members.find((m) => m.id === id);
 export const cardById = (id: string) => cards.find((c) => c.id === id);
 
 /**
- * Sum of spending caps across all active cards. Caps are NOT reserved against
- * the wallet — multiple cards can share the same pool of funds on a
- * first-come, first-served basis. This figure is informational only.
+ * Sum of spending caps across all active cards. Caps ARE reserved against
+ * the wallet — the sum of allocations cannot exceed the wallet balance.
  */
 export const totalAllocatedLimits = (excludeId?: string): number =>
   cards
@@ -405,11 +404,17 @@ export const totalSpentAcrossCards = (excludeId?: string): number =>
     .reduce((s, c) => s + c.spent, 0);
 
 /**
- * Funds remaining in the shared wallet pool after card spend.
- * All active cards draw from this same pool — first spend wins.
+ * Funds remaining in the wallet after deducting actual spend.
  */
 export const walletAvailable = (excludeId?: string): number =>
   Math.max(0, walletBalance - totalSpentAcrossCards(excludeId));
+
+/**
+ * Unallocated wallet funds — wallet balance minus the sum of spending caps
+ * already assigned to active cards. New allocations must fit within this.
+ */
+export const walletUnallocated = (excludeId?: string): number =>
+  Math.max(0, walletBalance - totalAllocatedLimits(excludeId));
 
 /**
  * Whether the wallet has ever been funded. Card issuance is gated on this:
