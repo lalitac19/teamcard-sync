@@ -185,10 +185,7 @@ const Dashboard = () => {
             <div>
               <p className="text-xs uppercase tracking-widest text-white/60">Wallet balance</p>
               <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(available)}</p>
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
-                <span>Topped up: {formatCurrency(walletBalance)}</span>
-                <span>Spent: {formatCurrency(walletBalance - available)}</span>
-              </div>
+              
             </div>
             <div className="flex gap-2">
               <Button size="sm" variant="secondary" className="bg-white/10 text-white hover:bg-white/20 border-0" asChild>
