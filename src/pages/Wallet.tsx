@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  walletTopUps, cards as allCards, walletBalance, walletAvailable,
+  walletTopUps, cards as allCards, walletBalance, walletAvailable, walletUnallocated,
   totalSpentAcrossCards, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
@@ -34,6 +34,7 @@ const COMPANY_BANK = {
 const Wallet = () => {
   const spent = useMemo(() => totalSpentAcrossCards(), []);
   const available = useMemo(() => walletAvailable(), []);
+  const unallocated = useMemo(() => walletUnallocated(), []);
   const activeCards = useMemo(
     () => allCards.filter((c) => c.status !== "terminated"),
     [],
@@ -46,7 +47,7 @@ const Wallet = () => {
   return (
     <AppLayout
       title="Wallet"
-      subtitle="A single pool of funds shared by all cards. Card spend caps are not reserved — any card can spend until the wallet is empty (first spend wins)."
+      subtitle="A single pool of funds. Each card's spending cap is reserved against the wallet — the sum of all card limits cannot exceed the wallet balance. To issue more cards, top up or reduce existing limits."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
@@ -63,18 +64,18 @@ const Wallet = () => {
           </div>
           <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
           <p className="mt-1 text-xs text-white/60">
-            Shared pool — every active card draws from this same balance. Spend caps on cards are limits, not reservations.
+            Card spending caps are reserved against this balance. Sum of card limits cannot exceed wallet balance.
           </p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
             <div>
-              <p className="text-white/60">Spent from wallet</p>
-              <p className="mt-1 font-semibold">{formatCurrency(spent)}</p>
-              <p className="text-xs text-white/50">{activeCards.length} active cards</p>
+              <p className="text-white/60">Allocated to cards</p>
+              <p className="mt-1 font-semibold">{formatCurrency(totalCaps)}</p>
+              <p className="text-xs text-white/50">{activeCards.length} active cards · {formatCurrency(spent)} spent</p>
             </div>
             <div>
-              <p className="text-white/60">Available to spend</p>
-              <p className="mt-1 font-semibold">{formatCurrency(available)}</p>
-              <p className="text-xs text-white/50">First spend wins</p>
+              <p className="text-white/60">Unallocated</p>
+              <p className="mt-1 font-semibold">{formatCurrency(unallocated)}</p>
+              <p className="text-xs text-white/50">Available to assign to new cards</p>
             </div>
             <div>
               <p className="text-white/60">Funding IBAN</p>
