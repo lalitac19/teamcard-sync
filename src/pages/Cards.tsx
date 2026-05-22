@@ -668,9 +668,6 @@ function IssueCardDialog() {
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
     if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
-    if (exceedsUnallocated) {
-      return toast.error(`Only ${formatCurrency(unallocated)} unallocated in the wallet. Top up or reduce an existing card's limit to free up funds.`);
-    }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
