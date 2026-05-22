@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  walletTopUps, cards as allCards, walletBalance, walletAvailable, walletUnallocated,
+  walletTopUps, cards as allCards, walletBalance, walletAvailable,
   totalSpentAcrossCards, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
@@ -34,7 +34,6 @@ const COMPANY_BANK = {
 const Wallet = () => {
   const spent = useMemo(() => totalSpentAcrossCards(), []);
   const available = useMemo(() => walletAvailable(), []);
-  const unallocated = useMemo(() => walletUnallocated(), []);
   const activeCards = useMemo(
     () => allCards.filter((c) => c.status !== "terminated"),
     [],
@@ -47,7 +46,7 @@ const Wallet = () => {
   return (
     <AppLayout
       title="Wallet"
-      subtitle="A single pool of funds. Each card's spending cap is reserved against the wallet — the sum of all card limits cannot exceed the wallet balance. To issue more cards, top up or reduce existing limits."
+      subtitle="A single pool of funds. All active cards spend from this shared balance on a first-come basis. After your first top-up, you can issue cards freely — each with its own spending cap."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
@@ -57,25 +56,25 @@ const Wallet = () => {
       <Card className="gradient-hero text-white border-0 shadow-card">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-widest text-white/60">Wallet · Total balance</p>
+            <p className="text-xs uppercase tracking-widest text-white/60">Wallet · Available balance</p>
             <Badge className="bg-white/15 text-white border-0 hover:bg-white/15 gap-1">
               <WalletIcon className="h-3 w-3" /> Wallet
             </Badge>
           </div>
-          <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletBalance)}</p>
+          <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(available)}</p>
           <p className="mt-1 text-xs text-white/60">
-            Card spending caps are reserved against this balance. Sum of card limits cannot exceed wallet balance.
+            Shared across all active cards. Card spending caps do not reserve funds — cards draw from this balance as they transact.
           </p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-6 text-sm">
             <div>
-              <p className="text-white/60">Allocated to cards</p>
-              <p className="mt-1 font-semibold">{formatCurrency(totalCaps)}</p>
-              <p className="text-xs text-white/50">{activeCards.length} active cards · {formatCurrency(spent)} spent</p>
+              <p className="text-white/60">Total topped up</p>
+              <p className="mt-1 font-semibold">{formatCurrency(walletBalance)}</p>
+              <p className="text-xs text-white/50">{formatCurrency(spent)} spent across {activeCards.length} active cards</p>
             </div>
             <div>
-              <p className="text-white/60">Unallocated</p>
-              <p className="mt-1 font-semibold">{formatCurrency(unallocated)}</p>
-              <p className="text-xs text-white/50">Available to assign to new cards</p>
+              <p className="text-white/60">Sum of card caps</p>
+              <p className="mt-1 font-semibold">{formatCurrency(totalCaps)}</p>
+              <p className="text-xs text-white/50">Informational only — caps don't reserve funds</p>
             </div>
             <div>
               <p className="text-white/60">Funding IBAN</p>
@@ -85,6 +84,7 @@ const Wallet = () => {
           </div>
         </CardContent>
       </Card>
+
 
       <div className="mt-6">
         <Tabs defaultValue="topups">
@@ -161,7 +161,7 @@ const Wallet = () => {
                       <TableCell colSpan={3} className="text-sm font-medium">Sum of caps</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(totalCaps)}</TableCell>
                       <TableCell colSpan={2} className="text-right text-xs text-muted-foreground">
-                        Unallocated: {formatCurrency(unallocated)} of {formatCurrency(walletBalance)} · {formatCurrency(available)} unspent
+                        Wallet balance: {formatCurrency(available)} available of {formatCurrency(walletBalance)} topped up
                       </TableCell>
                     </TableRow>
                   </TableBody>
