@@ -34,7 +34,7 @@ const COMPANY_BANK = {
 const Wallet = () => {
   const spent = useMemo(() => totalSpentAcrossCards(), []);
   const available = useMemo(() => walletAvailable(), []);
-  const unallocated = useMemo(() => walletUnallocated(), []);
+  const spent = useMemo(() => totalSpentAcrossCards(), []);
   const activeCards = useMemo(
     () => allCards.filter((c) => c.status !== "terminated"),
     [],
