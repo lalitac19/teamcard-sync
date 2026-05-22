@@ -852,9 +852,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   );
   const [atmEnabled, setAtmEnabled] = useState(!!card.atmDailyLimit);
   const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
-  // Wallet pool is shared — caps are not reservations. Show available for info only.
-  const walletPoolAvailable = walletAvailable();
+  // Wallet pool minus other cards' allocations — this card can grow into the remainder.
+  const walletPoolAvailable = walletAvailable(card.id);
   const newSpendLimit = Number(spendLimit) || 0;
+  const exceedsWallet = newSpendLimit > walletPoolAvailable;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
   const atmDailyCap = Math.floor(newSpendLimit * 0.2 * 100) / 100;
