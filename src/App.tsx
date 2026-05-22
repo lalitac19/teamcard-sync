@@ -11,7 +11,6 @@ import Transactions from "./pages/Transactions.tsx";
 import Wallet from "./pages/Wallet.tsx";
 import AccountingExport from "./pages/AccountingExport.tsx";
 import AccountStatement from "./pages/AccountStatement.tsx";
-import CardStatement from "./pages/CardStatement.tsx";
 import Reimbursements from "./pages/Reimbursements.tsx";
 import Invoices from "./pages/Invoices.tsx";
 import Approvals from "./pages/Approvals.tsx";
@@ -44,7 +43,6 @@ const App = () => (
             <Route path="/approvals" element={<Approvals />} />
             <Route path="/accounting" element={<AccountingExport />} />
             <Route path="/statement" element={<AccountStatement />} />
-            <Route path="/statement/cards" element={<CardStatement />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/settings" element={<Settings />} />
 
