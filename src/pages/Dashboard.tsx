@@ -40,7 +40,7 @@ import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   // ---------- Aggregations ----------
-  const allocatedToCards = useMemo(() => totalAllocatedLimits(), []);
+  
   const available = useMemo(() => walletAvailable(), []);
   const processingTopUps = useMemo(
     () => walletTopUps.filter((w) => w.status === "processing").reduce((s, w) => s + w.amount, 0),
