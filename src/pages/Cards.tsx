@@ -810,9 +810,6 @@ function IssueCardDialog() {
             </div>
           )}
         </div>
-        <MultiSelectChips
-          label="Allowed merchant categories"
-          placeholder="all categories allowed"
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
