@@ -829,7 +829,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={!firstTopUpDone || !requested || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
+        <Button onClick={submit} disabled={!firstTopUpDone || !requested || exceedsWallet || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
