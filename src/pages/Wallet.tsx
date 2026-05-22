@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  walletTopUps, cards as allCards, walletBalance, walletAvailable, walletUnallocated,
+  walletTopUps, cards as allCards, walletBalance, walletAvailable,
   totalSpentAcrossCards, memberById,
   formatCurrency, formatDate,
 } from "@/lib/mockData";
