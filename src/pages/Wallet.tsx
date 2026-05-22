@@ -46,7 +46,7 @@ const Wallet = () => {
   return (
     <AppLayout
       title="Wallet"
-      subtitle="A single pool of funds shared by all cards. Card spend caps are not reserved — any card can spend until the wallet is empty (first spend wins)."
+      subtitle="A single wallet funds all cards. Each card reserves its spending cap from the wallet — to issue a new card, the wallet must have enough unallocated funds, otherwise top up or reduce an existing card's limit."
       actions={
         <div className="flex gap-2">
           <TopUpDialog />
