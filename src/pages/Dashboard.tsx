@@ -31,7 +31,7 @@ import {
   cardRequests,
   walletBalance,
   walletAvailable,
-  totalAllocatedLimits,
+  
   formatCurrency,
   formatDate,
   memberById,
