@@ -161,7 +161,7 @@ const Wallet = () => {
                       <TableCell colSpan={3} className="text-sm font-medium">Sum of caps</TableCell>
                       <TableCell className="text-right text-sm font-semibold">{formatCurrency(totalCaps)}</TableCell>
                       <TableCell colSpan={2} className="text-right text-xs text-muted-foreground">
-                        Wallet available: {formatCurrency(available)} of {formatCurrency(walletBalance)}
+                        Unallocated: {formatCurrency(unallocated)} of {formatCurrency(walletBalance)} · {formatCurrency(available)} unspent
                       </TableCell>
                     </TableRow>
                   </TableBody>
