@@ -41,7 +41,7 @@ import {
   type CardType,
 } from "@/lib/mockData";
 import { useCurrentUser } from "@/lib/currentUser";
-import { CreditCard, Plus, ArrowUp } from "lucide-react";
+import { CreditCard, Plus, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 const statusBadge = (s: string) => {
@@ -63,7 +63,7 @@ export default function MyRequests() {
   const [atmLimit, setAtmLimit] = useState("");
   const [reason, setReason] = useState("");
 
-  // Top-up dialog
+  // Limit-increase dialog
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [cardId, setCardId] = useState<string>("");
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -126,25 +126,25 @@ export default function MyRequests() {
     setCardId("");
     setTopUpAmount("");
     setTopUpReason("");
-    toast.success("Top-up request submitted");
+    toast.success("Limit-increase request submitted");
   };
 
   return (
     <AppLayout
       title="My requests"
-      subtitle="Request a new card or a top-up on an existing one."
+      subtitle="Request a new card or a spending-limit increase on an existing one."
       actions={
         <div className="flex gap-2">
           <Dialog open={topUpOpen} onOpenChange={setTopUpOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" disabled={myCards.length === 0}>
-                <ArrowUp className="mr-2 h-4 w-4" /> Top-up request
+                <TrendingUp className="mr-2 h-4 w-4" /> Limit-increase request
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Request a card top-up</DialogTitle>
-                <DialogDescription>Admin will review and fund your card.</DialogDescription>
+                <DialogTitle>Request a spending-limit increase</DialogTitle>
+                <DialogDescription>Admin will review your request against policy caps.</DialogDescription>
               </DialogHeader>
               <div className="space-y-3">
                 <div>
@@ -154,19 +154,19 @@ export default function MyRequests() {
                     <SelectContent>
                       {myCards.map((c) => (
                         <SelectItem key={c.id} value={c.id}>
-                          {c.type} ••••{c.last4} — {formatCurrency(c.spendLimit - c.spent)} remaining
+                          {c.type} ••••{c.last4} — current limit {formatCurrency(c.spendLimit)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Amount (AED)</Label>
+                  <Label>Additional limit (AED)</Label>
                   <Input type="number" value={topUpAmount} onChange={(e) => setTopUpAmount(e.target.value)} placeholder="0.00" />
                 </div>
                 <div>
                   <Label>Reason</Label>
-                  <Textarea value={topUpReason} onChange={(e) => setTopUpReason(e.target.value)} placeholder="Why do you need more funds?" />
+                  <Textarea value={topUpReason} onChange={(e) => setTopUpReason(e.target.value)} placeholder="Why do you need a higher limit?" />
                 </div>
               </div>
               <DialogFooter>
@@ -278,7 +278,7 @@ export default function MyRequests() {
         <Card className="shadow-soft">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <ArrowUp className="h-4 w-4" /> Top-up requests
+              <TrendingUp className="h-4 w-4" /> Limit-increase requests
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -287,7 +287,7 @@ export default function MyRequests() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Card</TableHead>
-                  <TableHead>Amount</TableHead>
+                  <TableHead>Additional limit</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -306,7 +306,7 @@ export default function MyRequests() {
                 {myTopUps.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
-                      No top-up requests yet.
+                      No limit-increase requests yet.
                     </TableCell>
                   </TableRow>
                 )}

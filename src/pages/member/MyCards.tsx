@@ -125,7 +125,7 @@ export default function MyCards() {
                       {c.status === "frozen" ? "Unfreeze" : "Freeze"}
                     </Button>
                     <Button variant="outline" size="sm" className="flex-1" asChild>
-                      <Link to="/me/requests">Top up</Link>
+                      <Link to="/me/requests">Request limit increase</Link>
                     </Button>
                     {c.type === "virtual" && (
                       <Button
