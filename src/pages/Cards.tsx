@@ -688,7 +688,7 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Sets a spending cap for this card. Card issuance is unlimited once the wallet has been funded — caps are limits, not reservations, and cards spend from the shared wallet on a first-come, first-served basis.
+          Sets a spending cap for this card. The cap is allocated from the wallet — issuing a new card requires enough unallocated wallet funds, otherwise top up or reduce an existing card's limit.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
