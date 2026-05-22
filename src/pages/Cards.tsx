@@ -750,10 +750,11 @@ function IssueCardDialog() {
               </SelectContent>
             </Select>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet on a first-come, first-served basis.
+          <p className={`text-xs ${exceedsUnallocated ? "text-destructive" : "text-muted-foreground"}`}>
+            {exceedsUnallocated
+              ? `Only ${formatCurrency(unallocated)} unallocated in the wallet. Top up or reduce another card's limit to free up funds.`
+              : `Reserved against the wallet. ${formatCurrency(unallocated)} unallocated and available to assign.`}
           </p>
-        </div>
         <div className="space-y-1.5">
           <Label>Per-transaction limit (AED, optional)</Label>
           <Input
