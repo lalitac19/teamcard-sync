@@ -1127,7 +1127,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={exceedsUnallocated || perTxnExceedsSpend || atmExceedsCap}
+                disabled={perTxnExceedsSpend || atmExceedsCap}
               >
                 Save limits
               </Button>
