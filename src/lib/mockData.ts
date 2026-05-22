@@ -405,12 +405,11 @@ export const totalSpentAcrossCards = (excludeId?: string): number =>
     .reduce((s, c) => s + c.spent, 0);
 
 /**
- * Funds remaining in the wallet after card limit allocations.
- * Each active card reserves its spendLimit against the wallet, so the
- * wallet must have enough headroom to cover a new card's allocation.
+ * Funds remaining in the shared wallet pool after card spend.
+ * All active cards draw from this same pool — first spend wins.
  */
 export const walletAvailable = (excludeId?: string): number =>
-  Math.max(0, walletBalance - totalAllocatedLimits(excludeId));
+  Math.max(0, walletBalance - totalSpentAcrossCards(excludeId));
 
 /**
  * Whether the wallet has ever been funded. Card issuance is gated on this:

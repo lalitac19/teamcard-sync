@@ -106,7 +106,7 @@ const Cards = () => {
   return (
     <AppLayout
       title="Cards"
-      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} of the wallet still available to allocate to new cards.`}
+      subtitle={`${cards.length} cards issued · ${formatCurrency(available)} available in the shared wallet pool.`}
       actions={
         <div className="flex gap-2">
           <FreezeAllDialog />
@@ -653,8 +653,6 @@ function IssueCardDialog() {
 
   const firstTopUpDone = hasCompletedFirstTopUp();
   const requested = Number(allocatedLimit) || 0;
-  const walletPoolAvailable = walletAvailable();
-  const exceedsWallet = requested > 0 && requested > walletPoolAvailable;
 
   const perTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = perTxn > 0 && requested > 0 && perTxn > requested;
@@ -667,9 +665,6 @@ function IssueCardDialog() {
   const submit = () => {
     if (!firstTopUpDone) return toast.error("Complete your first wallet top-up before issuing cards");
     if (!requested || requested <= 0) return toast.error("Enter a spending cap for this card");
-    if (exceedsWallet) {
-      return toast.error(`Not enough unallocated wallet funds. Only ${formatCurrency(walletPoolAvailable)} available — top up the wallet or reduce an existing card's limit.`);
-    }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
@@ -688,7 +683,7 @@ function IssueCardDialog() {
       <DialogHeader>
         <DialogTitle>Issue a card</DialogTitle>
         <DialogDescription>
-          Sets a spending cap for this card. The cap is allocated from the wallet — issuing a new card requires enough unallocated wallet funds, otherwise top up or reduce an existing card's limit.
+          Sets a spending cap for this card. Card issuance is unlimited once the wallet has been funded — caps are limits, not reservations, and cards spend from the shared wallet on a first-come, first-served basis.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-2">
@@ -750,10 +745,8 @@ function IssueCardDialog() {
               </SelectContent>
             </Select>
           </div>
-          <p className={`text-xs ${exceedsWallet ? "text-destructive" : "text-muted-foreground"}`}>
-            {exceedsWallet
-              ? `Exceeds unallocated wallet funds (${formatCurrency(walletPoolAvailable)} available). Top up the wallet or reduce another card's limit.`
-              : `Allocated from the wallet. ${formatCurrency(walletPoolAvailable)} currently unallocated.`}
+          <p className="text-xs text-muted-foreground">
+            Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet on a first-come, first-served basis.
           </p>
         </div>
         <div className="space-y-1.5">
@@ -829,7 +822,7 @@ function IssueCardDialog() {
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
-        <Button onClick={submit} disabled={!firstTopUpDone || !requested || exceedsWallet || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
+        <Button onClick={submit} disabled={!firstTopUpDone || !requested || perTxnExceedsSpend || atmExceedsCap}>Issue card</Button>
       </DialogFooter>
     </DialogContent>
   );
@@ -852,10 +845,9 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   );
   const [atmEnabled, setAtmEnabled] = useState(!!card.atmDailyLimit);
   const [atmLimit, setAtmLimit] = useState(card.atmDailyLimit ? String(card.atmDailyLimit) : "");
-  // Wallet pool minus other cards' allocations — this card can grow into the remainder.
-  const walletPoolAvailable = walletAvailable(card.id);
+  // Wallet pool is shared — caps are not reservations. Show available for info only.
+  const walletPoolAvailable = walletAvailable();
   const newSpendLimit = Number(spendLimit) || 0;
-  const exceedsWallet = newSpendLimit > walletPoolAvailable;
   const newPerTxn = Number(perTxnLimit) || 0;
   const perTxnExceedsSpend = newPerTxn > 0 && newSpendLimit > 0 && newPerTxn > newSpendLimit;
   const atmDailyCap = Math.floor(newSpendLimit * 0.2 * 100) / 100;
@@ -902,9 +894,6 @@ function ManageCardDialog({ card }: { card: CardModel }) {
 
   const saveLimits = () => {
     if (newSpendLimit <= 0) return toast.error("Spending cap must be greater than zero");
-    if (exceedsWallet) {
-      return toast.error(`Not enough unallocated wallet funds. Only ${formatCurrency(walletPoolAvailable)} available for this card — top up the wallet or reduce another card's limit.`);
-    }
     if (perTxnExceedsSpend) {
       return toast.error("Per-transaction limit cannot exceed the spending cap");
     }
@@ -1034,10 +1023,8 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   </SelectContent>
                 </Select>
               </div>
-              <p className={`text-xs ${exceedsWallet ? "text-destructive" : "text-muted-foreground"}`}>
-                {exceedsWallet
-                  ? `Exceeds unallocated wallet funds (${formatCurrency(walletPoolAvailable)} available for this card). Top up the wallet or reduce another card's limit.`
-                  : `Allocated from the wallet. ${formatCurrency(walletPoolAvailable)} available for this card (excludes its current allocation).`}
+              <p className="text-xs text-muted-foreground">
+                Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -1095,7 +1082,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 onClick={saveLimits}
-                disabled={exceedsWallet || perTxnExceedsSpend || atmExceedsCap}
+                disabled={perTxnExceedsSpend || atmExceedsCap}
               >
                 Save limits
               </Button>
