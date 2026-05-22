@@ -642,8 +642,11 @@ function MultiSelectChips({
 }
 
 function IssueCardDialog() {
-  const [categories, setCategories] = useState<string[]>([]);
-  const [countries, setCountries] = useState<string[]>([]);
+  const [blockedCategories, setBlockedCategories] = useState<string[]>([]);
+  const [blockedRegions, setBlockedRegions] = useState<string[]>([]);
+  const toggleBlocked = (list: string[], setList: (v: string[]) => void, item: string) => {
+    setList(list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
+  };
   const [allocatedLimit, setAllocatedLimit] = useState("");
   const [limitFrequency, setLimitFrequency] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [perTxnLimit, setPerTxnLimit] = useState("");
@@ -807,25 +810,69 @@ function IssueCardDialog() {
             </div>
           )}
         </div>
-        <MultiSelectChips
-          label="Allowed merchant categories"
-          placeholder="all categories allowed"
-          allLabel="No restrictions"
-          options={MERCHANT_CATEGORIES.map((c) => ({ value: c, label: c }))}
-          selected={categories}
-          onChange={setCategories}
-        />
-        <MultiSelectChips
-          label="Allowed geography"
-          placeholder="all regions allowed"
-          allLabel="No restrictions"
-          options={[
-            { value: "Domestic", label: "Domestic" },
-            { value: "International", label: "International" },
-          ]}
-          selected={countries}
-          onChange={setCountries}
-        />
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium">Merchant categories</Label>
+              <p className="text-xs text-muted-foreground">Mark categories to restrict on this card.</p>
+            </div>
+            <span className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground">Restrict</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 rounded-lg border p-3">
+            {MERCHANT_CATEGORIES.map((m) => {
+              const active = blockedCategories.includes(m);
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => toggleBlocked(blockedCategories, setBlockedCategories, m)}
+                  className="flex items-center gap-2 text-left text-sm"
+                >
+                  <span
+                    className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
+                      active ? "border-destructive bg-destructive text-destructive-foreground" : "border-input"
+                    }`}
+                  >
+                    {active && <X className="h-3 w-3" strokeWidth={3} />}
+                  </span>
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium">Geography</Label>
+              <p className="text-xs text-muted-foreground">Mark regions to restrict on this card.</p>
+            </div>
+            <span className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground">Restrict</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 rounded-lg border p-3">
+            {(["Domestic", "International"] as const).map((label) => {
+              const active = blockedRegions.includes(label);
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => toggleBlocked(blockedRegions, setBlockedRegions, label)}
+                  className="flex items-center gap-2 text-left text-sm"
+                >
+                  <span
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
+                      active ? "border-destructive bg-destructive text-destructive-foreground" : "border-input"
+                    }`}
+                  >
+                    {active && <X className="h-3 w-3" strokeWidth={3} />}
+                  </span>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </div>
       <DialogFooter>
         <Button variant="outline">Cancel</Button>
