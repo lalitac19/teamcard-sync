@@ -1035,8 +1035,10 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   </SelectContent>
                 </Select>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Maximum this card can spend in the chosen period. Funds are drawn from the shared wallet ({formatCurrency(walletPoolAvailable)} available) on a first-come, first-served basis.
+              <p className={`text-xs ${exceedsUnallocated ? "text-destructive" : "text-muted-foreground"}`}>
+                {exceedsUnallocated
+                  ? `Only ${formatCurrency(unallocatedExcludingThis)} unallocated in the wallet. Top up or reduce another card's limit to free up funds.`
+                  : `Reserved against the wallet. ${formatCurrency(unallocatedExcludingThis)} unallocated and available to assign to this card.`}
               </p>
             </div>
             <div className="space-y-1.5">
