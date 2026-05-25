@@ -75,6 +75,7 @@ export function TopNav() {
   const location = useLocation();
   const items = isMember ? memberItems : adminItems;
   const moreActive = !isMember && adminMoreItems.some((i) => location.pathname.startsWith(i.url));
+  const accountingActive = !isMember && adminAccountingItems.some((i) => location.pathname.startsWith(i.url));
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
