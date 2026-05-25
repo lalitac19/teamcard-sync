@@ -125,7 +125,7 @@ export function TopNav() {
                         <DropdownMenuTrigger asChild>
                           <button
                             type="button"
-                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md align-middle transition-colors ${
+                            className={`inline-flex h-9 w-9 shrink-0 -translate-y-2.5 items-center justify-center rounded-md align-middle transition-colors ${
                               accountingActive
                                 ? "bg-secondary text-foreground"
                                 : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
@@ -156,7 +156,7 @@ export function TopNav() {
                         <DropdownMenuTrigger asChild>
                           <button
                             type="button"
-                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md align-middle transition-colors ${
+                            className={`inline-flex h-9 w-9 shrink-0 -translate-y-2.5 items-center justify-center rounded-md align-middle transition-colors ${
                               moreActive
                                 ? "bg-secondary text-foreground"
                                 : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
