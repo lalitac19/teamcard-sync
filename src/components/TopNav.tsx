@@ -19,9 +19,29 @@ import {
   UserCog,
   LucideIcon,
 } from "lucide-react";
+import {
+  LayoutDashboard,
+  CreditCard,
+  Users,
+  Receipt,
+  Wallet,
+  FileSpreadsheet,
+  BookOpen,
+  Settings,
+  Zap,
+  HandCoins,
+  FileText,
+  ClipboardCheck,
+  Sparkles,
+  PlusCircle,
+  Search,
+  UserCog,
+  LucideIcon,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserSwitcher } from "./UserSwitcher";
+import { NotificationsPopover } from "./NotificationsPopover";
 import { useCurrentUser } from "@/lib/currentUser";
 import {
   Tooltip,
