@@ -19,12 +19,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ShieldCheck, Plus, Trash2, Lock } from "lucide-react";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import { CheckCircle2, ShieldCheck, Plus, Trash2, Lock, Check, Sparkles, Download } from "lucide-react";
 import {
   defaultRolePermissions,
   permissionCatalog,
   chartOfAccounts,
   vatRates,
+  formatCurrency,
+  formatDate,
   type RolePermissions,
 } from "@/lib/mockData";
 import { toast } from "sonner";
