@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CreditCard,
@@ -16,10 +16,17 @@ import {
   PlusCircle,
   Search,
   UserCog,
+  MoreHorizontal,
   LucideIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { UserSwitcher } from "./UserSwitcher";
 import { NotificationsPopover } from "./NotificationsPopover";
 import { useCurrentUser } from "@/lib/currentUser";
@@ -38,13 +45,16 @@ const adminItems: NavItem[] = [
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "People", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
-  { title: "Approvals", url: "/approvals", icon: ClipboardCheck },
-  { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
-  { title: "Vendor Invoices", url: "/invoices", icon: FileText },
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
   { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
+];
+
+const adminMoreItems: NavItem[] = [
+  { title: "Approvals", url: "/approvals", icon: ClipboardCheck },
+  { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
+  { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
 const memberItems: NavItem[] = [
@@ -59,7 +69,10 @@ const memberItems: NavItem[] = [
 
 export function TopNav() {
   const { isMember } = useCurrentUser();
+  const navigate = useNavigate();
+  const location = useLocation();
   const items = isMember ? memberItems : adminItems;
+  const moreActive = !isMember && adminMoreItems.some((i) => location.pathname.startsWith(i.url));
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
@@ -75,7 +88,7 @@ export function TopNav() {
           <TooltipProvider delayDuration={150}>
             {items.map((item) => {
               const Icon = item.icon;
-              return (
+              const node = (
                 <Tooltip key={item.url}>
                   <TooltipTrigger asChild>
                     <NavLink
@@ -96,6 +109,44 @@ export function TopNav() {
                   <TooltipContent side="bottom">{item.title}</TooltipContent>
                 </Tooltip>
               );
+              if (!isMember && item.url === "/transactions") {
+                return (
+                  <span key="txn-more" className="contents">
+                    {node}
+                    <DropdownMenu>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
+                                moreActive
+                                  ? "bg-secondary text-foreground"
+                                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                              }`}
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">More</span>
+                            </button>
+                          </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">More</TooltipContent>
+                      </Tooltip>
+                      <DropdownMenuContent align="start">
+                        {adminMoreItems.map((m) => {
+                          const MIcon = m.icon;
+                          return (
+                            <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
+                              <MIcon className="mr-2 h-4 w-4" />
+                              {m.title}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </span>
+                );
+              }
+              return node;
             })}
           </TooltipProvider>
         </nav>
