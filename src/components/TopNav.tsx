@@ -7,6 +7,7 @@ import {
   Wallet,
   FileSpreadsheet,
   BookOpen,
+  Calculator,
   Settings,
   Zap,
   HandCoins,
@@ -77,6 +78,10 @@ export function TopNav() {
   const moreActive = !isMember && adminMoreItems.some((i) => location.pathname.startsWith(i.url));
   const accountingActive = !isMember && adminAccountingItems.some((i) => location.pathname.startsWith(i.url));
 
+
+
+
+
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
       <div className="flex h-14 items-center gap-3 px-4 md:px-6">
@@ -113,70 +118,70 @@ export function TopNav() {
                 </Tooltip>
               );
               if (!isMember && item.url === "__accounting__") {
-                return (
-                  <span key="accounting-more" className="contents">
-                    <DropdownMenu>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
-                                accountingActive
-                                  ? "bg-secondary text-foreground"
-                                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                              }`}
-                            >
-                              <BookOpen className="h-4 w-4" />
-                              <span className="sr-only">Accounting</span>
-                            </button>
-                          </DropdownMenuTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">Accounting</TooltipContent>
-                      </Tooltip>
-                      <DropdownMenuContent align="start">
-                        {adminAccountingItems.map((m) => {
-                          const MIcon = m.icon;
-                          return (
-                            <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
-                              <MIcon className="mr-2 h-4 w-4" />
-                              {m.title}
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <DropdownMenu>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
-                                moreActive
-                                  ? "bg-secondary text-foreground"
-                                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                              }`}
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">More</span>
-                            </button>
-                          </DropdownMenuTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">More</TooltipContent>
-                      </Tooltip>
-                      <DropdownMenuContent align="start">
-                        {adminMoreItems.map((m) => {
-                          const MIcon = m.icon;
-                          return (
-                            <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
-                              <MIcon className="mr-2 h-4 w-4" />
-                              {m.title}
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </span>
-                );
+                return [
+                  <DropdownMenu key="accounting">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md align-middle transition-colors ${
+                              accountingActive
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                            }`}
+                          >
+                            <Calculator className="h-4 w-4" />
+                            <span className="sr-only">Accounting</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Accounting</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent align="start">
+                      {adminAccountingItems.map((m) => {
+                        const MIcon = m.icon;
+                        return (
+                          <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
+                            <MIcon className="mr-2 h-4 w-4" />
+                            {m.title}
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>,
+                  <DropdownMenu key="more">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md align-middle transition-colors ${
+                              moreActive
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                            }`}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">More</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent align="start">
+                      {adminMoreItems.map((m) => {
+                        const MIcon = m.icon;
+                        return (
+                          <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
+                            <MIcon className="mr-2 h-4 w-4" />
+                            {m.title}
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>,
+                ];
               }
               return node;
             })}
