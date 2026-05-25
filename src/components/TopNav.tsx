@@ -131,7 +131,7 @@ export function TopNav() {
                                 : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
                             }`}
                           >
-                            <BookOpen className="h-4 w-4" />
+                            <Calculator className="h-4 w-4" />
                             <span className="sr-only">Accounting</span>
                           </button>
                         </DropdownMenuTrigger>
