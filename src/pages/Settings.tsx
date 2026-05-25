@@ -47,6 +47,9 @@ const Settings = () => {
             <ShieldCheck className="h-4 w-4" /> Roles & Permissions
           </TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
+          <TabsTrigger value="billing" className="gap-2">
+            <Sparkles className="h-4 w-4" /> Plans & Billing
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="mt-0">
