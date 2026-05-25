@@ -92,7 +92,7 @@ export function TopNav() {
           <span className="hidden text-sm font-semibold sm:inline">Peko</span>
         </div>
 
-        <nav className="ml-2 flex flex-1 items-center gap-1 overflow-x-auto">
+        <nav className="ml-2 flex h-9 min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <TooltipProvider delayDuration={150}>
             {items.map((item) => {
               const Icon = item.icon;
