@@ -44,9 +44,13 @@ const adminItems: NavItem[] = [
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "People", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
+  { title: "Accounting", url: "__accounting__", icon: BookOpen },
+  { title: "Settings", url: "/settings", icon: Settings },
+];
+
+const adminAccountingItems: NavItem[] = [
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
-  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 const adminMoreItems: NavItem[] = [
@@ -71,6 +75,7 @@ export function TopNav() {
   const location = useLocation();
   const items = isMember ? memberItems : adminItems;
   const moreActive = !isMember && adminMoreItems.some((i) => location.pathname.startsWith(i.url));
+  const accountingActive = !isMember && adminAccountingItems.some((i) => location.pathname.startsWith(i.url));
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
@@ -142,6 +147,40 @@ export function TopNav() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </span>
+                );
+              }
+              if (!isMember && item.url === "__accounting__") {
+                return (
+                  <DropdownMenu key="accounting">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
+                              accountingActive
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                            }`}
+                          >
+                            <BookOpen className="h-4 w-4" />
+                            <span className="sr-only">Accounting</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Accounting</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent align="start">
+                      {adminAccountingItems.map((m) => {
+                        const MIcon = m.icon;
+                        return (
+                          <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
+                            <MIcon className="mr-2 h-4 w-4" />
+                            {m.title}
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 );
               }
               return node;

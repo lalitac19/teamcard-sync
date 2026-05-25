@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CreditCard,
@@ -15,6 +15,12 @@ import {
   PlusCircle,
   UserCog,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -43,11 +49,6 @@ const adminApprovals = [
   { title: "Approval Requests", url: "/approvals", icon: ClipboardCheck },
   { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
   { title: "Vendor Invoices", url: "/invoices", icon: FileText },
-];
-
-const adminAccounting = [
-  { title: "Account Statement", url: "/statement", icon: BookOpen },
-  { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
 ];
 
 const adminPersonal = [
@@ -86,7 +87,9 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { user, isMember } = useCurrentUser();
+  const navigate = useNavigate();
   const adminHasCard = !isMember && allCards.some((c) => c.memberId === user.id && c.status !== "terminated");
+  const accountingActive = !isMember && (location.pathname === "/statement" || location.pathname.startsWith("/accounting"));
 
   const isActive = (url: string) =>
     url === "/" || url === "/statement" ? location.pathname === url : location.pathname.startsWith(url);
@@ -144,7 +147,35 @@ export function AppSidebar() {
           <>
             {renderGroup("Main", adminMain)}
             {renderGroup("Approvals", adminApprovals)}
-            {renderGroup("Accounting", adminAccounting)}
+            <SidebarGroup className="mt-4">
+              {!collapsed && (
+                <SidebarGroupLabel className="text-sidebar-foreground/60">Accounting</SidebarGroupLabel>
+              )}
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton className={linkCls(accountingActive)}>
+                          <BookOpen className="h-4 w-4" />
+                          {!collapsed && <span>Accounting</span>}
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem onClick={() => navigate("/statement")}>
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          Account Statement
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/accounting")}>
+                          <FileSpreadsheet className="mr-2 h-4 w-4" />
+                          Accounting Export
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
             {adminHasCard && renderGroup("Personal", adminPersonal)}
           </>
         )}
