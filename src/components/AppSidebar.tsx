@@ -154,7 +154,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border px-2 py-3">
         <SidebarMenu>
-          {bottomItems.map((item) => (
+          {(isMember ? memberBottomItems : adminBottomItems).map((item) => (
             <SidebarMenuItem key={item.url}>
               <SidebarMenuButton asChild>
                 <NavLink to={item.url} className={linkCls(isActive(item.url))}>

@@ -16,6 +16,7 @@ import {
   PlusCircle,
   Bell,
   Search,
+  UserCog,
   LucideIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
