@@ -45,13 +45,16 @@ const adminItems: NavItem[] = [
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "People", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
-  { title: "Approvals", url: "/approvals", icon: ClipboardCheck },
-  { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
-  { title: "Vendor Invoices", url: "/invoices", icon: FileText },
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
   { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
+];
+
+const adminMoreItems: NavItem[] = [
+  { title: "Approvals", url: "/approvals", icon: ClipboardCheck },
+  { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
+  { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
 const memberItems: NavItem[] = [
