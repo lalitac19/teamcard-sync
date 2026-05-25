@@ -69,7 +69,10 @@ const memberItems: NavItem[] = [
 
 export function TopNav() {
   const { isMember } = useCurrentUser();
+  const navigate = useNavigate();
+  const location = useLocation();
   const items = isMember ? memberItems : adminItems;
+  const moreActive = !isMember && adminMoreItems.some((i) => location.pathname.startsWith(i.url));
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
@@ -85,7 +88,7 @@ export function TopNav() {
           <TooltipProvider delayDuration={150}>
             {items.map((item) => {
               const Icon = item.icon;
-              return (
+              const node = (
                 <Tooltip key={item.url}>
                   <TooltipTrigger asChild>
                     <NavLink
@@ -106,6 +109,44 @@ export function TopNav() {
                   <TooltipContent side="bottom">{item.title}</TooltipContent>
                 </Tooltip>
               );
+              if (!isMember && item.url === "/transactions") {
+                return (
+                  <span key="txn-more" className="contents">
+                    {node}
+                    <DropdownMenu>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
+                                moreActive
+                                  ? "bg-secondary text-foreground"
+                                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                              }`}
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">More</span>
+                            </button>
+                          </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">More</TooltipContent>
+                      </Tooltip>
+                      <DropdownMenuContent align="start">
+                        {adminMoreItems.map((m) => {
+                          const MIcon = m.icon;
+                          return (
+                            <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
+                              <MIcon className="mr-2 h-4 w-4" />
+                              {m.title}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </span>
+                );
+              }
+              return node;
             })}
           </TooltipProvider>
         </nav>
