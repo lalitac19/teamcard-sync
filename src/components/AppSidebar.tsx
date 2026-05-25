@@ -68,7 +68,6 @@ const memberSubmit = [
 ];
 
 const adminBottomItems = [
-  { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
