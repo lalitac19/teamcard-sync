@@ -51,11 +51,6 @@ const adminApprovals = [
   { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
-const adminAccounting = [
-  { title: "Account Statement", url: "/statement", icon: BookOpen },
-  { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
-];
-
 const adminPersonal = [
   { title: "My Cards", url: "/me/cards", icon: CreditCard },
 ];
