@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CreditCard,
@@ -16,10 +16,17 @@ import {
   PlusCircle,
   Search,
   UserCog,
+  MoreHorizontal,
   LucideIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { UserSwitcher } from "./UserSwitcher";
 import { NotificationsPopover } from "./NotificationsPopover";
 import { useCurrentUser } from "@/lib/currentUser";
