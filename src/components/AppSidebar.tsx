@@ -12,7 +12,6 @@ import {
   HandCoins,
   FileText,
   ClipboardCheck,
-  Sparkles,
   PlusCircle,
   UserCog,
 } from "lucide-react";
@@ -68,7 +67,6 @@ const memberSubmit = [
 ];
 
 const adminBottomItems = [
-  { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 

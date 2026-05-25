@@ -12,7 +12,6 @@ import {
   HandCoins,
   FileText,
   ClipboardCheck,
-  Sparkles,
   PlusCircle,
   Search,
   UserCog,
@@ -47,7 +46,6 @@ const adminItems: NavItem[] = [
   { title: "Transactions", url: "/transactions", icon: Receipt },
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
-  { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
