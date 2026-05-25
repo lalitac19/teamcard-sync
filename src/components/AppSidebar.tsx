@@ -12,7 +12,6 @@ import {
   HandCoins,
   FileText,
   ClipboardCheck,
-  Sparkles,
   PlusCircle,
   UserCog,
 } from "lucide-react";
