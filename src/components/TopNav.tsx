@@ -112,10 +112,39 @@ export function TopNav() {
                   <TooltipContent side="bottom">{item.title}</TooltipContent>
                 </Tooltip>
               );
-              if (!isMember && item.url === "/transactions") {
+              if (!isMember && item.url === "__accounting__") {
                 return (
-                  <span key="txn-more" className="contents">
-                    {node}
+                  <span key="accounting-more" className="contents">
+                    <DropdownMenu>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
+                                accountingActive
+                                  ? "bg-secondary text-foreground"
+                                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                              }`}
+                            >
+                              <BookOpen className="h-4 w-4" />
+                              <span className="sr-only">Accounting</span>
+                            </button>
+                          </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">Accounting</TooltipContent>
+                      </Tooltip>
+                      <DropdownMenuContent align="start">
+                        {adminAccountingItems.map((m) => {
+                          const MIcon = m.icon;
+                          return (
+                            <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
+                              <MIcon className="mr-2 h-4 w-4" />
+                              {m.title}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <DropdownMenu>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -147,40 +176,6 @@ export function TopNav() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </span>
-                );
-              }
-              if (!isMember && item.url === "__accounting__") {
-                return (
-                  <DropdownMenu key="accounting">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors ${
-                              accountingActive
-                                ? "bg-secondary text-foreground"
-                                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                            }`}
-                          >
-                            <BookOpen className="h-4 w-4" />
-                            <span className="sr-only">Accounting</span>
-                          </button>
-                        </DropdownMenuTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">Accounting</TooltipContent>
-                    </Tooltip>
-                    <DropdownMenuContent align="start">
-                      {adminAccountingItems.map((m) => {
-                        const MIcon = m.icon;
-                        return (
-                          <DropdownMenuItem key={m.url} onClick={() => navigate(m.url)}>
-                            <MIcon className="mr-2 h-4 w-4" />
-                            {m.title}
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 );
               }
               return node;
