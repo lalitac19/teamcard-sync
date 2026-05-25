@@ -14,7 +14,6 @@ import {
   ClipboardCheck,
   Sparkles,
   PlusCircle,
-  Bell,
   Search,
   UserCog,
   LucideIcon,
@@ -22,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserSwitcher } from "./UserSwitcher";
+import { NotificationsPopover } from "./NotificationsPopover";
 import { useCurrentUser } from "@/lib/currentUser";
 import {
   Tooltip,
@@ -108,10 +108,8 @@ export function TopNav() {
           />
         </div>
 
+        <NotificationsPopover />
         <UserSwitcher />
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <Bell className="h-4 w-4" />
-        </Button>
       </div>
     </header>
   );

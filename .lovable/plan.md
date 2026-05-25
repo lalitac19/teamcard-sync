@@ -1,29 +1,28 @@
 ## Goal
-Remove admin Settings from the member portal and replace it with a member-scoped Profile & Preferences page.
+Turn the existing (non-functional) bell icon in `TopNav` into a working notifications button shown across every interface (admin + member).
 
 ## Changes
 
-**1. New page `src/pages/member/MyProfile.tsx`**
-Sections:
-- **Profile** — name, email, phone (used for OTP), avatar/initials, department (read-only, set by admin)
-- **Security** — change password, OTP device (phone for card-reveal OTP), active sessions list with "sign out", "sign out everywhere"
-- **Notifications** — toggles for: transaction alerts (email/push), receipt reminders, approval status updates, weekly spend summary
-- **Preferences** — language, timezone, theme (light/dark/system)
-- **Linked devices** — list of devices currently signed in to the mobile app / browser
+**1. New component `src/components/NotificationsPopover.tsx`**
+- Trigger: bell icon button with a small red unread-count dot.
+- Popover (shadcn `Popover`) anchored to the bell, width ~360px, scrollable.
+- Header: "Notifications" + "Mark all as read" link.
+- List of notifications: icon, title, short description, relative time, unread indicator. Clicking an item marks it read and (optionally) navigates to its target route via `react-router-dom`.
+- Empty state: "You're all caught up."
+- Footer: "View all" link (placeholder, no new page).
+- State is local (prototype, no backend), seeded from a mock list scoped by role.
 
-All controls are local UI state (prototype), no backend wiring.
+**2. Mock notifications source `src/lib/mockNotifications.ts`**
+- Export `getNotificationsForUser(user)` returning a role-aware list:
+  - **Admin/accountant**: new approval requests, low wallet balance, card-issuance request, vendor invoice awaiting approval, accounting export ready.
+  - **Member**: card request approved, reimbursement reimbursed, receipt missing reminder, OTP-protected card reveal confirmation, limit-increase status.
+- Each item: `{ id, title, description, time, unread, icon, href? }`.
 
-**2. `src/App.tsx`**
-Add route `/me/profile` → `MyProfile`. Keep `/settings` route (admin-only page unchanged).
-
-**3. `src/components/AppSidebar.tsx`**
-- Remove `Settings` from the shared `bottomItems` so it no longer renders for members.
-- Render bottom items conditionally: admins get `Plans & Billing` + `Settings`; members get `My Profile` (icon: `UserCog`) only.
-
-**4. `src/components/TopNav.tsx`**
-- `memberItems`: replace the `Settings` entry with `My Profile` → `/me/profile` (icon `UserCog`).
-- `adminItems`: unchanged.
+**3. `src/components/TopNav.tsx`**
+- Replace the current static `<Button><Bell/></Button>` with `<NotificationsPopover />`.
+- No other changes to nav items.
 
 ## Out of scope
-- No changes to the admin `Settings.tsx` page.
-- No backend, no auth wiring — UI only, consistent with the rest of the prototype.
+- No backend, no real notification delivery — pure UI with local state.
+- No new dedicated `/notifications` page.
+- No changes to layout, sidebar, or routes.
