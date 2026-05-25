@@ -44,9 +44,13 @@ const adminItems: NavItem[] = [
   { title: "Cards", url: "/cards", icon: CreditCard },
   { title: "People", url: "/members", icon: Users },
   { title: "Transactions", url: "/transactions", icon: Receipt },
+  { title: "Accounting", url: "__accounting__", icon: BookOpen },
+  { title: "Settings", url: "/settings", icon: Settings },
+];
+
+const adminAccountingItems: NavItem[] = [
   { title: "Account Statement", url: "/statement", icon: BookOpen },
   { title: "Accounting Export", url: "/accounting", icon: FileSpreadsheet },
-  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 const adminMoreItems: NavItem[] = [
