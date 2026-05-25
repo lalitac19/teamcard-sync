@@ -77,6 +77,20 @@ export function TopNav() {
   const moreActive = !isMember && adminMoreItems.some((i) => location.pathname.startsWith(i.url));
   const accountingActive = !isMember && adminAccountingItems.some((i) => location.pathname.startsWith(i.url));
 
+  if (typeof window !== "undefined") {
+    setTimeout(() => {
+      const nav = document.querySelector("header nav");
+      if (nav) {
+        const rects = Array.from(nav.children).map((c, i) => {
+          const r = c.getBoundingClientRect();
+          return `${i}:${c.tagName} x=${Math.round(r.left)} w=${Math.round(r.width)} h=${Math.round(r.height)} y=${Math.round(r.top)}`;
+        });
+        console.log("NAVDEBUG", rects.join(" | "));
+      }
+    }, 500);
+  }
+
+
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
       <div className="flex h-14 items-center gap-3 px-4 md:px-6">
