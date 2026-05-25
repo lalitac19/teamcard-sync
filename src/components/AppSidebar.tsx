@@ -14,6 +14,7 @@ import {
   ClipboardCheck,
   Sparkles,
   PlusCircle,
+  UserCog,
 } from "lucide-react";
 import {
   Sidebar,
@@ -66,9 +67,13 @@ const memberSubmit = [
   { title: "Card Requests", url: "/me/requests", icon: PlusCircle },
 ];
 
-const bottomItems = [
+const adminBottomItems = [
   { title: "Plans & Billing", url: "/plans", icon: Sparkles },
   { title: "Settings", url: "/settings", icon: Settings },
+];
+
+const memberBottomItems = [
+  { title: "My Profile", url: "/me/profile", icon: UserCog },
 ];
 
 const roleLabel: Record<string, string> = {
@@ -149,7 +154,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border px-2 py-3">
         <SidebarMenu>
-          {bottomItems.map((item) => (
+          {(isMember ? memberBottomItems : adminBottomItems).map((item) => (
             <SidebarMenuItem key={item.url}>
               <SidebarMenuButton asChild>
                 <NavLink to={item.url} className={linkCls(isActive(item.url))}>

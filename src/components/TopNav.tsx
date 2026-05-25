@@ -16,6 +16,7 @@ import {
   PlusCircle,
   Bell,
   Search,
+  UserCog,
   LucideIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -53,7 +54,7 @@ const memberItems: NavItem[] = [
   { title: "Reimbursements", url: "/me/reimbursements", icon: HandCoins },
   { title: "Vendor Invoices", url: "/me/invoices", icon: FileText },
   { title: "Card Requests", url: "/me/requests", icon: PlusCircle },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "My Profile", url: "/me/profile", icon: UserCog },
 ];
 
 export function TopNav() {

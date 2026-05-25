@@ -1,22 +1,29 @@
-## Replace card — reasons for virtual card replacement
+## Goal
+Remove admin Settings from the member portal and replace it with a member-scoped Profile & Preferences page.
 
-Since the replacement is always a **virtual card** (issued with a fresh card number, expiry, and CVV), the existing reasons (Lost / Stolen / Damaged / Other) don't all fit. Lost/Stolen/Damaged describe physical events.
+## Changes
 
-### New reason list
+**1. New page `src/pages/member/MyProfile.tsx`**
+Sections:
+- **Profile** — name, email, phone (used for OTP), avatar/initials, department (read-only, set by admin)
+- **Security** — change password, OTP device (phone for card-reveal OTP), active sessions list with "sign out", "sign out everywhere"
+- **Notifications** — toggles for: transaction alerts (email/push), receipt reminders, approval status updates, weekly spend summary
+- **Preferences** — language, timezone, theme (light/dark/system)
+- **Linked devices** — list of devices currently signed in to the mobile app / browser
 
-Replace the dropdown options in `src/pages/Cards.tsx` (Lifecycle tab → Replace card section) with reasons that make sense for re-issuing a virtual card:
+All controls are local UI state (prototype), no backend wiring.
 
-1. **Card details compromised** — number, CVV, or expiry was exposed (phishing, data breach, accidental sharing).
-2. **Suspected fraud** — unrecognized authorizations or fraud alert on the current card.
-3. **Merchant data breach** — vendor that stored the card disclosed a breach.
-4. **Recurring charges out of control** — too many subscriptions tied to the card; user wants a clean number.
-5. **Other** — free-text reason captured in the existing Notes field.
+**2. `src/App.tsx`**
+Add route `/me/profile` → `MyProfile`. Keep `/settings` route (admin-only page unchanged).
 
-### Behavior
+**3. `src/components/AppSidebar.tsx`**
+- Remove `Settings` from the shared `bottomItems` so it no longer renders for members.
+- Render bottom items conditionally: admins get `Plans & Billing` + `Settings`; members get `My Profile` (icon: `UserCog`) only.
 
-- The `replaceReason` state type updates from `"lost" | "stolen" | "damaged" | "other"` to the new union.
-- Default selection: `compromised`.
-- Toast on submit keeps the same shape: `Replacement virtual card requested (<reason label>)`.
-- Notes textarea remains for additional context (especially useful when "Other" is picked).
+**4. `src/components/TopNav.tsx`**
+- `memberItems`: replace the `Settings` entry with `My Profile` → `/me/profile` (icon `UserCog`).
+- `adminItems`: unchanged.
 
-No other parts of the dialog change. Files touched: `src/pages/Cards.tsx` only.
+## Out of scope
+- No changes to the admin `Settings.tsx` page.
+- No backend, no auth wiring — UI only, consistent with the rest of the prototype.
