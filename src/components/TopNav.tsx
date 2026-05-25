@@ -108,10 +108,8 @@ export function TopNav() {
           />
         </div>
 
+        <NotificationsPopover />
         <UserSwitcher />
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <Bell className="h-4 w-4" />
-        </Button>
       </div>
     </header>
   );
