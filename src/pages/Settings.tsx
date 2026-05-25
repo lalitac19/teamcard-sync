@@ -121,6 +121,10 @@ const Settings = () => {
             <FeesAccountCard />
           </div>
         </TabsContent>
+
+        <TabsContent value="billing" className="mt-0">
+          <PlansBilling />
+        </TabsContent>
       </Tabs>
     </AppLayout>
   );
