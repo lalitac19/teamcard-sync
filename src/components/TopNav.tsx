@@ -7,6 +7,7 @@ import {
   Wallet,
   FileSpreadsheet,
   BookOpen,
+  Calculator,
   Settings,
   Zap,
   HandCoins,
