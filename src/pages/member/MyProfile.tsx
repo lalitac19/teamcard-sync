@@ -42,7 +42,7 @@ export default function MyProfile() {
   const save = (section: string) => toast({ title: `${section} updated`, description: "Your changes have been saved." });
 
   return (
-    <AppLayout>
+    <AppLayout title="My Profile">
       <div className="mx-auto w-full max-w-4xl space-y-6 p-6">
         <div>
           <h1 className="text-2xl font-semibold">My Profile</h1>

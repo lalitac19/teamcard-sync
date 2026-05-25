@@ -22,6 +22,7 @@ import MyTransactions from "./pages/member/MyTransactions.tsx";
 import MyReimbursements from "./pages/member/MyReimbursements.tsx";
 import MyInvoices from "./pages/member/MyInvoices.tsx";
 import MyRequests from "./pages/member/MyRequests.tsx";
+import MyProfile from "./pages/member/MyProfile.tsx";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/me/reimbursements" element={<MyReimbursements />} />
             <Route path="/me/invoices" element={<MyInvoices />} />
             <Route path="/me/requests" element={<MyRequests />} />
+            <Route path="/me/profile" element={<MyProfile />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
