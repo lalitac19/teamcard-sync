@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Fintech Design System — Brex/Ramp inspired
+   Deep ink background, sharp typography, restrained accents.
+   All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 222 30% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 11%;
+
+    /* Primary: deep ink */
+    --primary: 222 30% 11%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Accent: signature lime — Ramp/Brex feel */
+    --accent: 75 90% 60%;
+    --accent-foreground: 222 30% 11%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 30% 11%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 38%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 30% 11%;
+
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 222 30% 11%;
+
+    --radius: 0.625rem;
+
+    /* Card gradients */
+    --gradient-card-virtual: linear-gradient(135deg, hsl(222 30% 11%), hsl(222 30% 22%));
+    --gradient-card-physical: linear-gradient(135deg, hsl(222 30% 11%), hsl(260 25% 25%));
+    --gradient-card-single: linear-gradient(135deg, hsl(222 30% 18%), hsl(75 90% 60% / 0.9));
+    --gradient-hero: linear-gradient(135deg, hsl(222 30% 11%) 0%, hsl(222 30% 18%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(222 30% 11% / 0.04);
+    --shadow-md: 0 4px 12px -2px hsl(222 30% 11% / 0.08);
+    --shadow-card: 0 8px 24px -8px hsl(222 30% 11% / 0.18);
+    --shadow-glow: 0 0 0 4px hsl(75 90% 60% / 0.25);
+
+    /* Sidebar */
+    --sidebar-background: 222 30% 11%;
+    --sidebar-foreground: 220 14% 78%;
+    --sidebar-primary: 75 90% 60%;
+    --sidebar-primary-foreground: 222 30% 11%;
+    --sidebar-accent: 222 25% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 25% 18%;
+    --sidebar-ring: 75 90% 60%;
+  }
+
+  .dark {
+    --background: 222 30% 8%;
+    --foreground: 220 14% 96%;
+
+    --card: 222 30% 11%;
+    --card-foreground: 220 14% 96%;
+
+    --popover: 222 30% 11%;
+    --popover-foreground: 220 14% 96%;
+
+    --primary: 75 90% 60%;
+    --primary-foreground: 222 30% 11%;
+
+    --accent: 75 90% 60%;
+    --accent-foreground: 222 30% 11%;
+
+    --secondary: 222 25% 16%;
+    --secondary-foreground: 220 14% 96%;
+
+    --muted: 222 25% 16%;
+    --muted-foreground: 220 9% 60%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 30% 11%;
+
+    --info: 217 91% 65%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 222 25% 18%;
+    --input: 222 25% 18%;
+    --ring: 75 90% 60%;
+
+    --sidebar-background: 222 30% 6%;
+    --sidebar-foreground: 220 14% 78%;
+    --sidebar-primary: 75 90% 60%;
+    --sidebar-primary-foreground: 222 30% 11%;
+    --sidebar-accent: 222 25% 12%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 25% 14%;
+    --sidebar-ring: 75 90% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4 {
+    @apply tracking-tight;
+  }
+}
+
+@layer utilities {
+  .gradient-card-virtual { background: var(--gradient-card-virtual); }
+  .gradient-card-physical { background: var(--gradient-card-physical); }
+  .gradient-card-single { background: var(--gradient-card-single); }
+  .gradient-hero { background: var(--gradient-hero); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-soft { box-shadow: var(--shadow-md); }
+}
