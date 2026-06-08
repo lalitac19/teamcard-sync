@@ -5,11 +5,7 @@ import { TooltipProvider } from '@src/domains/dashboard/CorporateCard/teamcard/c
 import { Toaster } from '@src/domains/dashboard/CorporateCard/teamcard/components/ui/toaster';
 import { Toaster as Sonner } from '@src/domains/dashboard/CorporateCard/teamcard/components/ui/sonner';
 import { CurrentUserProvider, useCurrentUser } from '@src/domains/dashboard/CorporateCard/teamcard/lib/currentUser';
-import {
-    LayoutDashboard, CreditCard, Users, Receipt, Wallet as WalletIcon,
-    BookOpen, Settings as SettingsIcon, HandCoins, FileText, ClipboardCheck,
-    Calculator, PlusCircle, UserCog,
-} from 'lucide-react';
+// No lucide icons needed — using emoji icons for the pill nav style
 
 const queryClient = new QueryClient();
 
@@ -37,28 +33,28 @@ const MyProfile        = lazy(() => import('@src/domains/dashboard/CorporateCard
 // ── Tab navigation ─────────────────────────────────────────────────────────
 
 const adminNav = [
-    { label: 'Dashboard',         path: '/',              icon: LayoutDashboard },
-    { label: 'Corporate Account', path: '/wallet',        icon: WalletIcon },
-    { label: 'Cards',             path: '/cards',         icon: CreditCard },
-    { label: 'People',            path: '/members',       icon: Users },
-    { label: 'Transactions',      path: '/transactions',  icon: Receipt },
-    { label: 'Approvals',         path: '/approvals',     icon: ClipboardCheck },
-    { label: 'Reimbursements',    path: '/reimbursements',icon: HandCoins },
-    { label: 'Invoices',          path: '/invoices',      icon: FileText },
-    { label: 'Statement',         path: '/statement',     icon: BookOpen },
-    { label: 'Accounting',        path: '/accounting',    icon: Calculator },
-    { label: 'Service Fees',      path: '/service-fees',  icon: Receipt },
-    { label: 'Settings',          path: '/settings',      icon: SettingsIcon },
+    { label: 'Dashboard',         path: '/',              emoji: '🏠' },
+    { label: 'Corporate Account', path: '/wallet',        emoji: '🏦' },
+    { label: 'Cards',             path: '/cards',         emoji: '💳' },
+    { label: 'People',            path: '/members',       emoji: '👥' },
+    { label: 'Transactions',      path: '/transactions',  emoji: '💸' },
+    { label: 'Approvals',         path: '/approvals',     emoji: '✅' },
+    { label: 'Reimbursements',    path: '/reimbursements',emoji: '🔄' },
+    { label: 'Invoices',          path: '/invoices',      emoji: '📄' },
+    { label: 'Statement',         path: '/statement',     emoji: '📋' },
+    { label: 'Accounting',        path: '/accounting',    emoji: '📊' },
+    { label: 'Service Fees',      path: '/service-fees',  emoji: '💰' },
+    { label: 'Settings',          path: '/settings',      emoji: '⚙️' },
 ];
 
 const memberNav = [
-    { label: 'Dashboard',      path: '/',                  icon: LayoutDashboard },
-    { label: 'My Cards',       path: '/me/cards',          icon: CreditCard },
-    { label: 'Transactions',   path: '/me/transactions',   icon: Receipt },
-    { label: 'Reimbursements', path: '/me/reimbursements', icon: HandCoins },
-    { label: 'Invoices',       path: '/me/invoices',       icon: FileText },
-    { label: 'Requests',       path: '/me/requests',       icon: PlusCircle },
-    { label: 'Profile',        path: '/me/profile',        icon: UserCog },
+    { label: 'Dashboard',      path: '/',                  emoji: '🏠' },
+    { label: 'My Cards',       path: '/me/cards',          emoji: '💳' },
+    { label: 'Transactions',   path: '/me/transactions',   emoji: '💸' },
+    { label: 'Reimbursements', path: '/me/reimbursements', emoji: '🔄' },
+    { label: 'Invoices',       path: '/me/invoices',       emoji: '📄' },
+    { label: 'Requests',       path: '/me/requests',       emoji: '➕' },
+    { label: 'Profile',        path: '/me/profile',        emoji: '👤' },
 ];
 
 function TabNav() {
@@ -69,25 +65,47 @@ function TabNav() {
     const isActive = (p: string) => p === '/' ? location.pathname === '/' : location.pathname.startsWith(p);
 
     return (
-        <div style={{ borderBottom: '1px solid #E4E7EC', background: '#fff', position: 'sticky', top: 0, zIndex: 20 }}>
-            <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        <div style={{
+            background: '#fff',
+            borderBottom: '1px solid #E4E7EC',
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+            padding: '10px 16px',
+        }}>
+            <div style={{
+                display: 'flex',
+                gap: '8px',
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                alignItems: 'center',
+            }}>
                 {items.map(item => {
                     const active = isActive(item.path);
-                    const Icon = item.icon;
                     return (
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
                             style={{
-                                padding: '12px 16px', border: 'none', background: 'transparent',
-                                borderBottom: active ? '2px solid #FF3A3A' : '2px solid transparent',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '7px',
+                                padding: '7px 14px',
+                                border: 'none',
+                                borderRadius: '999px',
+                                background: active ? '#FFF0EE' : '#F5F5F5',
                                 color: active ? '#FF3A3A' : '#595959',
-                                fontWeight: active ? 600 : 400, fontSize: '13px', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
-                                fontFamily: 'Roboto, system-ui, sans-serif', flexShrink: 0,
+                                fontWeight: active ? 600 : 400,
+                                fontSize: '13px',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                                fontFamily: 'Roboto, system-ui, sans-serif',
+                                flexShrink: 0,
+                                outline: active ? '1.5px solid #FFCCC7' : '1.5px solid transparent',
+                                transition: 'background 0.15s, color 0.15s',
                             }}
                         >
-                            <Icon size={14} />
+                            <span style={{ fontSize: '16px', lineHeight: 1 }}>{item.emoji}</span>
                             {item.label}
                         </button>
                     );
