@@ -1,7 +1,7 @@
 [run]
-install = "cd 'Downloads/UAE Corporate Card (1)' && bun install"
-build = "cd 'Downloads/UAE Corporate Card (1)' && bun run build"
-dev = "cd 'Downloads/UAE Corporate Card (1)' && bun run dev"
+install = "bun install"
+build = "bun run build"
+dev = "bun run dev -- --host 0.0.0.0 --port 8080"
 
 [build]
-output = "Downloads/UAE Corporate Card (1)/dist"
+output = "dist"
