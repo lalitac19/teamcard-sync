@@ -1,0 +1,7 @@
+[run]
+install = "cd 'Downloads/UAE Corporate Card (1)' && bun install"
+build = "cd 'Downloads/UAE Corporate Card (1)' && bun run build"
+dev = "cd 'Downloads/UAE Corporate Card (1)' && bun run dev"
+
+[build]
+output = "Downloads/UAE Corporate Card (1)/dist"
