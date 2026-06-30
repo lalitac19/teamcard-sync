@@ -922,7 +922,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
     | "damaged"
     | "other"
   >("compromised");
-  const [replaceType, setReplaceType] = useState<"virtual">("virtual");
+  const [replaceType, setReplaceType] = useState<"virtual" | "physical">(card.type === "physical" ? "physical" : "virtual");
   const [replaceNotes, setReplaceNotes] = useState("");
 
   // Terminate
@@ -966,7 +966,8 @@ function ManageCardDialog({ card }: { card: CardModel }) {
   };
 
   const handleReplace = () => {
-    toast.success(`Replacement virtual card requested (${replaceReasonLabels[replaceReason]})`);
+    const typeLabel = replaceType === "physical" ? "physical" : "virtual";
+    toast.success(`Replacement ${typeLabel} card requested (${replaceReasonLabels[replaceReason]})`);
     setOpen(false);
   };
 
@@ -1234,7 +1235,7 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                       <SelectItem value="suspected_fraud">Suspected fraud</SelectItem>
                       <SelectItem value="merchant_breach">Merchant data breach</SelectItem>
                       <SelectItem value="subscription_reset">Recurring charges reset</SelectItem>
-                      {card.type === "physical" && (
+                      {replaceType === "physical" && (
                         <>
                           <SelectItem value="lost">Lost</SelectItem>
                           <SelectItem value="stolen">Stolen</SelectItem>
@@ -1247,9 +1248,13 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Replacement type</Label>
-                  <div className="flex h-9 items-center rounded-md border border-input bg-secondary/40 px-3 text-sm">
-                    Virtual card
-                  </div>
+                  <Select value={replaceType} onValueChange={(v) => setReplaceType(v as "virtual" | "physical")}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="virtual">Virtual card</SelectItem>
+                      <SelectItem value="physical">Physical card</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="space-y-1.5">
@@ -1261,12 +1266,22 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   onChange={(e) => setReplaceNotes(e.target.value)}
                 />
               </div>
-              <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
-                <p className="font-medium text-foreground">Replacement fee</p>
-                <p className="mt-1">
-                  A one-off fee of {formatCurrency(25)} + 5% VAT ({formatCurrency(1.25)}) = {formatCurrency(26.25)} per replacement card will be charged to the Corporate Account.
-                </p>
-              </div>
+              {replaceType === "physical" && (
+                <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                  <p className="font-medium text-foreground">Replacement fee</p>
+                  <p className="mt-1">
+                    A one-off fee of {formatCurrency(25)} + 5% VAT ({formatCurrency(1.25)}) = {formatCurrency(26.25)} per replacement physical card will be charged to the Corporate Account.
+                  </p>
+                </div>
+              )}
+              {replaceType === "virtual" && (
+                <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                  <p className="font-medium text-foreground">No replacement fee</p>
+                  <p className="mt-1">
+                    Virtual card replacements are free of charge and the new card will be available instantly.
+                  </p>
+                </div>
+              )}
               <Button onClick={handleReplace} className="gap-2">
                 <RefreshCcw className="h-4 w-4" /> Request replacement
               </Button>
