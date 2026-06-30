@@ -1261,6 +1261,12 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                   onChange={(e) => setReplaceNotes(e.target.value)}
                 />
               </div>
+              <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                <p className="font-medium text-foreground">Replacement fee</p>
+                <p className="mt-1">
+                  A one-off fee of {formatCurrency(25)} + 5% VAT ({formatCurrency(1.25)}) = {formatCurrency(26.25)} per replacement card will be charged to the Corporate Account.
+                </p>
+              </div>
               <Button onClick={handleReplace} className="gap-2">
                 <RefreshCcw className="h-4 w-4" /> Request replacement
               </Button>
@@ -1274,6 +1280,12 @@ function ManageCardDialog({ card }: { card: CardModel }) {
                 <p className="text-xs text-muted-foreground">
                   Order a physical card with the <strong>same card number, expiry, and CVV</strong> as this virtual card. It will be shipped to the cardholder. Use “Replace card” instead if you need a brand-new card number.
                 </p>
+                <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                  <p className="font-medium text-foreground">Physical card fee</p>
+                  <p className="mt-1">
+                    A one-off fee of {formatCurrency(25)} + 5% VAT ({formatCurrency(1.25)}) = {formatCurrency(26.25)} per physical card will be charged to the Corporate Account.
+                  </p>
+                </div>
                 <Button
                   variant="outline"
                   className="gap-2"
