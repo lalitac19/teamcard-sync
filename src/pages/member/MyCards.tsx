@@ -128,17 +128,25 @@ export default function MyCards() {
                       <Link to="/me/requests">Request limit increase</Link>
                     </Button>
                     {c.type === "virtual" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() =>
-                          toast.success(`Physical card requested for ••••${c.last4}`)
-                        }
-                      >
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Request physical card
-                      </Button>
+                      <>
+                        <div className="w-full rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                          <p className="font-medium text-foreground">Physical card fee</p>
+                          <p className="mt-1">
+                            A one-off fee of {formatCurrency(25)} + 5% VAT ({formatCurrency(1.25)}) = {formatCurrency(26.25)} per physical card will be charged to the Corporate Account.
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() =>
+                            toast.success(`Physical card requested for ••••${c.last4}`)
+                          }
+                        >
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          Request physical card
+                        </Button>
+                      </>
                     )}
                   </div>
                 </CardContent>
