@@ -1,0 +1,37 @@
+import { useCallback, useState } from 'react';
+
+import { useAppDispatch, useAppSelector } from '@src/hooks/store';
+
+import { cancellationPolicy } from '../Api';
+import { getCancelPolicy } from '../slices/getHotelSlice';
+import { HotelCancellationPolicy, cancelpolicyRoom } from '../types/cancellationTypes';
+
+export default function useCancellationPolicyApi() {
+    const dispatch = useAppDispatch();
+    const { role, id } = useAppSelector(state => state.reducer.auth);
+    const [isLoading, setIsLoading] = useState(true);
+    const [policyData, setPolicyData] = useState<cancelpolicyRoom[]>([]);
+
+    const cancellationPolicyDetails = useCallback(
+        async (searchId: string, hotelId: string, rateId: string) => {
+            const data: HotelCancellationPolicy | false = await cancellationPolicy({
+                userId: id,
+                userType: role,
+                searchId,
+                hotelId,
+                rateId,
+            });
+
+            if (data) {
+                dispatch(getCancelPolicy(data));
+                const cancelData = data.data as cancelpolicyRoom[];
+                setPolicyData(cancelData);
+                return cancelData;
+            }
+            return [];
+        },
+        [id, role, dispatch]
+    );
+
+    return { isLoading, cancellationPolicyDetails };
+}

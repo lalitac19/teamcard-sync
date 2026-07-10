@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Background circle -->
+  <circle cx="24" cy="24" r="20" fill="#FFF0EE"/>
+  <!-- Headset arc -->
+  <path d="M14 22C14 16.477 18.477 12 24 12C29.523 12 34 16.477 34 22" stroke="#FF3A3A" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Left ear cup -->
+  <rect x="11" y="21" width="5" height="9" rx="2.5" fill="#FF3A3A"/>
+  <!-- Right ear cup -->
+  <rect x="32" y="21" width="5" height="9" rx="2.5" fill="#FF3A3A"/>
+  <!-- Mic arm -->
+  <path d="M16 30C16 30 16 35 24 35" stroke="#FF3A3A" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Mic dot -->
+  <circle cx="24" cy="36" r="1.5" fill="#FF3A3A"/>
+</svg>
