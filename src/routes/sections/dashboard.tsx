@@ -59,6 +59,7 @@ const ServiceNotFound = lazy(() => import('@src/domains/dashboard/503/pages/Serv
 const RuyaSupport = lazy(() => import('@src/domains/dashboard/RuyaSupport/pages/RuyaSupport'));
 const PekoMoney = lazy(() => import('@src/domains/dashboard/PekoMoney/pages/PekoMoney'));
 const OneKYB = lazy(() => import('@src/domains/dashboard/OneKYB/pages/OneKYB'));
+const OneKYBDashboard = lazy(() => import('@src/domains/dashboard/OneKYB/pages/OneKYBDashboard'));
 const ServiceNotAvailable = lazy(() => import('@src/domains/failed/pages/ServiceNotAvailable'));
 const BusinessListings = lazy(
     () => import('@src/domains/dashboard/businessListings/pages/BusinessListings')
@@ -232,6 +233,10 @@ export const dashboardRoutes = [
             {
                 element: <OneKYB />,
                 path: paths.dashboard.oneKYB,
+            },
+            {
+                element: <OneKYBDashboard />,
+                path: paths.dashboard.oneKYBDashboard,
             },
             {
                 element: <BusinessListings />,

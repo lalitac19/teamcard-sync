@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import {
     Button,
     Card,
-    Checkbox,
     Col,
     Collapse,
     Divider,
@@ -96,7 +97,6 @@ const SERVICES: Service[] = [
     { id: 'corp-card',       name: 'Corporate Credit Card', category: 'Cards',     icon: '💳', desc: 'Visa Business card up to AED 250K limit',           requiredFields: ['legal_name','avg_monthly_inflow','avg_balance','bounce_count','years_trading','annual_turnover','kyc_director'] },
     { id: 'payroll',         name: 'WPS Payroll',           category: 'HR',        icon: '👥', desc: 'MOHRE-compliant payroll via Wages Protection System', requiredFields: ['legal_name','licence_no','employee_count','mol_registered'] },
     { id: 'payment-gateway', name: 'Payment Gateway',       category: 'Payments',  icon: '🌐', desc: 'Accept online & in-store payments, multi-currency',  requiredFields: ['legal_name','trn','avg_monthly_inflow','website_url','ecommerce_pct','avg_ticket_size'] },
-    { id: 'trade-finance',   name: 'Trade Finance',         category: 'Trade',     icon: '🚢', desc: 'Letters of credit, bank guarantees, and SCF',       requiredFields: ['legal_name','avg_monthly_inflow','annual_turnover','intl_pct','trade_partners','years_trading','audited_accounts'] },
     { id: 'eor',             name: 'Employer of Record',   category: 'HR',        icon: '🤝', desc: 'Hire and pay employees across the UAE without a local entity', requiredFields: ['legal_name','licence_no','sh1_name','directors'] },
 ];
 
@@ -104,7 +104,7 @@ const QA_SECTIONS: QASection[] = [
     {
         id: 'basics', title: 'Business basics', icon: '🏢', sub: 'Pre-filled where possible from your trade licence',
         questions: [
-            { key: 'years_trading',       label: 'Years in business',           type: 'radio',  options: ['< 1 year','1–2 years','2–5 years','5–10 years','10+ years'], note: 'Required by banks to assess lending risk.',   unlocks: ['working-capital','corp-card','trade-finance'] },
+            { key: 'years_trading',       label: 'Years in business',           type: 'radio',  options: ['< 1 year','1–2 years','2–5 years','5–10 years','10+ years'], note: 'Required by banks to assess lending risk.',   unlocks: ['working-capital','corp-card'] },
             { key: 'employee_count',      label: 'Number of employees',         type: 'radio',  options: ['1–5','6–20','21–50','51–200','200+'],                         note: 'Required for WPS payroll setup.',             unlocks: ['payroll'] },
             { key: 'monthly_revenue_band',label: 'Average monthly revenue',     type: 'radio',  options: ['< AED 100K','AED 100K–500K','AED 500K–2M','AED 2M–10M','> AED 10M'], note: 'Determines working capital limits.', unlocks: ['working-capital','corp-card','payment-gateway'] },
         ],
@@ -114,7 +114,7 @@ const QA_SECTIONS: QASection[] = [
         questions: [
             { key: 'existing_bank',          label: 'Existing UAE business bank account?',    type: 'radio',  options: ['Yes – same bank','Yes – different bank','No – first account'], unlocks: ['bank-account'] },
             { key: 'expected_monthly_txns',  label: 'Expected monthly incoming transactions', type: 'select', options: ['Under 20','20–100','100–500','500–2,000','2,000+'],             unlocks: ['bank-account'] },
-            { key: 'expected_intl',          label: 'Expect international wire transfers?',   type: 'radio',  options: ['Yes – regularly','Yes – occasionally','No'],                  unlocks: ['bank-account','trade-finance'] },
+            { key: 'expected_intl',          label: 'Expect international wire transfers?',   type: 'radio',  options: ['Yes – regularly','Yes – occasionally','No'],                  unlocks: ['bank-account'] },
         ],
     },
     {
@@ -138,14 +138,6 @@ const QA_SECTIONS: QASection[] = [
             { key: 'website_url',     label: 'Business website URL',               type: 'input', placeholder: 'https://alnoor.ae', unlocks: ['payment-gateway'] },
             { key: 'ecommerce_pct',   label: '% of sales online',                  type: 'radio', options: ['< 10%','10–30%','30–60%','60–90%','> 90%'],                 unlocks: ['payment-gateway'] },
             { key: 'avg_ticket_size', label: 'Average customer transaction (AED)', type: 'radio', options: ['< AED 100','AED 100–500','AED 500–2K','AED 2K–10K','> AED 10K'], unlocks: ['payment-gateway'] },
-        ],
-    },
-    {
-        id: 'trade', title: 'Trade & international', icon: '🚢', sub: 'For trade finance and letters of credit',
-        questions: [
-            { key: 'trade_partners',       label: 'Primary trade corridors',     type: 'radio', options: ['GCC only','Asia (India/China/SE Asia)','Europe','USA/Americas','Global'], unlocks: ['trade-finance'] },
-            { key: 'import_export',        label: 'The business is primarily',   type: 'radio', options: ['Importer','Exporter','Both'], unlocks: ['trade-finance'] },
-            { key: 'has_audited_accounts', label: '2+ years of audited accounts?',type: 'radio', options: ['Yes – available','Yes – need 2–4 weeks','No'], unlocks: ['trade-finance'] },
         ],
     },
 ];
@@ -183,13 +175,6 @@ const MOCK_FIN_FIELDS: ExtractedField[] = [
 const MOCK_OWNERS: Owner[] = [
     { id: 'o1', name: 'Ahmed Al Mansoori', pct: 60, role: 'Managing Director', nationality: 'UAE',    initials: 'AM', kyc: 'complete' },
     { id: 'o2', name: 'Sara Rahman',       pct: 40, role: 'Director',          nationality: 'Indian', initials: 'SR', kyc: 'pending'  },
-];
-
-const DECLARATIONS = [
-    'I confirm the business is not used for money laundering, terrorism financing, or proliferation financing.',
-    'All beneficial owners disclosed are accurate under Cabinet Decision No. (109) of 2023.',
-    'The business is not subject to any current regulatory sanctions or enforcement actions.',
-    'I consent to ongoing monitoring, periodic KYB refresh, and sharing of verified status via OneKYB.',
 ];
 
 const AI_LICENCE = `I can see this is a trade licence issued by Dubai Economy & Tourism (DED) for Al Noor Trading LLC, a Limited Liability Company registered on 14 March 2019. The licence covers General Trading activities and is valid until 31 Dec 2025. Tax Registration Number 1000324789800003 is present. 10 fields extracted — please review and confirm.`;
@@ -663,17 +648,13 @@ function StepReview({ onBack, onNext, extracted, answers }: {
     extracted: Record<string, Record<string, string>>;
     answers: Record<string, string>;
 }) {
-    const [checked, setChecked] = useState<Set<number>>(new Set());
-    const [amlDone, setAmlDone] = useState(false);
-    useEffect(() => { const t = setTimeout(() => setAmlDone(true), 2400); return () => clearTimeout(t); }, []);
+    const [complianceUploaded, setComplianceUploaded] = useState<Set<string>>(new Set());
 
     const lic = extracted.licence    ?? {};
     const fin = extracted.statements ?? {};
     const docCount = Object.keys(extracted).length + 2;
     const filledCount = Object.values(extracted).reduce((a, v) => a + Object.keys(v).length, 0) + Object.keys(answers).filter(k => answers[k]).length;
     const pct = Math.min(100, Math.round(filledCount / 24 * 100));
-
-    const toggleDecl = (i: number) => setChecked(p => { const n = new Set(p); n.has(i) ? n.delete(i) : n.add(i); return n; });
 
     return (
         <>
@@ -699,25 +680,42 @@ function StepReview({ onBack, onNext, extracted, answers }: {
                 ))}
             </Row>
 
-            <Card title={<Flex align="center" gap={8}><Text strong>AML Screening</Text><Tag color="processing">Live</Tag></Flex>} style={{ marginBottom: 16 }}>
-                {['Ahmed Al Mansoori', 'Sara Rahman'].map((name, i) => (
-                    <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i === 0 ? '1px solid #F5F5F5' : 'none' }}>
-                        <div>
-                            <Text strong style={{ display: 'block', fontSize: 13 }}>{name}</Text>
-                            <Text type="secondary" style={{ fontSize: 11 }}>OFAC · UN · EU sanctions · PEP check</Text>
+            <Card
+                title={<Text strong>Compliance documents</Text>}
+                style={{ marginBottom: 16 }}
+            >
+                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <span style={{ fontSize: 14, marginTop: 1 }}>⚠️</span>
+                    <Text style={{ fontSize: 13, color: '#92400E' }}>The following compliance forms must be completed before submission.</Text>
+                </div>
+                {[
+                    { id: 'facta', label: 'FACTA Self-Declaration Form' },
+                    { id: 'crs',   label: 'CRS Self-Declaration Form'  },
+                ].map((form, i, arr) => {
+                    const isUp = complianceUploaded.has(form.id);
+                    return (
+                        <div key={form.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < arr.length - 1 ? '1px solid #F5F5F5' : 'none' }}>
+                            <Flex align="center" gap={10}>
+                                <div style={{ width: 36, height: 36, borderRadius: 8, background: '#FFFBEB', border: '1px solid #FDE68A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                                    📋
+                                </div>
+                                <div>
+                                    <Flex align="center" gap={6} wrap="wrap">
+                                        <Text strong style={{ color: '#92400E', fontSize: 13 }}>{form.label}</Text>
+                                        <Text style={{ fontSize: 12, color: '#FF3A3A', cursor: 'pointer', textDecoration: 'underline' }}>click here to download</Text>
+                                    </Flex>
+                                </div>
+                            </Flex>
+                            <Button
+                                size="small"
+                                style={isUp ? { borderColor: '#10B981', color: '#10B981' } : {}}
+                                onClick={() => setComplianceUploaded(p => new Set([...p, form.id]))}
+                            >
+                                {isUp ? '✓ Uploaded' : 'Upload file'}
+                            </Button>
                         </div>
-                        <Tag color={amlDone ? 'success' : 'processing'}>{amlDone ? '✓ Clear' : 'Screening…'}</Tag>
-                    </div>
-                ))}
-            </Card>
-
-            <Card title={<Text strong>Statutory declarations</Text>} style={{ marginBottom: 16 }}>
-                {DECLARATIONS.map((decl, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: i < DECLARATIONS.length - 1 ? '1px solid #F5F5F5' : 'none', cursor: 'pointer' }} onClick={() => toggleDecl(i)}>
-                        <Checkbox checked={checked.has(i)} style={{ marginTop: 2 }} />
-                        <Text style={{ fontSize: 13, lineHeight: 1.5 }}>{decl}</Text>
-                    </div>
-                ))}
+                    );
+                })}
             </Card>
 
             <Card title={<Text strong>Application summary</Text>} style={{ marginBottom: 16 }}>
@@ -765,6 +763,7 @@ function StepServices({ onBack, filledFields, selectedServices, setSelectedServi
     selectedServices: Set<string>;
     setSelectedServices: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
+    const navigate = useNavigate();
     const [submitted, setSubmitted] = useState(false);
     const categories = Array.from(new Set(SERVICES.map(s => s.category)));
 
@@ -798,7 +797,16 @@ function StepServices({ onBack, filledFields, selectedServices, setSelectedServi
                             </Col>
                         ))}
                     </Row>
-                    <Button type="primary" danger size="large">Go to dashboard →</Button>
+                    <Button
+                        type="primary"
+                        danger
+                        size="large"
+                        onClick={() => navigate('/more-services/one-kyb/dashboard', {
+                            state: { appliedIds: Array.from(selectedServices) },
+                        })}
+                    >
+                        Go to dashboard →
+                    </Button>
                 </div>
             </div>
         );

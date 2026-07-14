@@ -68,6 +68,7 @@ export const paths = {
         ruyaSupport: '/more-services/ruya-support',
         bankAccount: '/more-services/bank-account',
         oneKYB: '/more-services/one-kyb',
+        oneKYBDashboard: '/more-services/one-kyb/dashboard',
         businessListings: '/more-services/business-listings',
     },
     payments: {
