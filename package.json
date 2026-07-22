@@ -162,5 +162,13 @@
         "extends": [
             "react-app"
         ]
+    },
+    "overrides": {
+        "form-data": ">=4.0.4",
+        "tar": ">=6.2.1"
+    },
+    "resolutions": {
+        "form-data": ">=4.0.4",
+        "tar": ">=6.2.1"
     }
 }
