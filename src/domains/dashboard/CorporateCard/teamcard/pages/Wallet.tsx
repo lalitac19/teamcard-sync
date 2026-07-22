@@ -424,7 +424,7 @@ function ConvertSurplusDialog({ open, onOpenChange, surplus, onConvert }: { open
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={!valid}>Convert to credit limit</Button>
+            <Button type="submit" disabled={!valid}>Use to increase credit limit</Button>
           </DialogFooter>
         </form>
       </DialogContent>
