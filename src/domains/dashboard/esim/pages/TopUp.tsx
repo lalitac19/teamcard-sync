@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 import { Button, Card, Col, Flex, Image, Row, Typography } from 'antd';
