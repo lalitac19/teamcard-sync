@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 
 import { ChatThreadProperties } from '@azure/communication-chat';

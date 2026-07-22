@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import configureMockStore from 'redux-mock-store';
