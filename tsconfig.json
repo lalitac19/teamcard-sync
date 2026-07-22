@@ -79,9 +79,5 @@
     "postcss.config.js",
     "vitest.setup.ts"
   ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+  "references": []
 }
