@@ -22,12 +22,11 @@ import {
   cards,
   members,
   transactions,
-  reimbursements,
-  invoices,
   txnApprovals,
   cardRequests,
   walletBalance,
   walletAvailable,
+  corporateCreditLimit,
   totalSpentAcrossCards,
   formatCurrency,
   formatDate,
@@ -49,15 +48,9 @@ const Dashboard = () => {
   const verifiedMembers = useMemo(() => members.filter((m) => m.kycStatus === "verified"), []);
   const pendingKyc = members.length - verifiedMembers.length;
 
-  const pendingReimb = useMemo(() => reimbursements.filter((r) => r.status === "pending"), []);
-  const pendingReimbTotal = pendingReimb.reduce((s, r) => s + r.amount, 0);
-  const pendingInvoices = invoices.filter((i) => i.status === "pending");
-
   const pendingApprovalsTotal =
     txnApprovals.filter((t) => t.status === "pending").length +
-    cardRequests.filter((c) => c.status === "pending").length +
-    pendingReimb.length +
-    pendingInvoices.length;
+    cardRequests.filter((c) => c.status === "pending").length;
 
   // This month vs last month spend (anchor on most recent transaction date)
   const { thisMonthTotal, lastMonthTotal, momDelta, trendData } = useMemo(() => {
@@ -145,7 +138,7 @@ const Dashboard = () => {
     { count: txnApprovals.filter((t) => t.status === "pending").length, label: "transactions need approval", to: "/approvals", icon: ShieldCheck },
     { count: cardRequests.filter((c) => c.status === "pending").length, label: "card requests pending", to: "/approvals", icon: CardIcon },
     { count: pendingKyc, label: "people pending KYC", to: "/members", icon: Users },
-    { count: pendingInvoices.length, label: "vendor invoices awaiting approval", to: "/invoices", icon: Receipt },
+    
     { count: cardsNearLimit, label: "cards over 80% utilization", to: "/cards", icon: Flame },
   ].filter((a) => a.count > 0);
 
@@ -179,10 +172,10 @@ const Dashboard = () => {
         <Card className="md:col-span-2 gradient-hero text-white shadow-card border-0">
           <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-widest text-white/60">Wallet Balance</p>
+              <p className="text-xs uppercase tracking-widest text-white/60">Available Credit Limit</p>
               <p className="mt-2 text-4xl font-semibold tracking-tight">{formatCurrency(walletAv)}</p>
               <p className="mt-1 text-xs text-white/60">
-                {formatCurrency(walletBalance)} total funded · {formatCurrency(totalSpent)} spent across {activeCards.length} active cards
+                Corporate Credit Limit {formatCurrency(corporateCreditLimit)} · {formatCurrency(totalSpent)} spent across {activeCards.length} active cards
               </p>
             </div>
             <div className="flex gap-2">
@@ -217,6 +210,14 @@ const Dashboard = () => {
       {/* KPI row */}
       <div className="mt-4 grid gap-4 md:grid-cols-4">
         <KpiCard
+          label="Corporate Credit Limit"
+          value={formatCurrency(corporateCreditLimit)}
+          icon={<ShieldCheck className="h-4 w-4" />}
+          delta="Permanent limit"
+          trend="neutral"
+          to="/wallet"
+        />
+        <KpiCard
           label="Active cards"
           value={String(activeCards.length)}
           icon={<CardIcon className="h-4 w-4" />}
@@ -231,14 +232,6 @@ const Dashboard = () => {
           delta={pendingKyc > 0 ? `${pendingKyc} pending KYC` : "All verified"}
           trend={pendingKyc > 0 ? "neutral" : "up"}
           to="/members"
-        />
-        <KpiCard
-          label="Pending reimbursements"
-          value={formatCurrency(pendingReimbTotal)}
-          icon={<Receipt className="h-4 w-4" />}
-          delta={`${pendingReimb.length} awaiting approval`}
-          trend="neutral"
-          to="/reimbursements"
         />
         <KpiCard
           label="Pending approvals"

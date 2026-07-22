@@ -18,15 +18,11 @@ const Wallet           = lazy(() => import('@src/domains/dashboard/CorporateCard
 const AccountingExport = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/AccountingExport'));
 const AccountStatement = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/AccountStatement'));
 const ServiceFees      = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/ServiceFees'));
-const Reimbursements   = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/Reimbursements'));
-const Invoices         = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/Invoices'));
 const Approvals        = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/Approvals'));
 const Settings         = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/Settings'));
 const Plans            = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/Plans'));
 const MyCards          = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/member/MyCards'));
 const MyTransactions   = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/member/MyTransactions'));
-const MyReimbursements = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/member/MyReimbursements'));
-const MyInvoices       = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/member/MyInvoices'));
 const MyRequests       = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/member/MyRequests'));
 const MyProfile        = lazy(() => import('@src/domains/dashboard/CorporateCard/teamcard/pages/member/MyProfile'));
 
@@ -39,8 +35,7 @@ const adminNav = [
     { label: 'People',            path: '/members',       emoji: '👥' },
     { label: 'Transactions',      path: '/transactions',  emoji: '💸' },
     { label: 'Approvals',         path: '/approvals',     emoji: '✅' },
-    { label: 'Reimbursements',    path: '/reimbursements',emoji: '🔄' },
-    { label: 'Invoices',          path: '/invoices',      emoji: '📄' },
+    { label: 'Statement',         path: '/statement',     emoji: '📋' },
     { label: 'Statement',         path: '/statement',     emoji: '📋' },
     { label: 'Accounting',        path: '/accounting',    emoji: '📊' },
     { label: 'Service Fees',      path: '/service-fees',  emoji: '💰' },
@@ -51,8 +46,6 @@ const memberNav = [
     { label: 'Dashboard',      path: '/',                  emoji: '🏠' },
     { label: 'My Cards',       path: '/me/cards',          emoji: '💳' },
     { label: 'Transactions',   path: '/me/transactions',   emoji: '💸' },
-    { label: 'Reimbursements', path: '/me/reimbursements', emoji: '🔄' },
-    { label: 'Invoices',       path: '/me/invoices',       emoji: '📄' },
     { label: 'Requests',       path: '/me/requests',       emoji: '➕' },
     { label: 'Profile',        path: '/me/profile',        emoji: '👤' },
 ];
@@ -163,8 +156,6 @@ export default function InnerApp() {
                                             <Route path="/members"        element={<Members />} />
                                             <Route path="/transactions"   element={<Transactions />} />
                                             <Route path="/wallet"         element={<Wallet />} />
-                                            <Route path="/reimbursements" element={<Reimbursements />} />
-                                            <Route path="/invoices"       element={<Invoices />} />
                                             <Route path="/approvals"      element={<Approvals />} />
                                             <Route path="/accounting"     element={<AccountingExport />} />
                                             <Route path="/statement"      element={<AccountStatement />} />
@@ -173,8 +164,6 @@ export default function InnerApp() {
                                             <Route path="/settings"       element={<Settings />} />
                                             <Route path="/me/cards"          element={<MyCards />} />
                                             <Route path="/me/transactions"   element={<MyTransactions />} />
-                                            <Route path="/me/reimbursements" element={<MyReimbursements />} />
-                                            <Route path="/me/invoices"       element={<MyInvoices />} />
                                             <Route path="/me/requests"       element={<MyRequests />} />
                                             <Route path="/me/profile"        element={<MyProfile />} />
                                         </Routes>
