@@ -3,6 +3,8 @@ import { AppLayout } from "@src/domains/dashboard/CorporateCard/teamcard/compone
 import { Card, CardContent } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/card";
 import { Button } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/button";
 import { Badge } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/badge";
+import { Input } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/input";
+import { Label } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/label";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle, DialogTrigger,
@@ -15,17 +17,22 @@ import {
 } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/table";
 
 import {
-  walletBalance,
   walletTopUps,
   cards as allCards,
-  totalSpentAcrossCards,
-  totalAllocatedLimits,
-  walletAvailable,
   memberById,
   formatCurrency,
   formatDate,
+  fmtCycleDate,
+  corporateCreditLimit,
+  surplusFunds,
+  currentCycleAccrual,
+  unpaidBillsTotal,
+  availableCredit,
+  currentCycle,
+  bills,
+  creditLimitHistory,
 } from "@src/domains/dashboard/CorporateCard/teamcard/lib/mockData";
-import { Plus, Copy, Info, ArrowRight } from "lucide-react";
+import { Plus, Copy, Info, ArrowRight, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -39,59 +46,75 @@ const COMPANY_BANK = {
 };
 
 const Wallet = () => {
+  const [creditLimit, setCreditLimit] = useState(corporateCreditLimit);
+  const [surplus, setSurplus] = useState(surplusFunds);
+  const [convertOpen, setConvertOpen] = useState(false);
+
   const activeCards = useMemo(
     () => allCards.filter((c) => c.status !== "terminated"),
     [],
   );
-  const totalCaps = useMemo(() => totalAllocatedLimits(), []);
-  const totalSpent = useMemo(() => totalSpentAcrossCards(), []);
-  const walletAv = useMemo(() => walletAvailable(), []);
-  const totalFunded = useMemo(
-    () => walletTopUps
-      .filter((w) => w.status === "completed")
-      .reduce((s, w) => s + w.amount, 0),
-    [],
+
+  const cycleAccrual = useMemo(() => currentCycleAccrual(), []);
+  const unpaidBills = useMemo(() => unpaidBillsTotal(), []);
+  const availableLimit = useMemo(
+    () => Math.max(0, creditLimit + surplus - cycleAccrual - unpaidBills),
+    [creditLimit, surplus, cycleAccrual, unpaidBills],
   );
+
+  const cycle = useMemo(() => currentCycle(), []);
+  const cycleLabel = `${fmtCycleDate(cycle.start)} to ${fmtCycleDate(cycle.end)}`;
+
+  const handleConvert = (amount: number) => {
+    if (amount <= 0 || amount > surplus) return;
+    setCreditLimit((prev) => prev + amount);
+    setSurplus((prev) => prev - amount);
+    setConvertOpen(false);
+    toast.success(`AED ${amount.toLocaleString()} moved from surplus to Corporate Credit Limit`);
+  };
 
   return (
     <AppLayout
-      title="Wallet"
-      subtitle="A single pool of funds. All active cards spend from this shared wallet. Card spending caps don't reserve funds — unspent allocation remains in the wallet until it's actually spent."
-      actions={<TopUpDialog />}
+      title="Corporate Account"
+      subtitle={`Secured credit model. Current billing cycle: ${cycleLabel}. Available Limit = Corporate Credit Limit + Surplus Funds − Current Accrual − Unpaid Bills.`}
+      actions={<FundAccountDialog />}
     >
-      {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card className="shadow-soft">
-          <CardContent className="p-5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Wallet balance</p>
-            <p className="mt-2 text-2xl font-semibold">{formatCurrency(walletAv)}</p>
-            <p className="text-xs text-muted-foreground mt-1">shared across active cards</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Total topped up</p>
-            <p className="mt-2 text-2xl font-semibold">{formatCurrency(totalFunded > 0 ? totalFunded : walletBalance)}</p>
-            <p className="text-xs text-muted-foreground mt-1">via bank transfer</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Spending activity</p>
-            <p className="mt-2 text-2xl font-semibold">{formatCurrency(totalSpent)}</p>
-            <p className="text-xs text-muted-foreground mt-1">across {activeCards.length} active cards</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardContent className="p-5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Sum of card caps</p>
-            <p className="mt-2 text-2xl font-semibold">{formatCurrency(totalCaps)}</p>
-            <p className="text-xs text-muted-foreground mt-1">informational only</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Available Limit hero */}
+      <Card className="mb-6 shadow-soft border-l-4 border-l-primary">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Available Limit</p>
+              <p className="mt-1 text-4xl font-semibold">{formatCurrency(availableLimit)}</p>
+              <p className="text-sm text-muted-foreground mt-1">Available to spend across all cards right now</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setConvertOpen(true)} disabled={surplus <= 0}>
+                <TrendingUp className="h-4 w-4" /> Use surplus to increase limit
+              </Button>
+            </div>
+          </div>
 
-      {/* IBAN */}
+          {/* Breakdown */}
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t">
+            <BreakdownItem label="Corporate Credit Limit" value={creditLimit} />
+            <BreakdownItem label="Surplus Funds" value={surplus} highlight={surplus > 0} />
+            <BreakdownItem label="Current Cycle Accrual" value={cycleAccrual} negative />
+            <BreakdownItem label="Unpaid Bills" value={unpaidBills} negative />
+          </div>
+
+          {unpaidBills > 0 && (
+            <div className="mt-4 flex items-start gap-2 rounded-md bg-warning/10 p-3 text-xs text-warning">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <p>
+                {formatCurrency(unpaidBills)} in unpaid bills is locked against your Corporate Credit Limit. If not paid by month-end, your limit will drop automatically and permanently.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Funding IBAN */}
       <Card className="mb-6 shadow-soft">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
@@ -101,19 +124,29 @@ const Wallet = () => {
           <CopyField label="IBAN" value={COMPANY_BANK.iban} />
           <p className="mt-2 text-xs text-muted-foreground flex items-center gap-1.5">
             <Info className="h-3 w-3 shrink-0" />
-            Wire transfers only · Include payment reference · Settles in 1–2 business days
+            Bank transfer is the only accepted funding route · Include payment reference · Settles in 1–2 business days
           </p>
         </CardContent>
       </Card>
 
+      {/* Surplus conversion dialog (controlled from hero) */}
+      <ConvertSurplusDialog
+        open={convertOpen}
+        onOpenChange={setConvertOpen}
+        surplus={surplus}
+        onConvert={handleConvert}
+      />
+
       {/* Tabs */}
-      <Tabs defaultValue="topups">
+      <Tabs defaultValue="funding">
         <TabsList>
-          <TabsTrigger value="topups">Top-up history</TabsTrigger>
+          <TabsTrigger value="funding">Funding history</TabsTrigger>
+          <TabsTrigger value="bills">Bills</TabsTrigger>
+          <TabsTrigger value="limits">Limit history</TabsTrigger>
           <TabsTrigger value="allocations">Card spend limits</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="topups" className="mt-4">
+        <TabsContent value="funding" className="mt-4">
           <Card className="shadow-soft">
             <CardContent className="p-0">
               <Table>
@@ -150,6 +183,79 @@ const Wallet = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="bills" className="mt-4">
+          <Card className="shadow-soft">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Cycle</TableHead>
+                    <TableHead>Issued</TableHead>
+                    <TableHead>Due</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Billed</TableHead>
+                    <TableHead className="text-right">Paid</TableHead>
+                    <TableHead className="text-right">Balance</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {bills.map((b) => {
+                    const balance = Math.max(0, b.amount - (b.paidAmount ?? 0));
+                    return (
+                      <TableRow key={b.id}>
+                        <TableCell className="text-sm">{fmtCycleDate(new Date(b.cycleStart))} to {fmtCycleDate(new Date(b.cycleEnd))}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{formatDate(b.issueDate)}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{formatDate(b.dueDate)}</TableCell>
+                        <TableCell>
+                          <BillStatusBadge status={b.status} />
+                        </TableCell>
+                        <TableCell className="text-right text-sm font-semibold">{formatCurrency(b.amount)}</TableCell>
+                        <TableCell className="text-right text-sm text-muted-foreground">{formatCurrency(b.paidAmount ?? 0)}</TableCell>
+                        <TableCell className="text-right text-sm font-semibold">{formatCurrency(balance)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="limits" className="mt-4">
+          <Card className="shadow-soft">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead className="text-right">Change</TableHead>
+                    <TableHead className="text-right">New Limit</TableHead>
+                    <TableHead>Reference</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {creditLimitHistory.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell className="text-sm text-muted-foreground">{formatDate(e.date)}</TableCell>
+                      <TableCell>
+                        <LimitEventBadge type={e.type} />
+                      </TableCell>
+                      <TableCell className="text-sm max-w-xs truncate" title={e.reason}>{e.reason}</TableCell>
+                      <TableCell className="text-right text-sm font-semibold">
+                        {e.delta >= 0 ? `+${formatCurrency(e.delta)}` : `−${formatCurrency(Math.abs(e.delta))}`}
+                      </TableCell>
+                      <TableCell className="text-right text-sm font-semibold">{formatCurrency(e.resultingLimit)}</TableCell>
+                      <TableCell className="font-mono text-xs">{e.reference}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="allocations" className="mt-4">
           <Card className="shadow-soft">
             <CardContent className="p-0">
@@ -161,7 +267,7 @@ const Wallet = () => {
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Spend limit</TableHead>
                     <TableHead className="text-right">Spent</TableHead>
-                    <TableHead className="text-right">Cap remaining</TableHead>
+                    <TableHead className="text-right">Remaining</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -182,14 +288,6 @@ const Wallet = () => {
                       </TableRow>
                     );
                   })}
-                  <TableRow className="bg-muted/30">
-                    <TableCell colSpan={3} className="text-sm font-medium">Total</TableCell>
-                    <TableCell className="text-right text-sm font-semibold">{formatCurrency(totalCaps)}</TableCell>
-                    <TableCell className="text-right text-sm text-muted-foreground">{formatCurrency(totalSpent)}</TableCell>
-                    <TableCell className="text-right text-sm text-muted-foreground">
-                      Wallet available: {formatCurrency(walletAv)}
-                    </TableCell>
-                  </TableRow>
                 </TableBody>
               </Table>
             </CardContent>
@@ -199,6 +297,37 @@ const Wallet = () => {
     </AppLayout>
   );
 };
+
+function BreakdownItem({ label, value, highlight, negative }: { label: string; value: number; highlight?: boolean; negative?: boolean }) {
+  return (
+    <div className="rounded-lg border bg-card p-4">
+      <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className={`mt-1 text-xl font-semibold ${negative ? "text-destructive" : highlight ? "text-success" : ""}`}>
+        {negative && value > 0 ? "−" : ""}{formatCurrency(value)}
+      </p>
+    </div>
+  );
+}
+
+function BillStatusBadge({ status }: { status: string }) {
+  if (status === "paid") {
+    return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0">Paid</Badge>;
+  }
+  if (status === "partial") {
+    return <Badge className="bg-warning/10 text-warning hover:bg-warning/10 border-0">Partial</Badge>;
+  }
+  return <Badge className="bg-destructive/10 text-destructive hover:bg-destructive/10 border-0">Unpaid</Badge>;
+}
+
+function LimitEventBadge({ type }: { type: string }) {
+  if (type === "increase") {
+    return <Badge className="bg-success/10 text-success hover:bg-success/10 border-0 gap-1"><TrendingUp className="h-3 w-3" /> Increase</Badge>;
+  }
+  if (type === "decrease") {
+    return <Badge className="bg-destructive/10 text-destructive hover:bg-destructive/10 border-0 gap-1"><TrendingDown className="h-3 w-3" /> Decrease</Badge>;
+  }
+  return <Badge className="bg-info/10 text-info hover:bg-info/10 border-0">Initial</Badge>;
+}
 
 function CopyField({ label, value, mono = true }: { label: string; value: string; mono?: boolean }) {
   const copy = () => {
@@ -218,21 +347,21 @@ function CopyField({ label, value, mono = true }: { label: string; value: string
   );
 }
 
-function TopUpDialog() {
+function FundAccountDialog() {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
-          <Plus className="h-4 w-4" /> Top up wallet
+          <Plus className="h-4 w-4" /> Fund Account
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Top up wallet</DialogTitle>
+          <DialogTitle>Fund Account</DialogTitle>
           <DialogDescription>
-            Send a bank transfer to your company's assigned IBAN below. Funds are added to the shared wallet pool and become available to all cards.
+            Send a bank transfer to your company's assigned IBAN below. The first funding sets your Corporate Credit Limit; later funding creates surplus funds unless it settles a bill.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2 py-2">
@@ -252,6 +381,52 @@ function TopUpDialog() {
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ConvertSurplusDialog({ open, onOpenChange, surplus, onConvert }: { open: boolean; onOpenChange: (v: boolean) => void; surplus: number; onConvert: (amount: number) => void }) {
+  const [amount, setAmount] = useState<string>("");
+
+  const parsed = parseFloat(amount);
+  const valid = !isNaN(parsed) && parsed > 0 && parsed <= surplus;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!valid) return;
+    onConvert(parsed);
+    setAmount("");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Use surplus to increase credit limit</DialogTitle>
+          <DialogDescription>
+            Move funds from Surplus Funds to your Corporate Credit Limit. This permanently raises the credit limit and the new limit will be used for future bill calculations.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label htmlFor="convert-amount">Amount to convert</Label>
+            <Input
+              id="convert-amount"
+              type="number"
+              min={1}
+              max={surplus}
+              placeholder={`Max ${formatCurrency(surplus)}`}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">Available surplus: {formatCurrency(surplus)}</p>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" disabled={!valid}>Convert to credit limit</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
