@@ -423,7 +423,7 @@ export interface Bill {
 
 export const bills: Bill[] = [
   { id: "bl1", cycleStart: "2024-06-26", cycleEnd: "2024-07-25", issueDate: "2024-07-26", dueDate: "2024-07-31", amount: 41280, status: "paid", paidAmount: 41280, paidDate: "2024-07-30" },
-  { id: "bl2", cycleStart: "2024-07-26", cycleEnd: "2024-08-25", issueDate: "2024-08-26", dueDate: "2024-08-31", amount: 38420, status: "partial", paidAmount: 25000, paidDate: "2024-08-29" },
+  { id: "bl2", cycleStart: "2024-07-26", cycleEnd: "2024-08-25", issueDate: "2024-08-26", dueDate: "2024-08-31", amount: 38420, status: "paid", paidAmount: 38420, paidDate: "2024-08-29" },
   { id: "bl3", cycleStart: "2024-08-26", cycleEnd: "2024-09-25", issueDate: "2024-09-26", dueDate: "2024-09-30", amount: 52180, status: "paid", paidAmount: 52180, paidDate: "2024-09-30" },
 ];
 
