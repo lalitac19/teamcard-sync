@@ -8,7 +8,6 @@ import { Progress } from "@src/domains/dashboard/CorporateCard/teamcard/componen
 import {
   CreditCard as CardIcon,
   Receipt,
-  HandCoins,
   FileText,
   PlusCircle,
   ArrowUpRight,
@@ -17,8 +16,6 @@ import { CardVisual } from "@src/domains/dashboard/CorporateCard/teamcard/compon
 import {
   cards as allCards,
   transactions as allTxns,
-  reimbursements as allReimb,
-  invoices as allInvoices,
   cardRequests as allCardReq,
   topUpRequests as allTopUps,
   formatCurrency,
@@ -69,8 +66,6 @@ export default function MemberDashboard() {
         .sort((a, b) => +new Date(b.date) - +new Date(a.date)),
     [user.id],
   );
-  const myReimb = useMemo(() => allReimb.filter((r) => r.memberId === user.id), [user.id]);
-  const myInv = useMemo(() => allInvoices.filter((i) => i.uploadedBy === user.id), [user.id]);
   const pendingReq = [
     ...allCardReq.filter((r) => r.memberId === user.id && r.status === "pending"),
     ...allTopUps.filter((r) => r.memberId === user.id && r.status === "pending"),
@@ -78,9 +73,6 @@ export default function MemberDashboard() {
 
   const totalLimit = myCards.reduce((s, c) => s + c.spendLimit, 0);
   const totalSpent = myCards.reduce((s, c) => s + c.spent, 0);
-  const pendingReimbAmount = myReimb
-    .filter((r) => r.status === "pending")
-    .reduce((s, r) => s + r.amount, 0);
 
   return (
     <AppLayout
@@ -94,7 +86,7 @@ export default function MemberDashboard() {
         </Button>
       }
     >
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <KpiCard
           icon={CardIcon}
           label="My cards"
@@ -108,13 +100,6 @@ export default function MemberDashboard() {
           value={formatCurrency(totalSpent)}
           hint={`of ${formatCurrency(totalLimit)} limit`}
           tone="info"
-        />
-        <KpiCard
-          icon={HandCoins}
-          label="Pending reimbursement"
-          value={formatCurrency(pendingReimbAmount)}
-          hint={`${myReimb.filter((r) => r.status === "pending").length} awaiting approval`}
-          tone="warning"
         />
         <KpiCard
           icon={FileText}

@@ -42,8 +42,7 @@ export const permissionCatalog: { key: string; label: string; group: string }[] 
   { key: "freeze_cards", label: "Freeze / unfreeze cards", group: "Cards" },
   { key: "set_card_limits", label: "Set card spend limits", group: "Cards" },
   { key: "approve_transactions", label: "Approve card transactions", group: "Approvals" },
-  { key: "approve_oop", label: "Approve reimbursement expenses", group: "Approvals" },
-  { key: "approve_invoices", label: "Approve vendor invoices", group: "Approvals" },
+  
   { key: "approve_card_requests", label: "Approve card issuance requests", group: "Approvals" },
   { key: "approve_topup_requests", label: "Approve card fund requests", group: "Approvals" },
   { key: "view_wallet", label: "View Corporate Account & Available Limits", group: "Corporate Account" },
@@ -85,7 +84,7 @@ export const defaultRolePermissions: RolePermissions[] = [
   {
     role: "team_member",
     label: "Team Member",
-    description: "Standard cardholder, can submit expenses & invoices.",
+    description: "Standard cardholder.",
     permissions: Object.fromEntries(
       permissionCatalog.map((p) => [p.key, ["view_dashboard"].includes(p.key)]),
     ),
@@ -97,7 +96,7 @@ export const defaultRolePermissions: RolePermissions[] = [
     permissions: Object.fromEntries(
       permissionCatalog.map((p) => [
         p.key,
-        ["view_dashboard", "approve_oop", "approve_invoices", "set_card_limits"].includes(p.key),
+        ["view_dashboard", "set_card_limits"].includes(p.key),
       ]),
     ),
   },

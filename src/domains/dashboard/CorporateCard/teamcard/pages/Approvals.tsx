@@ -11,15 +11,13 @@ import {
 } from "@src/domains/dashboard/CorporateCard/teamcard/components/ui/table";
 import {
   txnApprovals as seedTxnApprovals,
-  reimbursements as seedReimbursements,
-  invoices as seedInvoices,
   cardRequests as seedCardRequests,
   topUpRequests as seedTopUpRequests,
   cardById,
   walletAvailable,
   cards as allCards, members, allCountries,
   formatCurrency, formatDate, memberById,
-  type TxnApproval, type Reimbursement, type Invoice,
+  type TxnApproval,
   type CardRequest, type TopUpRequest,
 } from "@src/domains/dashboard/CorporateCard/teamcard/lib/mockData";
 import { Check, X, Inbox, AlertTriangle } from "lucide-react";
@@ -61,8 +59,6 @@ const EmptyState = () => (
 
 const Approvals = () => {
   const [txns, setTxns] = useState<TxnApproval[]>(seedTxnApprovals);
-  const [oop, setOop] = useState<Reimbursement[]>(seedReimbursements);
-  const [invs, setInvs] = useState<Invoice[]>(seedInvoices);
   const [cReqs, setCReqs] = useState<CardRequest[]>(seedCardRequests);
   const [lReqs, setLReqs] = useState<TopUpRequest[]>(seedTopUpRequests);
 
@@ -120,30 +116,13 @@ const Approvals = () => {
     return true;
   }), [txns, from, to, memberFilter, activeCardId, merchantQLower]);
 
-  const oopFiltered = useMemo(() => oop.filter((r) => {
-    if (!inRange(r.date)) return false;
-    if (memberFilter !== ALL && r.memberId !== memberFilter) return false;
-    if (merchantQLower && !r.merchant.toLowerCase().includes(merchantQLower)) return false;
-    if (country !== ALL && r.country !== country) return false;
-    return true;
-  }), [oop, from, to, memberFilter, merchantQLower, country]);
-
-  const invsFiltered = useMemo(() => invs.filter((r) => {
-    if (!inRange(r.date)) return false;
-    if (memberFilter !== ALL && r.uploadedBy !== memberFilter) return false;
-    if (merchantQLower && !r.vendor.toLowerCase().includes(merchantQLower)) return false;
-    if (country !== ALL && r.country !== country) return false;
-    return true;
-  }), [invs, from, to, memberFilter, merchantQLower, country]);
 
 
   const counts = useMemo(() => ({
     txn: txns.filter((r) => r.status === "pending").length,
-    oop: oop.filter((r) => r.status === "pending").length,
-    inv: invs.filter((r) => r.status === "pending").length,
     card: cReqs.filter((r) => r.status === "pending").length,
     topup: lReqs.filter((r) => r.status === "pending").length,
-  }), [txns, oop, invs, cReqs, lReqs]);
+  }), [txns, cReqs, lReqs]);
 
   const setField = <T extends { id: string; status: ApprovalStatus }>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -154,8 +133,6 @@ const Approvals = () => {
   };
 
   const updateTxn = setField(setTxns, "Transaction tag");
-  const updateOop = setField(setOop, "Reimbursement");
-  const updateInv = setField(setInvs, "Invoice");
   const updateCard = setField(setCReqs, "Card request");
 
   const updateTopUp = (id: string, status: ApprovalStatus) => {
@@ -185,13 +162,11 @@ const Approvals = () => {
   return (
     <AppLayout
       title="Approval Requests"
-      subtitle="Review approval requests from members across transactions, expenses, invoices, and card controls."
+      subtitle="Review approval requests from members across transactions and card controls."
     >
       <Tabs defaultValue="txn" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 md:max-w-3xl">
+        <TabsList className="grid w-full grid-cols-3 md:max-w-2xl">
           <TabsTrigger value="txn">Transactions ({counts.txn})</TabsTrigger>
-          <TabsTrigger value="oop">Reimbursements ({counts.oop})</TabsTrigger>
-          <TabsTrigger value="inv">Vendor Invoices ({counts.inv})</TabsTrigger>
           <TabsTrigger value="card">Card requests ({counts.card})</TabsTrigger>
           <TabsTrigger value="topup">Limit increases ({counts.topup})</TabsTrigger>
         </TabsList>
@@ -257,126 +232,6 @@ const Approvals = () => {
           )}
         </TabsContent>
 
-        {/* 2. Reimbursements approvals */}
-        <TabsContent value="oop" className="mt-4 space-y-3">
-          <p className="text-xs text-muted-foreground">
-            Approved claims will flow to Accounting Export for mapping.
-          </p>
-          <TableFilters
-            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-            cardholders={cardholderOptions}
-            cardholderId={memberFilter}
-            onCardholderChange={(v) => { setMemberFilter(v); setCardFilter(ALL); }}
-            merchant={merchantQ}
-            onMerchantChange={setMerchantQ}
-            countries={countries}
-            country={country}
-            onCountryChange={setCountry}
-            onReset={resetFilters}
-          />
-          {oopFiltered.length === 0 ? <EmptyState /> : (
-            <Card className="shadow-soft">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Member</TableHead>
-                      <TableHead>Merchant / Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {oopFiltered.map((r) => {
-                      const m = memberById(r.memberId);
-                      return (
-                        <TableRow key={r.id}>
-                          <TableCell className="text-sm text-muted-foreground">{formatDate(r.date)}</TableCell>
-                          <TableCell className="text-sm font-medium">{m?.name}</TableCell>
-                          <TableCell>
-                            <p className="text-sm font-medium">{r.merchant}</p>
-                            <p className="text-xs text-muted-foreground">{r.description}</p>
-                          </TableCell>
-                          <TableCell className="text-sm">{r.category}</TableCell>
-                          <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                          <TableCell>{statusBadge(r.status)}</TableCell>
-                          <TableCell className="text-right">
-                            <ActionCell status={r.status}
-                              onApprove={() => updateOop(r.id, "approved")}
-                              onReject={() => updateOop(r.id, "rejected")} />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* 3. Invoice approvals */}
-        <TabsContent value="inv" className="mt-4 space-y-3">
-          <p className="text-xs text-muted-foreground">
-            Approved invoices will flow to Accounting Export for mapping.
-          </p>
-          <TableFilters
-            from={from} to={to} onFromChange={setFrom} onToChange={setTo}
-            cardholders={cardholderOptions}
-            cardholderId={memberFilter}
-            onCardholderChange={(v) => { setMemberFilter(v); setCardFilter(ALL); }}
-            merchant={merchantQ}
-            onMerchantChange={setMerchantQ}
-            merchantLabel="Vendor"
-            merchantPlaceholder="Search vendor…"
-            countries={countries}
-            country={country}
-            onCountryChange={setCountry}
-            onReset={resetFilters}
-          />
-          {invsFiltered.length === 0 ? <EmptyState /> : (
-            <Card className="shadow-soft">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Invoice #</TableHead>
-                      <TableHead>Vendor</TableHead>
-                      <TableHead>Due</TableHead>
-                      <TableHead>Uploaded by</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {invs.map((r) => {
-                      const m = memberById(r.uploadedBy);
-                      return (
-                        <TableRow key={r.id}>
-                          <TableCell className="font-mono text-xs">{r.invoiceNumber}</TableCell>
-                          <TableCell className="text-sm font-medium">{r.vendor}</TableCell>
-                          <TableCell className="text-sm">{formatDate(r.dueDate)}</TableCell>
-                          <TableCell className="text-sm">{m?.name}</TableCell>
-                          <TableCell className="text-right text-sm font-semibold">{formatCurrency(r.amount)}</TableCell>
-                          <TableCell>{statusBadge(r.status)}</TableCell>
-                          <TableCell className="text-right">
-                            <ActionCell status={r.status}
-                              onApprove={() => updateInv(r.id, "approved")}
-                              onReject={() => updateInv(r.id, "rejected")} />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
 
         {/* 4. Card issuance requests */}
         <TabsContent value="card" className="mt-4">

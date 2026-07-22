@@ -57,16 +57,12 @@ const adminAccountingItems: NavItem[] = [
 
 const adminMoreItems: NavItem[] = [
   { title: "Approvals", url: "/approvals", icon: ClipboardCheck },
-  { title: "Reimbursements", url: "/reimbursements", icon: HandCoins },
-  { title: "Vendor Invoices", url: "/invoices", icon: FileText },
 ];
 
 const memberItems: NavItem[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "My Cards", url: "/me/cards", icon: CreditCard },
   { title: "My Transactions", url: "/me/transactions", icon: Receipt },
-  { title: "Reimbursements", url: "/me/reimbursements", icon: HandCoins },
-  { title: "Vendor Invoices", url: "/me/invoices", icon: FileText },
   { title: "Card Requests", url: "/me/requests", icon: PlusCircle },
   { title: "My Profile", url: "/me/profile", icon: UserCog },
 ];

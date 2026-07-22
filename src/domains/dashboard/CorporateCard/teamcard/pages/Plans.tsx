@@ -51,7 +51,7 @@ const plans: Plan[] = [
       "10 team members",
       "Approval workflows",
       "Accounting export (CSV, Xero, QuickBooks)",
-      "Reimbursements & invoices",
+      "Accounting export",
       "Priority support",
     ],
     highlighted: true,
