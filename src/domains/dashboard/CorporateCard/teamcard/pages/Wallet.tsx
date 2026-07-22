@@ -95,7 +95,7 @@ const Wallet = () => {
               <p className="text-sm text-muted-foreground mt-1">Available to spend across all cards right now</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline" size="sm" className="gap-2" onClick={() => setConvertOpen(true)} disabled={surplus <= 0}>
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setConvertOpen(true)} disabled={displaySurplus <= 0}>
                 <TrendingUp className="h-4 w-4" /> Use surplus to increase limit
               </Button>
             </div>
@@ -104,7 +104,7 @@ const Wallet = () => {
           {/* Breakdown */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t">
             <BreakdownItem label="Corporate Credit Limit" value={creditLimit} />
-            <BreakdownItem label="Surplus Funds" value={surplus} highlight={surplus > 0} />
+            <BreakdownItem label="Surplus Funds" value={displaySurplus} highlight={displaySurplus > 0} />
             <BreakdownItem label="Current Cycle Accrual" value={cycleAccrual} negative />
             <BreakdownItem label="Unpaid Bills" value={unpaidBills} negative />
           </div>
