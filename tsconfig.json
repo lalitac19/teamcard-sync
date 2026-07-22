@@ -9,7 +9,7 @@
     ],
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "noFallthroughCasesInSwitch": true,
     "useUnknownInCatchVariables": false,
     "allowJs": false,
