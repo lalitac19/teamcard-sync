@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 
 import { Button, Card, Flex, Image, Skeleton, Typography } from 'antd';

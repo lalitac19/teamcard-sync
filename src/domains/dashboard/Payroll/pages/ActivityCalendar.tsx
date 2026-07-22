@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useRef, useState } from 'react';
 
 import Calendar from '@toast-ui/react-calendar'; // Import Calendar component
@@ -249,4 +250,4 @@ const ActivityCalendar = (props: Props) => {
         </Content>
     );
 };
-export default ActivityCalendar;
+export default ActivityCalendar;

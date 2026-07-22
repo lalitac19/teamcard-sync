@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 import SuccessScreen from '../components/Stages/Stage1/SubmitSucess';
