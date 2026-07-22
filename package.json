@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "vite --host",
         "build": "node --max-old-space-size=4096 ./node_modules/.bin/vite build",
+        "build:dev": "node --max-old-space-size=4096 ./node_modules/.bin/vite build --mode development",
         "build:windows": "set NODE_OPTIONS=--max-old-space-size=4096 && vite build",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
