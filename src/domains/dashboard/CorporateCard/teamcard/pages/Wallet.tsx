@@ -139,7 +139,7 @@ const Wallet = () => {
       <ConvertSurplusDialog
         open={convertOpen}
         onOpenChange={setConvertOpen}
-        surplus={surplus}
+        surplus={displaySurplus}
         onConvert={handleConvert}
       />
 
