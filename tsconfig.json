@@ -66,18 +66,7 @@
   },
   "exclude": [
     "node_modules",
-    "vite.config.mts",
-    "src/domains/admin/paymentLinks/hooks/useGetPaymentLinks.ts",
-    "src/domains/admin/support/hooks/useTicketListingApi.ts",
-    "src/domains/dashboard/Airline/hooks/useSearchAirport.tsx",
-    "src/domains/dashboard/GiftCards/hooks/useGetEmployeeApi.ts",
-    "src/domains/dashboard/Payroll",
-    "src/domains/dashboard/Reports/hooks/useGetReportsApi.ts",
-    "src/domains/dashboard/Subscriptions/slice/paymentSlice.ts",
-    "src/domains/dashboard/esim",
-    "src/domains/dashboard/esimV2",
-    "src/domains/dashboard/esr/pages/EsrDocumentSuccess.tsx",
-    "src/domains/dashboard/needHelp/hooks/useTicketListingApi.ts"
+    "vite.config.mts"
   ],
   "include": [
     "**/*.ts",
