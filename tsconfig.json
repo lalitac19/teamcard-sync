@@ -33,34 +33,34 @@
     ],
     "paths": {
       "@assets/*": [
-        "src/assets/*"
+        "./src/assets/*"
       ],
       "@store/*": [
-        "src/store/*"
+        "./src/store/*"
       ],
       "@components/*": [
-        "src/components/*"
+        "./src/components/*"
       ],
       "@customtypes/*": [
-        "src/types/*"
+        "./src/types/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "./src/utils/*"
       ],
       "@src/*": [
-        "src/*"
+        "./src/*"
       ],
       "@hooks/*": [
-        "src/hooks/*"
+        "./src/hooks/*"
       ],
       "@routes/*": [
-        "src/routes/*"
+        "./src/routes/*"
       ],
       "@layouts/*": [
-        "src/layouts/*"
+        "./src/layouts/*"
       ],
       "@domains/*": [
-        "src/domains/*"
+        "./src/domains/*"
       ]
     }
   },
