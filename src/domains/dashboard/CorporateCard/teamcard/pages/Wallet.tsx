@@ -61,12 +61,18 @@ const Wallet = () => {
     () => Math.max(0, creditLimit + surplus - cycleAccrual - unpaidBills),
     [creditLimit, surplus, cycleAccrual, unpaidBills],
   );
+  // Surplus displayed to the user is always Available Limit − Corporate Credit Limit.
+  // As current cycle accrual (and unpaid bills) grow, this shrinks in real time.
+  const displaySurplus = useMemo(
+    () => Math.max(0, availableLimit - creditLimit),
+    [availableLimit, creditLimit],
+  );
 
   const cycle = useMemo(() => currentCycle(), []);
   const cycleLabel = `${fmtCycleDate(cycle.start)} to ${fmtCycleDate(cycle.end)}`;
 
   const handleConvert = (amount: number) => {
-    if (amount <= 0 || amount > surplus) return;
+    if (amount <= 0 || amount > displaySurplus) return;
     setCreditLimit((prev) => prev + amount);
     setSurplus((prev) => prev - amount);
     setConvertOpen(false);
