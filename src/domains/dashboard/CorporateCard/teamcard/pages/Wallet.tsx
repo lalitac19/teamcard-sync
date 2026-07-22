@@ -61,12 +61,18 @@ const Wallet = () => {
     () => Math.max(0, creditLimit + surplus - cycleAccrual - unpaidBills),
     [creditLimit, surplus, cycleAccrual, unpaidBills],
   );
+  // Surplus displayed to the user is always Available Limit − Corporate Credit Limit.
+  // As current cycle accrual (and unpaid bills) grow, this shrinks in real time.
+  const displaySurplus = useMemo(
+    () => Math.max(0, availableLimit - creditLimit),
+    [availableLimit, creditLimit],
+  );
 
   const cycle = useMemo(() => currentCycle(), []);
   const cycleLabel = `${fmtCycleDate(cycle.start)} to ${fmtCycleDate(cycle.end)}`;
 
   const handleConvert = (amount: number) => {
-    if (amount <= 0 || amount > surplus) return;
+    if (amount <= 0 || amount > displaySurplus) return;
     setCreditLimit((prev) => prev + amount);
     setSurplus((prev) => prev - amount);
     setConvertOpen(false);
@@ -89,7 +95,7 @@ const Wallet = () => {
               <p className="text-sm text-muted-foreground mt-1">Available to spend across all cards right now</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline" size="sm" className="gap-2" onClick={() => setConvertOpen(true)} disabled={surplus <= 0}>
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setConvertOpen(true)} disabled={displaySurplus <= 0}>
                 <TrendingUp className="h-4 w-4" /> Use surplus to increase limit
               </Button>
             </div>
@@ -98,7 +104,7 @@ const Wallet = () => {
           {/* Breakdown */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t">
             <BreakdownItem label="Corporate Credit Limit" value={creditLimit} />
-            <BreakdownItem label="Surplus Funds" value={surplus} highlight={surplus > 0} />
+            <BreakdownItem label="Surplus Funds" value={displaySurplus} highlight={displaySurplus > 0} />
             <BreakdownItem label="Current Cycle Accrual" value={cycleAccrual} negative />
             <BreakdownItem label="Unpaid Bills" value={unpaidBills} negative />
           </div>
@@ -133,7 +139,7 @@ const Wallet = () => {
       <ConvertSurplusDialog
         open={convertOpen}
         onOpenChange={setConvertOpen}
-        surplus={surplus}
+        surplus={displaySurplus}
         onConvert={handleConvert}
       />
 
