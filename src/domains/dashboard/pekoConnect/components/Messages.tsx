@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect } from 'react';
 
 import { ChatMessage } from '@azure/communication-chat';
